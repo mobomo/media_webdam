@@ -1,0 +1,20 @@
+parameters:
+    git_dir: .
+    bin_dir: vendor/bin
+    tasks:
+      jsonlint:
+        ignore_patterns: []
+      phplint:
+        jobs: 15
+        triggered_by: ['php', 'module', 'install']
+      composer:
+        file: ./composer.json
+      phpcs:
+        standard: ./vendor/drupal/coder/coder_sniffer/Drupal/ruleset.xml
+        show_warnings: true
+        triggered_by: [php]
+      phpcs:
+        standard: ./vendor/drupal/coder/coder_sniffer/DrupalStandard/ruleset.xml
+        show_warnings: true
+        triggered_by: [php]
+
