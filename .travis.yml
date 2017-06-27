@@ -107,12 +107,14 @@ before_install:
   - drupal-ti before_install
 
 install:
+  - composer install
   - drupal-ti install
 
 before_script:
   - drupal-ti before_script
 
 script:
+  - ./vendor/bin/grumphp run
   - drupal-ti script
 
 after_script:
