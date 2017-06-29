@@ -1,0 +1,8 @@
+langcode: en
+status: true
+dependencies: {  }
+name: 'Webdam keywords'
+vid: webdam_vocab
+description: 'Vocabulary of Webdam keywords'
+hierarchy: 0
+weight: 0
