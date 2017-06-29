@@ -4,7 +4,6 @@ namespace Drupal\media_webdam\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Site\Settings;
 
 /**
  * Class WebdamConfig.
@@ -20,7 +19,7 @@ class WebdamConfig extends ConfigFormBase {
     return 'webdam_config';
   }
 
-  /** 
+  /**
    * {@inheritdoc}
    */
   protected function getEditableConfigNames() {
@@ -41,7 +40,7 @@ class WebdamConfig extends ConfigFormBase {
       '#default_value' => $config->get('username'),
     );
     $form['password'] = array(
-      '#type' => 'textfield',
+      '#type' => 'password',
       '#title' => $this->t('Webdam password'),
       '#default_value' => $config->get('password'),
     );
@@ -51,7 +50,7 @@ class WebdamConfig extends ConfigFormBase {
       '#default_value' => $config->get('client_id'),
     );
     $form['client_secret'] = array(
-      '#type' => 'textfield',
+      '#type' => 'password',
       '#title' => $this->t('Webdam client secret'),
       '#default_value' => $config->get('secret'),
     );
@@ -67,12 +66,12 @@ class WebdamConfig extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $config = \Drupal::configFactory()->getEditable('media_webdam.settings');
+    $this->config('media_webdam.settings');
 
     $config->set('username', $form_state->getValue('username'))
-           ->set('password', $form_state->getValue('password'))
-           ->set('client_id', $form_state->getValue('client_id'))
-           ->set('secret', $form_state->getValue('client_secret'));
+      ->set('password', $form_state->getValue('password'))
+      ->set('client_id', $form_state->getValue('client_id'))
+      ->set('secret', $form_state->getValue('client_secret'));
     $config->save();
 
     parent::submitForm($form, $form_state);
