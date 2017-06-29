@@ -6,3 +6,4 @@ package: Media
 dependencies:
   - media_entity
   - taxonomy
+configure: media_webdam.config
