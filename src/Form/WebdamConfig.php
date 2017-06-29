@@ -32,7 +32,7 @@ class WebdamConfig extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = \Drupal::config('media_webdam.settings');
+    $config = $this->config('media_webdam.settings');
 
     $form['username'] = array(
       '#type' => 'textfield',
@@ -66,13 +66,11 @@ class WebdamConfig extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('media_webdam.settings');
-
-    $config->set('username', $form_state->getValue('username'))
+    $this->config('media_webdam.settings')->set('username', $form_state->getValue('username'))
       ->set('password', $form_state->getValue('password'))
       ->set('client_id', $form_state->getValue('client_id'))
-      ->set('secret', $form_state->getValue('client_secret'));
-    $config->save();
+      ->set('secret', $form_state->getValue('client_secret'))
+      ->save();
 
     parent::submitForm($form, $form_state);
   }
