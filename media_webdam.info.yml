@@ -5,3 +5,4 @@ type: module
 package: Media
 dependencies:
   - media_entity
+  - taxonomy
