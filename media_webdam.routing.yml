@@ -5,3 +5,35 @@ media_webdam.config:
     _title: 'Media Webdam Configuration'
   requirements:
     _permission: 'administer site configuration'
+
+media_webdam.folders:
+  path: '/webdam/allfolders'
+  defaults:
+    _controller: '\Drupal\media_webdam\Controller\MediaWebdamController::getFolders'
+    _title: 'Get All Webdam Folders'
+  requirements:
+    _permission: 'access content'
+
+media_webdam.folderInfo:
+  path: '/webdam/folder-info/{folderId}'
+  defaults:
+    _controller: '\Drupal\media_webdam\Controller\MediaWebdamController::getFolder'
+    _title: 'Get Info for Webdam Folder'
+  requirements:
+    _permission: 'access content'
+
+media_webdam.folderItems:
+  path: '/webdam/folder-items/{folderId}'
+  defaults:
+    _controller: '\Drupal\media_webdam\Controller\MediaWebdamController::getFolderItems'
+    _title: 'Get Items for Webdam Folder'
+  requirements:
+    _permission: 'access content'
+
+media_webdam.assetInfo:
+  path: '/webdam/asset/{assetId}'
+  defaults:
+    _controller: '\Drupal\media_webdam\Controller\MediaWebdamController::getAsset'
+    _title: 'Fetch Asset info from Webdam'
+  requirements:
+    _permission: 'access content'
