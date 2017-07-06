@@ -10,7 +10,7 @@ use GuzzleHttp\Exception\RequestException;
 /**
  * Custom class to handle Webdam api functions.
  */
-class WebdamSession {
+class WebdamClient {
 
   public $username;
   public $password;

@@ -7,7 +7,7 @@ use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
 use GuzzleHttp\Handler\MockHandler;
 use Drupal\Tests\UnitTestCase;
-use Drupal\media_webdam\WebdamSession;
+use Drupal\media_webdam\WebdamClient;
 
 /**
  * Webdam test.
@@ -55,7 +55,7 @@ class WebdamTest extends UnitTestCase {
     $guzzleClient = new Client(['handler' => $handler]);
 
     $config = $this->stubConfig();
-    $webdamSession = new WebdamSession($config, $guzzleClient);
+    $webdamSession = new WebdamClient($config, $guzzleClient);
     $auth = $webdamSession->authenticate();
 
     $this->assertEquals($auth->access_token, "ACCESS_TOKEN", 'Authentication API calls returns token.');
@@ -77,7 +77,7 @@ class WebdamTest extends UnitTestCase {
     $guzzleClient = new Client(['handler' => $handler]);
 
     $config = $this->stubConfig();
-    $webdamSession = new WebdamSession($config, $guzzleClient);
+    $webdamSession = new WebdamClient($config, $guzzleClient);
 
     $token = $this->stubToken();
     $folders = $webdamSession->getFolders($token);
@@ -99,7 +99,7 @@ class WebdamTest extends UnitTestCase {
     $guzzleClient = new Client(['handler' => $handler]);
 
     $config = $this->stubConfig();
-    $webdamSession = new WebdamSession($config, $guzzleClient);
+    $webdamSession = new WebdamClient($config, $guzzleClient);
 
     $token = $this->stubToken();
     $folder = $webdamSession->getFolder($folderID, $token);
@@ -127,7 +127,7 @@ class WebdamTest extends UnitTestCase {
     $guzzleClient = new Client(['handler' => $handler]);
 
     $config = $this->stubConfig();
-    $webdamSession = new WebdamSession($config, $guzzleClient);
+    $webdamSession = new WebdamClient($config, $guzzleClient);
 
     $token = $this->stubToken();
     $folder = $webdamSession->getFolderItems($folderID, $token);
@@ -148,7 +148,7 @@ class WebdamTest extends UnitTestCase {
     $guzzleClient = new Client(['handler' => $handler]);
 
     $config = $this->stubConfig();
-    $webdamSession = new WebdamSession($config, $guzzleClient);
+    $webdamSession = new WebdamClient($config, $guzzleClient);
 
     $token = $this->stubToken();
     $asset = $webdamSession->getAssetInfo('12345', $token);
