@@ -54,9 +54,16 @@ class WebdamClient {
       $res = $client->post($url, array(
         'form_params' => $data,
       ));
-      $authentication = json_decode($res->getBody());
-      $this->token = json_decode($res->getBody())->access_token;
-      return $authentication;
+      try {
+        // Response contains keys for access_token & refresh_token.
+        // Also token_type: 'bearer'.
+        $authentication = json_decode($res->getBody());
+        $this->token = $authentication->access_token;
+        return $authentication;
+      }
+      catch (RequestException $e) {
+        return $e;
+      }
     }
     catch (RequestException $e) {
       $this->error = $e;
