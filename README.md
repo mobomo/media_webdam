@@ -1,5 +1,7 @@
 # Media: Webdam
 
+[![Build Status](https://travis-ci.org/mobomo/media_webdam.svg?branch=master)](https://travis-ci.org/mobomo/media_webdam)
+
 This module provides integration with Webdam.
 
 ## Contributing
