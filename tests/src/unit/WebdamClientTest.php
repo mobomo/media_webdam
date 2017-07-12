@@ -12,7 +12,7 @@ use Drupal\media_webdam\WebdamClient;
 /**
  * Webdam test.
  *
- * @group media_webdam
+ * @group media_webdam_broken
  */
 class WebdamClientTest extends UnitTestCase {
 
