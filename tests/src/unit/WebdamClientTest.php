@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\media_webdam\Unit;
+namespace Drupal\Tests\media_webdam\unit;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -14,7 +14,7 @@ use Drupal\media_webdam\WebdamClient;
  *
  * @group media_webdam
  */
-class WebdamTest extends UnitTestCase {
+class WebdamClientTest extends UnitTestCase {
 
   protected $webdamSession;
 
