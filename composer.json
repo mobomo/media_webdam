@@ -17,6 +17,12 @@
 			"email": "brianjameswagner@gmail.com"
 		}
 	],
+	"repositories": [
+		{
+			"type": "composer",
+			"url": "https://packages.drupal.org/8"
+		}
+	],
 	"type": "drupal-module",
 	"license": "GPL-2.0+",
 	"require": {},
