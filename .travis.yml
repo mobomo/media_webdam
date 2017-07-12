@@ -122,4 +122,5 @@ after_script:
   - drupal-ti after_script
 
 notifications:
+  slack: mobomo:IUUkblgpWtwuJjnYcBo3a2nN
   email: false
