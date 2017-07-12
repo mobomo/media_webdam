@@ -19,6 +19,10 @@ php:
 matrix:
   fast_finish: true
 
+cache:
+  directories:
+    - $HOME/.cache
+
 env:
   global:
     # add composer's global bin directory to the path
