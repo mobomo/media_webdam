@@ -79,7 +79,7 @@ env:
     # Code coverage via coveralls.io
     - DRUPAL_TI_COVERAGE="satooshi/php-coveralls:~1.0"
     # This needs to match your .coveralls.yml file.
-    - DRUPAL_TI_COVERAGE_FILE="build/logs/clover.xml"
+    - DRUPAL_TI_COVERAGE_FILE="coverage.xml"
 
     # Debug options
     #- DRUPAL_TI_DEBUG="-x -v"
