@@ -24,11 +24,12 @@ class WebdamAssetPluginTest extends UnitTestCase {
       [],
       'test_plugin',
       [],
-      $this->getMock(EntityTypeManager::class),
-      $this->getMock(EntityFieldManager::class),
-      $this->getMock(Config::class)
+      new EntityTypeManagerStub(),
+      new EntityFieldManagerStub(),
+      new ConfigStub()
     );
 
+    $plugin->setStringTranslation($this->getStringTranslationStub());
     $this->assertArrayHasKey('type', $plugin->providedFields());
   }
 
@@ -40,14 +41,61 @@ class WebdamAssetPluginTest extends UnitTestCase {
       [],
       'test_plugin',
       [],
-      $this->getMock(EntityTypeManager::class),
-      $this->getMock(EntityFieldManager::class),
-      $this->getMock(Config::class)
+      new EntityTypeManagerStub(),
+      new EntityFieldManagerStub(),
+      new ConfigStub()
     );
 
-    $this->assertEquals('image', $plugin->getField(
-      $this->getMock(Media::class), 'type')
-    );
+    $media = new MediaStub();
+    $this->assertEquals('image', $plugin->getField($media, 'type'));
   }
+
+}
+
+/**
+ * Class EntityTypeManagerStub.
+ */
+class EntityTypeManagerStub extends EntityTypeManager {
+
+  /**
+   * EntityTypeManagerStub constructor.
+   */
+  public function __construct() {}
+
+}
+
+/**
+ * Class EntityFieldManagerStub.
+ */
+class EntityFieldManagerStub extends EntityFieldManager {
+
+  /**
+   * EntityFieldManagerStub constructor.
+   */
+  public function __construct() {}
+
+}
+
+/**
+ * Class ConfigStub.
+ */
+class ConfigStub extends Config {
+
+  /**
+   * ConfigStub constructor.
+   */
+  public function __construct() {}
+
+}
+
+/**
+ * Class MediaStub.
+ */
+class MediaStub extends Media {
+
+  /**
+   * MediaStub constructor.
+   */
+  public function __construct() {}
 
 }
