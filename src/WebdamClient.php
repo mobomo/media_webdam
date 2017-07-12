@@ -37,23 +37,23 @@ class WebdamClient {
    */
   public function authenticate() {
     $url = 'https://apiv2.webdamdb.com/oauth2/token';
-    $data = array(
+    $data = [
       'grant_type'    => 'password',
       'username'      => $this->username,
       'password'      => $this->password,
       'client_id'     => $this->client,
       'client_secret' => $this->secret,
-    );
+    ];
     $query = UrlHelper::buildQuery($data);
-    $options = array(
+    $options = [
       'data' => $query,
-    );
+    ];
 
     $client = $this->httpClient;
     try {
-      $res = $client->post($url, array(
+      $res = $client->post($url, [
         'form_params' => $data,
-      ));
+      ]);
       try {
         // Response contains keys for access_token & refresh_token.
         // Also token_type: 'bearer'.
@@ -81,11 +81,11 @@ class WebdamClient {
     if ($auth->access_token) {
       $client = $this->httpClient;
       try {
-        $res = $client->get($url, array(
-          'headers' => array(
+        $res = $client->get($url, [
+          'headers' => [
             'Authorization' => 'Bearer ' . $auth->access_token,
-          ),
-        ));
+          ],
+        ]);
         return [
           'status' => $res->getStatusCode(),
           'asset' => json_decode($res->getBody()),
@@ -114,11 +114,11 @@ class WebdamClient {
     if ($auth->access_token) {
       $client = $this->httpClient;
       try {
-        $res = $client->get($url, array(
-          'headers' => array(
+        $res = $client->get($url, [
+          'headers' => [
             'Authorization' => 'Bearer ' . $auth->access_token,
-          ),
-        ));
+          ],
+        ]);
         return [
           'status' => $res->getStatusCode(),
           'folders' => json_decode($res->getBody()),
@@ -147,11 +147,11 @@ class WebdamClient {
     if ($auth->access_token) {
       $client = $this->httpClient;
       try {
-        $res = $client->get($url, array(
-          'headers' => array(
+        $res = $client->get($url, [
+          'headers' => [
             'Authorization' => 'Bearer ' . $auth->access_token,
-          ),
-        ));
+          ],
+        ]);
         return [
           'status' => $res->getStatusCode(),
           'folder' => json_decode($res->getBody()),
@@ -181,11 +181,11 @@ class WebdamClient {
       $header = 'Authorization: Bearer ' . $auth->access_token;
       $client = $this->httpClient;
       try {
-        $res = $client->get($url, array(
-          'headers' => array(
+        $res = $client->get($url, [
+          'headers' => [
             'Authorization' => 'Bearer ' . $auth->access_token,
-          ),
-        ));
+          ],
+        ]);
         return [
           'status' => $res->getStatusCode(),
           'items' => json_decode($res->getBody()),

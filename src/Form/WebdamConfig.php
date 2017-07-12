@@ -34,30 +34,34 @@ class WebdamConfig extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('media_webdam.settings');
 
-    $form['username'] = array(
+    $form['username'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Webdam username'),
       '#default_value' => $config->get('username'),
-    );
-    $form['password'] = array(
+    ];
+
+    $form['password'] = [
       '#type' => 'password',
       '#title' => $this->t('Webdam password'),
       '#default_value' => $config->get('password'),
-    );
-    $form['client_id'] = array(
+    ];
+
+    $form['client_id'] = [
       '#type' => 'textfield',
       '#title' => $this->t('Webdam client ID'),
       '#default_value' => $config->get('client_id'),
-    );
-    $form['client_secret'] = array(
+    ];
+
+    $form['client_secret'] = [
       '#type' => 'password',
       '#title' => $this->t('Webdam client secret'),
       '#default_value' => $config->get('secret'),
-    );
-    $form['submit'] = array(
+    ];
+
+    $form['submit'] = [
       '#type' => 'submit',
       '#value' => $this->t('Submit'),
-    );
+    ];
 
     return $form;
   }

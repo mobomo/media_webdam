@@ -21,9 +21,9 @@ class WebdamAsset extends MediaTypeBase {
    */
   public function providedFields() {
     // @TODO: Populate the appropriate webdam properties here.
-    $fields = array(
+    $fields = [
       'type' => $this->t('Asset type'),
-    );
+    ];
 
     return $fields;
   }

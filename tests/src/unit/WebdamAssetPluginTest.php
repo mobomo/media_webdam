@@ -21,9 +21,9 @@ class WebdamAssetPluginTest extends UnitTestCase {
    */
   public function testProvidedFields() {
     $plugin = new WebdamAsset(
-      array(),
+      [],
       'test_plugin',
-      array(),
+      [],
       $this->getMock(EntityTypeManager::class),
       $this->getMock(EntityFieldManager::class),
       $this->getMock(Config::class)
@@ -37,9 +37,9 @@ class WebdamAssetPluginTest extends UnitTestCase {
    */
   public function testGetField() {
     $plugin = new WebdamAsset(
-      array(),
+      [],
       'test_plugin',
-      array(),
+      [],
       $this->getMock(EntityTypeManager::class),
       $this->getMock(EntityFieldManager::class),
       $this->getMock(Config::class)
