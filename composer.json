@@ -25,7 +25,9 @@
 	],
 	"type": "drupal-module",
 	"license": "GPL-2.0+",
-	"require": {},
+	"require": {
+		"cweagans/php-webdam-client": "dev-master"
+	},
 	"require-dev": {
 		"phpro/grumphp": "^0.11.6",
 		"squizlabs/PHP_CodeSniffer": "^2.0",
