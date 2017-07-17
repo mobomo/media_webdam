@@ -1,7 +1,7 @@
 media_webdam.config:
-  path: '/admin/structure/media_webdam/settings'
+  path: '/admin/config/media/webdam'
   defaults:
     _form: '\Drupal\media_webdam\Form\WebdamConfig'
-    _title: 'Media Webdam Configuration'
+    _title: 'Webdam Configuration'
   requirements:
     _permission: 'administer site configuration'
