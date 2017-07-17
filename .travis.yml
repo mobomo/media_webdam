@@ -103,8 +103,6 @@ mysql:
   encoding: utf8
 
 before_install:
-  - composer self-update
-    #- cd ./tests
   - composer global require "lionsad/drupal_ti:1.*"
   - drupal-ti before_install
 
@@ -116,7 +114,6 @@ before_script:
   - drupal-ti before_script
 
 script:
-  - ./vendor/bin/grumphp run
   - drupal-ti script
 
 after_script:
