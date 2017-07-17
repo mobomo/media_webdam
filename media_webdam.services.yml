@@ -1,4 +1,7 @@
 services:
-  media_webdam.session:
-    class: Drupal\media_webdam\WebdamClient
+  media_webdam.client_factory:
+    class: Drupal\media_webdam\ClientFactory
     arguments: ['@config.factory', '@http_client']
+  media_webdam.webdam:
+    class: Drupal\media_webdam\Webdam
+    arguments: ['@media_webdam.client_factory']
