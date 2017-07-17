@@ -119,9 +119,12 @@ class WebdamClient {
             'Authorization' => 'Bearer ' . $auth->access_token,
           ],
         ]);
+        $folders_shallow = json_decode($res->getBody());
+        $folders_deep = $this->extractFolders($folders_shallow, $token);
         return [
           'status' => $res->getStatusCode(),
-          'folders' => json_decode($res->getBody()),
+          'folders' => $folders_shallow,
+          'folder_list' => $folders_deep,
         ];
       }
       catch (RequestException $e) {
@@ -200,6 +203,37 @@ class WebdamClient {
         'error' => 'Failed to generate access token.',
       ];
     }
+  }
+
+  /**
+   * Using API result for 1st, 2nd level folders.
+   *
+   * Generates full list of Webdam folders.
+   *
+   * Must use additional queries for 3rd level, etc.
+   */
+  public function extractFolders($folder_list, $token = NULL) {
+    $folders = [];
+    foreach ($folder_list as $item) {
+      // Property 'numchildren' is present on all items.
+      if ($item->numchildren == 0) {
+        $folders[$item->id] = [$item->name, NULL];
+      }
+      // Property 'folders' array is only present on top-level items.
+      elseif (!empty($item->folders)) {
+        $children = $this->extractFolders($item->folders);
+        $folders[$item->id] = [$item->name, $children];
+      }
+      // Must query for second-level children or more.
+      else {
+        $folderInfo = $this->getFolder($item->id, $token)['folder'];
+        $children = isset($folderInfo->folders) ?
+          $this->extractFolders($folderInfo->folders) :
+          NULL;
+        $folders[$item->id] = [$item->name, $children];
+      }
+    }
+    return $folders;
   }
 
 }
