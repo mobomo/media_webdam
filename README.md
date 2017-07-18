@@ -1,7 +1,7 @@
 # Media: Webdam
 
 [![Build Status](https://travis-ci.org/mobomo/media_webdam.svg?branch=master)](https://travis-ci.org/mobomo/media_webdam)
-[![Coverage Status](https://coveralls.io/repos/github/mobomo/media_webdam/badge.svg)](https://coveralls.io/github/mobomo/media_webdam)
+[![Coverage Status](https://coveralls.io/repos/github/mobomo/media_webdam/badge.svg?branch=master)](https://coveralls.io/github/mobomo/media_webdam?branch=master)
 
 This module provides integration with Webdam.
 
