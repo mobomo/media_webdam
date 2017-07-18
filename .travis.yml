@@ -22,6 +22,8 @@ cache:
 #  encoding: utf8
 
 before_install:
+  # Travis automatically CDs into mobomo/media_webdam
+  - cd ../../
   - git clone https://github.com/mobomo/media_webdam_dev
   - cd media_webdam_dev
 
