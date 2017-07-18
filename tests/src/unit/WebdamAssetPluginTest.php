@@ -26,7 +26,7 @@ class WebdamAssetPluginTest extends UnitTestCase {
       [],
       new EntityTypeManagerStub(),
       new EntityFieldManagerStub(),
-      new ConfigStub()
+      new AssetConfigStub()
     );
 
     $plugin->setStringTranslation($this->getStringTranslationStub());
@@ -43,7 +43,7 @@ class WebdamAssetPluginTest extends UnitTestCase {
       [],
       new EntityTypeManagerStub(),
       new EntityFieldManagerStub(),
-      new ConfigStub()
+      new AssetConfigStub()
     );
 
     $media = new MediaStub();
@@ -79,7 +79,7 @@ class EntityFieldManagerStub extends EntityFieldManager {
 /**
  * Class ConfigStub.
  */
-class ConfigStub extends Config {
+class AssetConfigStub extends Config {
 
   /**
    * ConfigStub constructor.
