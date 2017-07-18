@@ -28,7 +28,7 @@ before_install:
   - cd media_webdam_dev
 
 install:
-  - make vendor
+  - make dependencies
   - rm -r ./modules/contrib/media_webdam/*
   - mv $TRAVIS_BUILD_DIR/* ./modules/contrib/media_webdam/
   - make travis-install-site
