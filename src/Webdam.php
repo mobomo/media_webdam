@@ -60,7 +60,7 @@ class Webdam implements WebdamInterface {
     foreach ($folders as $folder) {
       $folder_data[$folder->id] = $folder->name;
 
-      $folder_list = $this->getFolderList($folder->id);
+      $folder_list = $this->getFlattenedFolderList($folder->id);
 
       foreach ($folder_list as $folder_id => $folder_name) {
         $folder_data[$folder_id] = $folder_name;
