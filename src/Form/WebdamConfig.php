@@ -6,7 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\media_webdam\AdminSettings;
+use Drupal\media_webdam\Webdam;
 
 /**
  * Class WebdamConfig.
@@ -16,23 +16,23 @@ use Drupal\media_webdam\AdminSettings;
 class WebdamConfig extends ConfigFormBase {
 
   /**
-   * Drupal\media_webdam\AdminSettings definition.
+   * Drupal\media_webdam\Webdam definition.
    *
-   * @var \Drupal\media_webdam\AdminSettings
+   * @var \Drupal\media_webdam\Webdam $webdam
    */
-  protected $adminSettings;
+  protected $webdam;
 
   /**
    * WebdamConfig constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\media_webdam\AdminSettings $adminSettings
+   * @param \Drupal\media_webdam\Webdam $webdam
    *   The Webdam elements.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, AdminSettings $adminSettings) {
+  public function __construct(ConfigFactoryInterface $config_factory, Webdam $webdam) {
     parent::__construct($config_factory);
-    $this->adminSettings = $adminSettings;
+    $this->webdam = $webdam;
   }
 
   /**
@@ -41,7 +41,7 @@ class WebdamConfig extends ConfigFormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('config.factory'),
-      $container->get('media_webdam.admin_settings')
+      $container->get('media_webdam.webdam')
     );
   }
 
@@ -67,10 +67,7 @@ class WebdamConfig extends ConfigFormBase {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('media_webdam.settings');
     $webdamFolders = [];
-    // $webdamFolders = \Drupal::service('media_webdam.admin_settings')->folderList();
-    if (!empty($config->get('username')) && !empty($config->get('password'))) {
-      $webdamFolders = $this->adminSettings->folderList();
-    }
+    $webdamFolders = $this->webdam->getFlattenedFolderList();
 
     $form['authentication'] = [
       '#type' => 'fieldset',
@@ -106,7 +103,7 @@ class WebdamConfig extends ConfigFormBase {
       '#description' => $this->t('API Client Secret to use for API access. Contact the Webdam support team to get one assigned. Note that this field will appear blank even if you have previously saved a value.'),
       '#required' => TRUE,
     ];
-
+    //@TODO: replace checking on fields with a new isAuthenticated() fn
     if (!empty($config->get('username')) && !empty($config->get('password'))) {
       $form['configuration'] = [
         '#type' => 'fieldset',

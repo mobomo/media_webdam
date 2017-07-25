@@ -8,6 +8,3 @@ services:
   media_webdam.metadata:
     class: Drupal\media_webdam\Metadata
     arguments: ['@media_webdam.webdam', '@state']
-  media_webdam.admin_settings:
-    class: Drupal\media_webdam\AdminSettings
-    arguments: ['@media_webdam.webdam']
