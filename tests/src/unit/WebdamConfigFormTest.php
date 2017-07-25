@@ -11,6 +11,7 @@ use Drupal\Core\Form\FormState;
 use Drupal\media_webdam\Form\WebdamConfig;
 use Drupal\Tests\UnitTestCase;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Drupal\media_webdam\Form\AdminSettings;
 
 /**
  * Webdam config form test.
@@ -25,7 +26,6 @@ class WebdamConfigFormTest extends UnitTestCase {
     \Drupal::setContainer($container);
   }
 
-
   public function testGetFormId() {
     $form = new WebdamConfig($this->getConfigFactoryStub());
     $this->assertEquals('webdam_config', $form->getFormId());
@@ -38,6 +38,10 @@ class WebdamConfigFormTest extends UnitTestCase {
         'password' => 'WDpassword',
         'client_id' => 'WDclient-id',
         'secret' => 'WDsecret',
+//         'folders_filter' => [
+//           '112233' => 'WdFolder1',
+//           '223344' => 'WdFolder2',
+//         ],
       ]
     ]));
     $form = $wconfig->buildForm([], new FormState());
@@ -47,11 +51,13 @@ class WebdamConfigFormTest extends UnitTestCase {
     $this->assertArrayHasKey('password', $form['authentication']);
     $this->assertArrayHasKey('client_id', $form['authentication']);
     $this->assertArrayHasKey('client_secret', $form['authentication']);
+//     $this->assertArrayHasKey('folders_filter', $form['configuration']);
 
     $this->assertEquals('WDusername', $form['authentication']['username']['#default_value']);
     $this->assertEquals('WDpassword', $form['authentication']['password']['#default_value']);
     $this->assertEquals('WDclient-id', $form['authentication']['client_id']['#default_value']);
     $this->assertEquals('WDsecret', $form['authentication']['client_secret']['#default_value']);
+//     $this->assertEquals(['112233' => 'WdFolder1', '223344' => 'WdFolder2'], $form['configuration']['folders_filter']['#default_value']);
   }
 
   // @TODO: This test is broken. Not sure what's wrong and don't have time to debug.
