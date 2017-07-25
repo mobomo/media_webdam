@@ -9,7 +9,6 @@ use Drupal\Core\Form\FormState;
 use Drupal\media_webdam\Form\WebdamConfig;
 use Drupal\media_webdam\WebdamInterface;
 use Drupal\Tests\UnitTestCase;
-use GuzzleHttp\Psr7\Response;
 
 /**
  * Webdam config form test.
