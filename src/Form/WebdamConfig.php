@@ -18,7 +18,7 @@ class WebdamConfig extends ConfigFormBase {
   /**
    * Drupal\media_webdam\Webdam definition.
    *
-   * @var \Drupal\media_webdam\Webdam $webdam
+   * @var \Drupal\media_webdam\Webdam
    */
   protected $webdam;
 
@@ -59,6 +59,22 @@ class WebdamConfig extends ConfigFormBase {
     return [
       'media_webdam.settings',
     ];
+  }
+
+  /**
+   * Checks if we can get subscription details.
+   *
+   * @return bool
+   *   Whether client is authenticated or not.
+   */
+  protected function isAuthenticated() {
+    if ($this->webdam->getSubscriptionDetails()) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+
   }
 
   /**
@@ -103,8 +119,8 @@ class WebdamConfig extends ConfigFormBase {
       '#description' => $this->t('API Client Secret to use for API access. Contact the Webdam support team to get one assigned. Note that this field will appear blank even if you have previously saved a value.'),
       '#required' => TRUE,
     ];
-    //@TODO: replace checking on fields with a new isAuthenticated() fn
-    if (!empty($config->get('username')) && !empty($config->get('password'))) {
+
+    if ($this->isAuthenticated()) {
       $form['configuration'] = [
         '#type' => 'fieldset',
         '#title' => $this->t('Configuration'),
