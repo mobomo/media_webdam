@@ -6,6 +6,7 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\media_webdam\WebdamInterface;
 use Drupal\media_webdam\Webdam;
 
 /**
@@ -16,9 +17,9 @@ use Drupal\media_webdam\Webdam;
 class WebdamConfig extends ConfigFormBase {
 
   /**
-   * Drupal\media_webdam\Webdam definition.
+   * Drupal\media_webdam\WebdamInterface definition.
    *
-   * @var \Drupal\media_webdam\Webdam
+   * @var \Drupal\media_webdam\WebdamInterface
    */
   protected $webdam;
 
@@ -27,10 +28,10 @@ class WebdamConfig extends ConfigFormBase {
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
-   * @param \Drupal\media_webdam\Webdam $webdam
+   * @param \Drupal\media_webdam\WebdamInterface $webdam
    *   The Webdam elements.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, Webdam $webdam) {
+  public function __construct(ConfigFactoryInterface $config_factory, WebdamInterface $webdam) {
     parent::__construct($config_factory);
     $this->webdam = $webdam;
   }
