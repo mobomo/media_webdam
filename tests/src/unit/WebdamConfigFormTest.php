@@ -87,7 +87,7 @@ class WebdamConfigFormTest extends UnitTestCase {
   //
   //    $form = [];
   //
-  //    $wconfig->sbmitForm($form, $form_state);
+  //    $wconfig->submitForm($form, $form_state);
   //
   //    $this->assertEquals('webdam_username', $config_stub->get('username'));
   //    $this->assertEquals('webdam_pw', $config_stub->get('password'));
