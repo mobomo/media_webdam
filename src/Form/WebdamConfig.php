@@ -7,7 +7,8 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\media_webdam\WebdamInterface;
-use Drupal\media_webdam\Webdam;
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
+use cweagans\webdam\Exception\InvalidCredentialsException;
 
 /**
  * Class WebdamConfig.
@@ -69,10 +70,18 @@ class WebdamConfig extends ConfigFormBase {
    *   Whether client is authenticated or not.
    */
   protected function isAuthenticated() {
-    if ($this->webdam->getSubscriptionDetails()) {
-      return TRUE;
+
+    try {
+      $subsDetails = $this->webdam->getSubscriptionDetails();
+      $subsDetailsUrl = $subsDetails->url;
+      $subsDetailsUser = $subsDetails->username;
+
+      return isset($subsDetailsUrl);
     }
-    else {
+
+    catch (InvalidCredentialsException $e) {
+      $this->logger('media_webdam')->error($e->getMessage());
+
       return FALSE;
     }
 
@@ -83,8 +92,6 @@ class WebdamConfig extends ConfigFormBase {
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->config('media_webdam.settings');
-    $webdamFolders = [];
-    $webdamFolders = $this->webdam->getFlattenedFolderList();
 
     $form['authentication'] = [
       '#type' => 'fieldset',
@@ -96,6 +103,7 @@ class WebdamConfig extends ConfigFormBase {
       '#title' => $this->t('Username'),
       '#default_value' => $config->get('username'),
       '#description' => $this->t('The username of the Webdam account to use for API access.'),
+      '#required' => TRUE,
     ];
 
     $form['authentication']['password'] = [
@@ -111,6 +119,7 @@ class WebdamConfig extends ConfigFormBase {
       '#title' => $this->t('Client ID'),
       '#default_value' => $config->get('client_id'),
       '#description' => $this->t('API Client ID to use for API access. Contact the Webdam support team to get one assigned.'),
+      '#required' => TRUE,
     ];
 
     $form['authentication']['client_secret'] = [
@@ -122,6 +131,8 @@ class WebdamConfig extends ConfigFormBase {
     ];
 
     if ($this->isAuthenticated()) {
+      $webdamFolders = $this->webdam->getFlattenedFolderList();
+
       $form['configuration'] = [
         '#type' => 'fieldset',
         '#title' => $this->t('Configuration'),
