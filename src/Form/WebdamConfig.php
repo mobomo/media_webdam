@@ -133,18 +133,26 @@ class WebdamConfig extends ConfigFormBase {
     if ($this->isAuthenticated()) {
       $webdamFolders = $this->webdam->getFlattenedFolderList();
 
-      $form['configuration'] = [
+      $form['folders_filter'] = [
         '#type' => 'fieldset',
-        '#title' => $this->t('Configuration'),
+        '#title' => $this->t('Folder access control'),
+        '#tree' => TRUE,
+        '#description' => $this->t('Select which folders from your Webdam account will be available.'),
       ];
 
-      $form['configuration']['folders_filter'] = [
+      foreach($webdamFolders as $folderID => $folderName) {
+        $form['folders_filter'][$folderID] = [
         '#type' => 'checkboxes',
-        '#title' => $this->t('Available Folders'),
-        '#options' => $webdamFolders,
-        '#description' => $this->t('Select which folders from your Webdam account will be available.'),
-        '#default_value' => $config->get('folders_filter'),
-      ];
+        '#title' => $this->t($folderName),
+        '#options' => [
+          'View' => 'View',
+          'Create' => 'Create',
+          'Update' => 'Update',
+          'Delete' => 'Delete',
+          ],
+        '#default_value' => $config->get('folders_filter')[$folderID],
+        ];
+      }
     }
 
     return parent::buildForm($form, $form_state);
