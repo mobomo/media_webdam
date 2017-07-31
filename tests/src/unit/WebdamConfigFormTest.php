@@ -48,8 +48,8 @@ class WebdamConfigFormTest extends UnitTestCase {
         'client_id' => 'WDclient-id',
         'secret' => 'WDsecret',
         'folders_filter' => [
-          '112233' => 'Wd Folder 1',
-          '223344' => 'Wd Folder 2',
+          '112233' => ['View' => 1, 'Create' => 1, 'Update' => 0, 'Delete' => 0],
+          '445566' => ['View' => 0, 'Create' => 0, 'Update' => 0, 'Delete' => 0],
         ],
       ],
     ]), $webdamStub
@@ -57,18 +57,22 @@ class WebdamConfigFormTest extends UnitTestCase {
     $form = $wconfig->buildForm([], new FormState());
 
     $this->assertArrayHasKey('authentication', $form);
-    $this->assertArrayHasKey('configuration', $form);
+    $this->assertArrayHasKey('folders_filter', $form);
     $this->assertArrayHasKey('username', $form['authentication']);
     $this->assertArrayHasKey('password', $form['authentication']);
     $this->assertArrayHasKey('client_id', $form['authentication']);
     $this->assertArrayHasKey('client_secret', $form['authentication']);
-    $this->assertArrayHasKey('folders_filter', $form['configuration']);
+    $this->assertArrayHasKey('112233', $form['folders_filter']);
+    $this->assertArrayHasKey('445566', $form['folders_filter']);
 
     $this->assertEquals('WDusername', $form['authentication']['username']['#default_value']);
     $this->assertEquals('WDpassword', $form['authentication']['password']['#default_value']);
     $this->assertEquals('WDclient-id', $form['authentication']['client_id']['#default_value']);
     $this->assertEquals('WDsecret', $form['authentication']['client_secret']['#default_value']);
-    $this->assertEquals(['112233' => 'Wd Folder 1', '223344' => 'Wd Folder 2'], $form['configuration']['folders_filter']['#default_value']);
+    $this->assertTrue(array_key_exists('112233', $form['folders_filter']));
+    $this->assertTrue(array_key_exists('445566', $form['folders_filter']));
+    $this->assertEquals(['View' => 1, 'Create' => 1, 'Update' => 0, 'Delete' => 0], $form['folders_filter']['112233']['#default_value']);
+    $this->assertEquals(['View' => 0, 'Create' => 0, 'Update' => 0, 'Delete' => 0], $form['folders_filter']['445566']['#default_value']);
   }
 
   // @TODO: This test is broken. Not sure what's wrong and don't have time to debug.
