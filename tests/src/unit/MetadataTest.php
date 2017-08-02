@@ -37,6 +37,8 @@ class MetadataTestWebdamStub implements WebdamInterface {
       789 => "Test folder 3",
     ];
   }
+  public function getFolder($folder_id = NULL) {}
+
 }
 
 class MetadataTestStateStub implements StateInterface {

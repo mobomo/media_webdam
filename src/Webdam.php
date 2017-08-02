@@ -70,4 +70,17 @@ class Webdam implements WebdamInterface {
     return $folder_data;
   }
 
+  /**
+   * Gets a webdam folder by its ID.
+   *
+   * @param int $folder_id
+   *   The folder ID to recurse into. This is mostly for internal use.
+   *
+   * @return object
+   *   Webdam folder.
+   */
+  public function getFolder($folder_id = NULL) {
+    return $this->client->getFolder($folder_id);
+  }
+
 }

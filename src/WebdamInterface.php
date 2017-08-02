@@ -36,4 +36,16 @@ interface WebdamInterface {
    *   A list of folder names keyed by folder IDs.
    */
   public function getFlattenedFolderList($folder_id = NULL);
+
+  /**
+   * Gets a webdam folder by its ID.
+   *
+   * @param int $folder_id
+   *   The folder ID to recurse into. This is mostly for internal use.
+   *
+   * @return object
+   *   Webdam folder.
+   */
+  public function getFolder($folder_id = NULL);
+
 }

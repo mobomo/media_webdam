@@ -7,7 +7,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\media_webdam\WebdamInterface;
-use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use cweagans\webdam\Exception\InvalidCredentialsException;
 
 /**

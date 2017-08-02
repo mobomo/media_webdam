@@ -138,4 +138,11 @@ class WebdamTestStub implements WebdamInterface {
       445566 => "Wd Folder 2",
     ];
   }
+  public function getFolder($folder_id = NULL) {
+    return (object) [
+      '112233id' => 112233,
+      'name' => "Wd Folder 1",
+    ];
+  }
+
 }
