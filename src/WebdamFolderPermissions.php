@@ -12,9 +12,28 @@ class WebdamFolderPermissions implements ContainerInjectionInterface {
 
   use StringTranslationTrait;
 
+  /**
+   * A config object to retrieve Webdam folder info.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
   protected $config_factory;
+
+  /**
+   * Drupal\media_webdam\WebdamInterface definition.
+   *
+   * @var \Drupal\media_webdam\WebdamInterface
+   */
   protected $webdam;
 
+  /**
+   * WebdamFolderPermissions contructor.
+   *
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   A config object to retrieve local settings for Webdam folder.
+   * @param \Drupal\media_webdam\WebdamInterface $webdam
+   *   Webdam interface to query for folders.
+   */
   public function __construct(ConfigFactoryInterface $config_factory, WebdamInterface $webdam) {
     $this->config = $config_factory->get('media_webdam.settings');
     $this->webdam = $webdam;
@@ -30,6 +49,9 @@ class WebdamFolderPermissions implements ContainerInjectionInterface {
     );
   }
 
+  /**
+   * Return array of local permissions for individual Webdam folders enabled via WebdamConfig.
+   */
   public function getPermissions() {
     $permissions = [];
 
@@ -65,7 +87,7 @@ class WebdamFolderPermissions implements ContainerInjectionInterface {
   }
 
   /**
-   * Return array of Webdam folders set to enabled in local configuration. 
+   * Return array of Webdam folders enabled via WebdamConfig. 
    */
   public function getEnabledFolders() {
     // Get local configuration for Webdam folders.
