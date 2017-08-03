@@ -100,11 +100,9 @@ class WebdamConfig extends ConfigFormBase {
     $assetsInFolder = $this->webdam->getFolder($folder_id)->numassets;
 
     if (!empty($assetsInFolder)) {
-      dump($folder_id);
       return TRUE;
     }
     else {
-      dump($folder_id);
       return FALSE;
     }
 
