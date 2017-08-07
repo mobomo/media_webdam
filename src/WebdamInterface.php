@@ -48,4 +48,17 @@ interface WebdamInterface {
    */
   public function getFolder($folder_id = NULL);
 
+  /**
+   * Uploads Assets to Webdam using the previously defined methods.
+   *
+   * @param array $file_data
+   *   The file data required by Webdam.
+   * @param int $folderID
+   *   The Webdam folder ID.
+   *
+   * @return array
+   *   Webdam response.
+   */
+  public function uploadAsset(array $file_data, $folderID = NULL);
+
 }

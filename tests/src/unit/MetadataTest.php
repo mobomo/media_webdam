@@ -38,6 +38,15 @@ class MetadataTestWebdamStub implements WebdamInterface {
     ];
   }
   public function getFolder($folder_id = NULL) {}
+  public function uploadAsset(array $file_data, $folderID = NULL) {
+    return [
+      'processId' => '123456789',
+      'presignUrl' => 'https://webdamuploads.s3.amazonaws.com/abc123.png?AWSAccessKeyId=ABCDEF&Expires=1533422083&Signature=aBcDe5678',
+      'post_status' => 200,
+      'confirm' => 200,
+      'id' => '55697118',
+    ];
+  }
 
 }
 

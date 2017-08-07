@@ -4,11 +4,11 @@ namespace Drupal\media_webdam\Form;
 
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\file\Entity\File;
 use Drupal\media_webdam\WebdamInterface;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 
 /**
  * Implements form to save media files and upload them to Webdam.
@@ -39,16 +39,26 @@ class WebdamUpload extends FormBase {
   protected $fileStorage;
 
   /**
+   * The EntityManagerInterface.
+   *
+   * @var \Drupal\Core\Entity\EntityManagerInterface
+   */
+  protected $entityManager;
+
+  /**
    * WebdamUpload constructor.
    *
    * @param \Drupal\media_webdam\WebdamInterface $webdam
    *   The Webdam elements.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityManager
+   *   The EntityManagerInterface.
    */
-  public function __construct(WebdamInterface $webdam, ConfigFactoryInterface $config_factory) {
+  public function __construct(WebdamInterface $webdam, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entityManager) {
     $this->webdam = $webdam;
     $this->configFactory = $config_factory;
+    $this->entityManager = $entityManager;
   }
 
   /**
@@ -57,7 +67,8 @@ class WebdamUpload extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('media_webdam.webdam'),
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('entity_type.manager')
     );
   }
 
@@ -119,15 +130,7 @@ class WebdamUpload extends FormBase {
       '#value' => $this->t('Add media'),
     ];
 
-
     return $form;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function validateForm(array &$form, FormStateInterface $form_state) {
-    parent::validateForm($form, $form_state);
   }
 
   /**
@@ -136,10 +139,8 @@ class WebdamUpload extends FormBase {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $folder = $form_state->getValue('webdam_folder');
     $fid = $form_state->getValue('managed_file');
-
     if (!empty($fid)) {
-      $file = File::load($fid);
-      $file->setPermanent();
+      $file = $this->entityManager->getStorage('file')->load($fid[0]);
       $file->save();
 
       // File data we need for upload assets to Webdam.
@@ -148,8 +149,8 @@ class WebdamUpload extends FormBase {
         'filename' => $file->getFilename(),
         'filesize' => $file->getSize(),
         'file_uri' => $file->getFileUri(),
-        'folder' => $folder,
       ];
+      $this->webdam->uploadAsset($file_data, $folder);
     }
 
   }

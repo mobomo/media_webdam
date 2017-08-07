@@ -145,4 +145,7 @@ class WebdamTestStub implements WebdamInterface {
     ];
   }
 
+  public function uploadAsset(array $file_data, $folderID = NULL) {}
+
 }
+
