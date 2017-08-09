@@ -11,7 +11,10 @@
 function media_webdam_drush_command() {
   $commands['webdam-folder-import'] = [
     'description' => 'Imports list of folders from Webdam',
-    'aliases' => 'wdfi',
+    'examples' => [
+      'drush wdfi' => 'Command imports all Webdam folders into Drupal state',
+    ],
+    'aliases' => ['wdfi'],
     'bootstrap' => DRUSH_BOOTSTRAP_DRUPAL_FULL,
   ];
 
@@ -21,7 +24,7 @@ function media_webdam_drush_command() {
 /**
  * Drush command callback for webdam-folder-import.
  */
-function drush_media_webdam_folders_import() {
+function drush_media_webdam_webdam_folder_import() {
   /** @var \Drupal\media_webdam\Metadata $metadata */
   $metadata = \Drupal::service('media_webdam.metadata');
   $metadata->saveFolderList();
