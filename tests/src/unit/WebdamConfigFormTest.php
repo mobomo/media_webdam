@@ -4,11 +4,13 @@ namespace Drupal\Tests\media_webdam\unit;
 
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Database\TransactionNameNonUniqueException;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Form\FormState;
 use Drupal\media_webdam\Form\WebdamConfig;
 use Drupal\media_webdam\WebdamInterface;
 use Drupal\Tests\UnitTestCase;
+use cweagans\webdam\Exception\InvalidCredentialsException;
 
 /**
  * Webdam config form test.
@@ -69,6 +71,19 @@ class WebdamConfigFormTest extends UnitTestCase {
     $this->assertEquals('WDclient-id', $form['authentication']['client_id']['#default_value']);
     $this->assertEquals('WDsecret', $form['authentication']['client_secret']['#default_value']);
     $this->assertEquals(['112233' => 'Wd Folder 1', '223344' => 'Wd Folder 2'], $form['configuration']['folders_filter']['#default_value']);
+  }
+
+  public function testFolderHasAssets() {
+    $folder_id = 112233;
+    $webdamStub = new WebdamTestStub();
+    $configStub = new FormConfigStub();
+    $configFactoryStub = new FormConfigFactoryStub();
+    $configFactoryStub->set('media_webdam.settings', $configStub);
+    $configForm = new WebdamConfig($configFactoryStub, $webdamStub);
+
+    // Test for non empty folder.
+    $this->assertEquals(TRUE, $configForm->folderHasAssets($folder_id));
+
   }
 
   // @TODO: This test is broken. Not sure what's wrong and don't have time to debug.
@@ -138,4 +153,12 @@ class WebdamTestStub implements WebdamInterface {
       445566 => "Wd Folder 2",
     ];
   }
+
+  public function getFolder($folder_id = NULL) {
+    return (object) [
+      'name' => 'Wd Folder 1',
+      'numassets' => 2,
+    ];
+  }
+
 }

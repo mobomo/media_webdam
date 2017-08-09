@@ -88,6 +88,65 @@ class WebdamConfig extends ConfigFormBase {
   }
 
   /**
+   * Checks if Webdam folder has assets.
+   *
+   * @param int $folder_id
+   *   The Webdam folder ID.
+   *
+   * @return bool
+   *   Whether the folder is empty or has assets.
+   */
+  public function folderHasAssets($folder_id) {
+    $assetsInFolder = $this->webdam->getFolder($folder_id)->numassets;
+
+    if (!empty($assetsInFolder)) {
+      return TRUE;
+    }
+    else {
+      return FALSE;
+    }
+
+  }
+
+  /**
+   * Process checkboxes.
+   *
+   * @todo: find a better way to re-build checkboxes.
+   * Ref: Checkboxes::processCheckboxes in https://api.drupal.org/api/drupal/core!lib!Drupal!Core!Render!Element!Checkboxes.php/class/Checkboxes/8.3.x
+   */
+  public function buildCheckboxes(&$element, FormStateInterface $form_state, &$complete_form) {
+    $value = is_array($element['#value']) ? $element['#value'] : [];
+    $element['#tree'] = TRUE;
+    if (count($element['#options']) > 0) {
+      if (!isset($element['#default_value']) || $element['#default_value'] == 0) {
+        $element['#default_value'] = [];
+      }
+      $weight = 0;
+      foreach ($element['#options'] as $key => $choice) {
+
+        $weight += 0.001;
+        $element += [$key => []];
+        $element[$key] += [
+          '#type' => 'checkbox',
+          '#title' => $choice,
+          '#return_value' => $key,
+          '#default_value' => isset($value[$key]) ? $key : NULL,
+          '#attributes' => $element['#attributes'],
+          '#ajax' => isset($element['#ajax']) ? $element['#ajax'] : NULL,
+          '#error_no_message' => TRUE,
+          '#weight' => $weight,
+        ];
+        if ($this->folderHasAssets($key)) {
+          $element[$key]['#disabled'] = TRUE;
+          $element[$key]['#default_value'] = $key;
+        }
+      }
+    }
+
+    return $element;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
@@ -142,7 +201,13 @@ class WebdamConfig extends ConfigFormBase {
         '#type' => 'checkboxes',
         '#title' => $this->t('Available Folders'),
         '#options' => $webdamFolders,
-        '#description' => $this->t('Select which folders from your Webdam account will be available.'),
+        '#process' => [
+          [$this, 'buildCheckboxes'],
+        ],
+        '#description' => $this->t(
+          'Choose which folders from your Webdam account will be available.
+          Please note: greyed out folders have assets and can not be disabled.'
+        ),
         '#default_value' => $config->get('folders_filter'),
       ];
     }
