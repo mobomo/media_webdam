@@ -42,7 +42,7 @@ class WebdamFolderPermissionsTest extends UnitTestCase {
 
     $this->assertEquals($configFactoryStub->get('media_webdam.settings'), $configStub);
 
-    $webdamStub = new WebdamTestStub();
+    $webdamStub = new WebdamFolderTestStub();
     $permissions = new WebdamFolderPermissions($configFactoryStub, $webdamStub);
 
     $this->assertEquals($permissions->getEnabledFolders(), ['112233' => '112233', '445566' => '445566']);
@@ -95,7 +95,7 @@ class ConfigStub extends Config {
 
 }
 
-class WebdamTestStub implements WebdamInterface {
+class WebdamFolderTestStub implements WebdamInterface {
 
   public function getSubscriptionDetails() {
     return (object) array(
