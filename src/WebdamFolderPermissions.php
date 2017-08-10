@@ -93,7 +93,7 @@ class WebdamFolderPermissions implements ContainerInjectionInterface {
     // Get local configuration for Webdam folders.
     $allFolders = $this->config->get('folders_filter');
     // Eliminate folders NOT enabled via WebdamConfig.
-    $enabledFolders = array_filter($allFolders, function($v) { return $v != 0;});
+    $enabledFolders = array_filter($allFolders);
     return $enabledFolders;
   }
 }
