@@ -1,0 +1,15 @@
+'view webdam assets':
+  title: 'View any Webdam assets'
+  description: 'View assets on Webdam.'
+'create webdam assets':
+  title: 'Create any Webdam assets'
+  description: 'Add new assets to Webdam.'
+'update webdam assets':
+  title: 'Update any Webdam assets'
+  description: 'Edit assets on Webdam.'
+'delete webdam assets':
+  title: 'Delete any Webdam assets'
+  description: 'Delete assets on Webdam.'
+
+permission_callbacks:
+  - Drupal\media_webdam\WebdamFolderPermissions::getPermissions
