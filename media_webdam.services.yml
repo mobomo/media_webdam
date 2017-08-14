@@ -5,6 +5,3 @@ services:
   media_webdam.webdam:
     class: Drupal\media_webdam\Webdam
     arguments: ['@media_webdam.client_factory']
-  media_webdam.metadata:
-    class: Drupal\media_webdam\Metadata
-    arguments: ['@media_webdam.webdam', '@state']
