@@ -58,7 +58,7 @@ class WebdamUploadFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testGetFormId() {
-    $webdamStub = new WebdamTestStub();
+    $webdamStub = new WebdamStub();
     $configFactoryStub = new ConfigFactoryStub();
     $entityTypeManager = new EntityTypeManagerTestStub();
     $form = new WebdamUpload($webdamStub, $configFactoryStub, $entityTypeManager);
@@ -69,7 +69,7 @@ class WebdamUploadFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testBuildForm() {
-    $webdamStub = new WebdamTestStub();
+    $webdamStub = new WebdamStub();
     $configStub = new ConfigStub();
     $configFactoryStub = new ConfigFactoryStub();
     $entityTypeManager = new EntityTypeManagerTestStub();
@@ -98,7 +98,7 @@ class WebdamUploadFormTest extends UnitTestCase {
     $client = new Client($guzzleClient, '', '', '', '');
 
     $form_state = new FormState();
-    $webdamStub = new WebdamTestStub();
+    $webdamStub = new WebdamStub();
     $configStub = new ConfigStub();
     $configFactoryStub = new ConfigFactoryStub();
     $entityTypeManager = new EntityTypeManagerTestStub();
