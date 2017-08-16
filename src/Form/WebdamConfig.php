@@ -6,8 +6,6 @@ use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Drupal\media_webdam\WebdamInterface;
-use cweagans\webdam\Exception\InvalidCredentialsException;
 
 /**
  * Class WebdamConfig.
@@ -31,7 +29,7 @@ class WebdamConfig extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('media_webdam.webdam')
+      $container->get('config.factory')
     );
   }
 
