@@ -137,20 +137,19 @@ class WebdamUpload extends FormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $folder = $form_state->getValue('webdam_folder');
+    $folderID = $form_state->getValue('webdam_folder');
     $fid = $form_state->getValue('managed_file');
     if (!empty($fid)) {
       $file = $this->entityManager->getStorage('file')->load($fid[0]);
       $file->save();
 
       // File data we need for upload assets to Webdam.
-      $file_data = [
-        'contenttype' => $file->getMimeType(),
-        'filename' => $file->getFilename(),
-        'filesize' => $file->getSize(),
-        'file_uri' => $file->getFileUri(),
-      ];
-      $this->webdam->uploadAsset($file_data, $folder);
+      $file_uri = $file->getFileUri();
+      $file_name = $file->getFilename();
+
+      // Uploading asset to AWS.
+      $this->webdam->uploadAsset($file_uri, $file_name, $folderID);
+
     }
 
   }

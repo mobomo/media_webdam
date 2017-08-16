@@ -58,7 +58,7 @@ class WebdamUploadFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testGetFormId() {
-    $webdamStub = new WebdamTestStub();
+    $webdamStub = new WebdamStub();
     $configFactoryStub = new ConfigFactoryStub();
     $entityTypeManager = new EntityTypeManagerTestStub();
     $form = new WebdamUpload($webdamStub, $configFactoryStub, $entityTypeManager);
@@ -69,7 +69,7 @@ class WebdamUploadFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testBuildForm() {
-    $webdamStub = new WebdamTestStub();
+    $webdamStub = new WebdamStub();
     $configStub = new ConfigStub();
     $configFactoryStub = new ConfigFactoryStub();
     $entityTypeManager = new EntityTypeManagerTestStub();
@@ -98,7 +98,7 @@ class WebdamUploadFormTest extends UnitTestCase {
     $client = new Client($guzzleClient, '', '', '', '');
 
     $form_state = new FormState();
-    $webdamStub = new WebdamTestStub();
+    $webdamStub = new WebdamStub();
     $configStub = new ConfigStub();
     $configFactoryStub = new ConfigFactoryStub();
     $entityTypeManager = new EntityTypeManagerTestStub();
@@ -114,7 +114,7 @@ class WebdamUploadFormTest extends UnitTestCase {
     self::assertEquals(123456, $form_state->get('webdam_folder'));
     self::assertNotEmpty(2, $form_state->get('managed_file'));
     // @TODO: Test uploadAsset() method.
-    // $upload = $client->uploadAsset($file_data, $folder = NULL);
+    // $upload = $client->uploadAsset($file_uri, $file_name, $folderID = NULL);
     // dump($upload);
   }
 
@@ -189,17 +189,11 @@ class WebdamStub implements WebdamInterface {
   /**
    * Implements uploadAsset method dor testing.
    *
-   * @return array
+   * @return string
    *   Webdam response.
    */
-  public function uploadAsset(array $file_data, $folderID = NULL) {
-    return [
-      'processId' => '123456789',
-      'presignUrl' => 'https://webdamuploads.s3.amazonaws.com/abc123.png?AWSAccessKeyId=ABCDEF&Expires=1533422083&Signature=aBcDe5678',
-      'post_status' => 200,
-      'confirm' => 200,
-      'id' => '55697118',
-    ];
+  public function uploadAsset($file_uri, $file_name, $folderID = NULL) {
+    return '55697118';
   }
 
 }
