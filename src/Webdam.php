@@ -70,4 +70,17 @@ class Webdam implements WebdamInterface {
     return $folder_data;
   }
 
+  /**
+   * Get a full Asset object from an asset ID.
+   *
+   * @param int $assetID
+   *   The webdam asset ID to fetch.
+   *
+   * @return \cweagans\webdam\Entity\Asset
+   *   A webdam asset.
+   */
+  public function getAsset($assetID) {
+    return $this->client->getAsset($assetID);
+  }
+
 }
