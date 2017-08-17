@@ -67,9 +67,9 @@ class WebdamUploadFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testGetFormId() {
-    $webdamStub = new WebdamStub();
+    $WebdamStubTest = new WebdamStubTest();
     $entityTypeManager = new EntityTypeManagerTestStub();
-    $form = new WebdamUpload($webdamStub, $entityTypeManager);
+    $form = new WebdamUpload($WebdamStubTest, $entityTypeManager);
     $this->assertEquals('webdam_upload', $form->getFormId());
   }
 
@@ -77,10 +77,10 @@ class WebdamUploadFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testBuildForm() {
-    $webdamStub = new WebdamStub();
+    $WebdamStubTest = new WebdamStubTest();
     $entityTypeManager = new EntityTypeManagerTestStub();
 
-    $form_array = new WebdamUpload($webdamStub, $entityTypeManager);
+    $form_array = new WebdamUpload($WebdamStubTest, $entityTypeManager);
     $form = $form_array->buildForm([], new FormState());
 
     $this->assertArrayHasKey('managed_file', $form['upload_media']);
@@ -98,11 +98,11 @@ class WebdamUploadFormTest extends UnitTestCase {
     $client = new Client($guzzleClient, '', '', '', '');
 
     $form_state = new FormState();
-    $webdamStub = new WebdamStub();
+    $WebdamStubTest = new WebdamStubTest();
 
     $entityTypeManager = new EntityTypeManagerTestStub();
 
-    $form_obj = new WebdamUpload($webdamStub, $entityTypeManager);
+    $form_obj = new WebdamUpload($WebdamStubTest, $entityTypeManager);
 
     $form_state->set('webdam_folder', 123456);
     $form_state->set('managed_file', 2);
@@ -162,7 +162,7 @@ class ConfigStub extends Config {
 /**
  * Webdam class stub.
  */
-class WebdamStub implements WebdamInterface {
+class WebdamStubTest implements WebdamInterface {
 
   public function getSubscriptionDetails() {
     return (object) [
