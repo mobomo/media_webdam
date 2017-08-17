@@ -5,8 +5,6 @@ namespace Drupal\media_webdam\Form;
 use Drupal\Core\Form\FormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\media_webdam\WebdamInterface;
-use Drupal\Core\Config\Config;
-use Drupal\Core\Config\ConfigFactoryInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 
@@ -23,13 +21,6 @@ class WebdamUpload extends FormBase {
    * @var \Drupal\media_webdam\WebdamInterface
    */
   protected $webdam;
-
-  /**
-   * The config factory.
-   *
-   * @var \Drupal\Core\Config\ConfigFactoryInterface
-   */
-  protected $configFactory;
 
   /**
    * The storage handler class for files.
@@ -50,14 +41,11 @@ class WebdamUpload extends FormBase {
    *
    * @param \Drupal\media_webdam\WebdamInterface $webdam
    *   The Webdam elements.
-   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
-   *   The config factory.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entityManager
    *   The EntityManagerInterface.
    */
-  public function __construct(WebdamInterface $webdam, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entityManager) {
+  public function __construct(WebdamInterface $webdam, EntityTypeManagerInterface $entityManager) {
     $this->webdam = $webdam;
-    $this->configFactory = $config_factory;
     $this->entityManager = $entityManager;
   }
 
@@ -67,28 +55,8 @@ class WebdamUpload extends FormBase {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('media_webdam.webdam'),
-      $container->get('config.factory'),
       $container->get('entity_type.manager')
     );
-  }
-
-  /**
-   * Returns a list with available Webdam folders keyed by ID.
-   *
-   * @return array
-   *   Array of available folders.
-   */
-  protected function availFoldersData() {
-    $folders = $this->config('media_webdam.settings')->get('folders_filter');
-
-    $availableFolders = array_filter($folders);
-
-    $avail_folders_data = [];
-    foreach ($availableFolders as $key => $folder) {
-      $avail_folders_data[$key] = $this->webdam->getFolder($folder)->name;
-    };
-
-    return $avail_folders_data;
   }
 
   /**
@@ -110,10 +78,9 @@ class WebdamUpload extends FormBase {
       '#type' => 'managed_file',
       '#title' => $this->t('Media Upload'),
       '#description' => $this->t('Select a file to Upload. Max upload size: 1MB'),
-      '#upload_location' => 'public://media_webdam/',
+      '#upload_location' => file_directory_temp(),
       '#upload_validators' => [
         'file_validate_extensions' => ['gif png jpg jpeg mp3 mp4 mkv'],
-        'file_validate_size' => [1048576],
       ],
       '#multiple' => FALSE,
       '#required' => TRUE,
@@ -122,7 +89,7 @@ class WebdamUpload extends FormBase {
       '#type' => 'radios',
       '#title' => $this->t('Webdam folder'),
       '#description' => $this->t('Please select a Webdam folder to store your file'),
-      '#options' => $this->availFoldersData(),
+      '#options' => $this->webdam->getFlattenedFolderList(),
       '#required' => TRUE,
     ];
     $form['submit'] = [

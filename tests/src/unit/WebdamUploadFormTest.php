@@ -2,6 +2,7 @@
 
 namespace Drupal\Tests\media_webdam\unit;
 
+use Drupal\Console\Bootstrap\Drupal;
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\DependencyInjection\Container;
@@ -32,6 +33,11 @@ class WebdamUploadFormTest extends UnitTestCase {
     parent::setUp();
     $container = new Container();
     $container->set('string_translation', $this->getStringTranslationStub());
+    $configFactory = $this->getConfigFactoryStub();
+    $container->set('config.factory', $configFactory);
+    $drupal_root = $this->root;
+
+    require_once ($drupal_root . '/core/includes/file.inc');
 
     \Drupal::setContainer($container);
   }
@@ -45,6 +51,9 @@ class WebdamUploadFormTest extends UnitTestCase {
         'client_id' => 'WDclient-id',
         'secret' => 'WDsecret',
       ],
+      'system.file' => [
+        'path.temporary' => '/path/to/temp/dir'
+      ]
     ]);
   }
 
@@ -59,10 +68,9 @@ class WebdamUploadFormTest extends UnitTestCase {
    */
   public function testGetFormId() {
     $webdamStub = new WebdamStub();
-    $configFactoryStub = new ConfigFactoryStub();
     $entityTypeManager = new EntityTypeManagerTestStub();
-    $form = new WebdamUpload($webdamStub, $configFactoryStub, $entityTypeManager);
-    self::assertEquals('webdam_upload', $form->getFormId());
+    $form = new WebdamUpload($webdamStub, $entityTypeManager);
+    $this->assertEquals('webdam_upload', $form->getFormId());
   }
 
   /**
@@ -70,21 +78,13 @@ class WebdamUploadFormTest extends UnitTestCase {
    */
   public function testBuildForm() {
     $webdamStub = new WebdamStub();
-    $configStub = new ConfigStub();
-    $configFactoryStub = new ConfigFactoryStub();
     $entityTypeManager = new EntityTypeManagerTestStub();
 
-    $configStub->set('folders_filter', [1234 => '1234', 5678 => '0']);
-    $configFactoryStub->set('media_webdam.settings', $configStub);
-
-    self::assertEquals($configStub->get('folders_filter'), [1234 => '1234', 5678 => '0']);
-    self::assertEquals($configFactoryStub->get('media_webdam.settings'), $configStub);
-
-    $form_array = new WebdamUpload($webdamStub, $configFactoryStub, $entityTypeManager);
+    $form_array = new WebdamUpload($webdamStub, $entityTypeManager);
     $form = $form_array->buildForm([], new FormState());
 
-    self::assertArrayHasKey('managed_file', $form['upload_media']);
-    self::assertArrayHasKey('webdam_folder', $form['upload_media']);
+    $this->assertArrayHasKey('managed_file', $form['upload_media']);
+    $this->assertArrayHasKey('webdam_folder', $form['upload_media']);
 
   }
 
@@ -99,11 +99,10 @@ class WebdamUploadFormTest extends UnitTestCase {
 
     $form_state = new FormState();
     $webdamStub = new WebdamStub();
-    $configStub = new ConfigStub();
-    $configFactoryStub = new ConfigFactoryStub();
+
     $entityTypeManager = new EntityTypeManagerTestStub();
-    $configFactoryStub->set('media_webdam.settings', $configStub);
-    $form_obj = new WebdamUpload($webdamStub, $configFactoryStub, $entityTypeManager);
+
+    $form_obj = new WebdamUpload($webdamStub, $entityTypeManager);
 
     $form_state->set('webdam_folder', 123456);
     $form_state->set('managed_file', 2);
@@ -111,8 +110,8 @@ class WebdamUploadFormTest extends UnitTestCase {
     $form = [];
     $form_obj->submitForm($form, $form_state);
 
-    self::assertEquals(123456, $form_state->get('webdam_folder'));
-    self::assertNotEmpty(2, $form_state->get('managed_file'));
+    $this->assertEquals(123456, $form_state->get('webdam_folder'));
+    $this->assertNotEmpty(2, $form_state->get('managed_file'));
     // @TODO: Test uploadAsset() method.
     // $upload = $client->uploadAsset($file_uri, $file_name, $folderID = NULL);
     // dump($upload);
