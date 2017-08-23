@@ -78,7 +78,7 @@ class WebdamUpload extends FormBase {
       '#type' => 'managed_file',
       '#title' => $this->t('Media Upload'),
       '#description' => $this->t('Select a file to Upload. Max upload size: 1MB'),
-      '#upload_location' => file_directory_temp(),
+      '#upload_location' => 'temporary://',
       '#upload_validators' => [
         'file_validate_extensions' => ['gif png jpg jpeg mp3 mp4 mkv'],
       ],
