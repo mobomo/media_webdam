@@ -12,4 +12,5 @@ media_webdam.webdam_upload:
     _form: '\Drupal\media_webdam\Form\WebdamUpload'
     _title: 'Webdam Upload'
   requirements:
+    #@todo: check / modify permissions.
     _permission: 'administer site configuration'

@@ -79,9 +79,6 @@ class WebdamUpload extends FormBase {
       '#title' => $this->t('Media Upload'),
       '#description' => $this->t('Select a file to Upload. Max upload size: 1MB'),
       '#upload_location' => 'temporary://',
-      '#upload_validators' => [
-        'file_validate_extensions' => ['gif png jpg jpeg mp3 mp4 mkv'],
-      ],
       '#multiple' => FALSE,
       '#required' => TRUE,
     ];
@@ -89,6 +86,7 @@ class WebdamUpload extends FormBase {
       '#type' => 'radios',
       '#title' => $this->t('Webdam folder'),
       '#description' => $this->t('Please select a Webdam folder to store your file'),
+      //@todo: Change method name for something nicer. 
       '#options' => $this->webdam->getFlattenedFolderList(),
       '#required' => TRUE,
     ];
