@@ -83,4 +83,35 @@ class Webdam implements WebdamInterface {
     return $this->client->getAsset($assetID);
   }
 
+  /**
+   * Gets a webdam folder by its ID.
+   *
+   * @param int $folder_id
+   *   The folder ID to recurse into. This is mostly for internal use.
+   *
+   * @return object
+   *   Webdam folder.
+   */
+  public function getFolder($folder_id = NULL) {
+    return $this->client->getFolder($folder_id);
+  }
+
+  /**
+   * Uploads Assets to Webdam using the previously defined methods.
+   *
+   * @param string $file_uri
+   *   The file URI.
+   *   The File size.
+   * @param string $file_name
+   *   The File filename.
+   * @param int $folderID
+   *   The Webdam folder ID.
+   *
+   * @return string
+   *   Webdam response.
+   */
+  public function uploadAsset($file_uri, $file_name, $folderID = NULL) {
+    return $this->client->uploadAsset($file_uri, $file_name, $folderID);
+  }
+
 }
