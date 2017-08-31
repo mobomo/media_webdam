@@ -9,9 +9,11 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Utility\Token;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
+use Drupal\media_webdam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\Core\Render\Element\Checkboxes;
+use Drupal\media_entity\Entity\Media;
 
 /**
  * Uses a view to provide entity listing in a browser's widget.
@@ -40,6 +42,13 @@ class Webdam extends WidgetBase {
   protected $token;
 
   /**
+   * The webdam interface.
+   *
+   * @var \Drupal\media_webdam\WebdamInterface
+   */
+  protected $webdam_interface;
+
+  /**
    * Upload constructor.
    *
    * @param array $configuration
@@ -59,10 +68,11 @@ class Webdam extends WidgetBase {
    * @param \Drupal\Core\Utility\Token $token
    *   The token service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, ModuleHandlerInterface $module_handler, Token $token) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, ModuleHandlerInterface $module_handler, Token $token, WebdamInterface $webdam_interface){
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
     $this->moduleHandler = $module_handler;
     $this->token = $token;
+    $this->webdam_interface = $webdam_interface;
   }
 
   /**
@@ -77,7 +87,8 @@ class Webdam extends WidgetBase {
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
       $container->get('module_handler'),
-      $container->get('token')
+      $container->get('token'),
+      $container->get('media_webdam.webdam')
     );
   }
 
@@ -88,7 +99,7 @@ class Webdam extends WidgetBase {
     return [
       'submit_text' => $this->t('Select assets'),
       'multiple' => TRUE,
-    ] + 
+    ] +
     parent::defaultConfiguration();
   }
 
@@ -115,11 +126,11 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
-    // $files = [];
-    // foreach ($form_state->getValue(['upload'], []) as $fid) {
-    //   $files[] = $this->entityTypeManager->getStorage('file')->load($fid);
-    // }
-    //return $files;
+    foreach ($form_state->getValue(['upload'], []) as $aid) {
+      if ($aid !== 0) {
+        //todo validate form selection
+      }
+    }
     return [];
   }
 
@@ -127,18 +138,24 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   public function submit(array &$element, array &$form, FormStateInterface $form_state) {
-    // if (!empty($form_state->getTriggeringElement()['#eb_widget_main_submit'])) {
-    //   $files = $this->prepareEntities($form, $form_state);
-    //   array_walk(
-    //     $files,
-    //     function (FileInterface $file) {
-    //       $file->setPermanent();
-    //       $file->save();
-    //     }
-    //   );
-    //   $this->selectEntities($files, $form_state);
-    //   $this->clearFormValues($element, $form_state);
-    // }
+    $assets = [];
+    if (!empty($form_state->getTriggeringElement()['#eb_widget_main_submit'])) {
+      foreach ($form_state->getValue(['assets'], []) as $aid) {
+        if ($aid !== 0) {
+          $asset = Media::create([
+            'bundle' => 'webdam',
+            'uid' => '1',
+            'langcode' => 'en',
+            'status' => Media::PUBLISHED,
+            'name' => $aid,
+          ]);
+          $asset->save();
+          $assets[] = $asset;
+        }
+      }
+    }
+    // $this->clearFormValues($element, $form_state);
+    $this->selectEntities($assets, $form_state);
   }
 
   /**
