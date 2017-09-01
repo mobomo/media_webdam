@@ -83,6 +83,14 @@ class Webdam implements WebdamInterface {
     return $this->client->getAsset($assetID);
   }
 
+  public function __call($name, $arguments) {
+    $method_variable = array($this->client, $name);
+    if(is_callable($method_variable)){
+      return call_user_func_array($method_variable, $arguments);
+    }
+  }
+
+
   /**
    * Gets a webdam folder by its ID.
    *

@@ -109,18 +109,72 @@ class Webdam extends WidgetBase {
   public function getForm(array &$original_form, FormStateInterface $form_state, array $additional_widget_parameters) {
     $form = parent::getForm($original_form, $form_state, $additional_widget_parameters);
     $field_cardinality = $form_state->get(['entity_browser', 'validators', 'cardinality', 'cardinality']);
-    $form['assets'] = [
-      '#type' => 'checkboxes',
-      '#title' => $this->t('Choose one or more assets'),
-      '#title_display' => 'invisible',
-      '#options' => array( 'asset_id_1' => 'Asset 1', 'asset_id_2' => 'Asset 2', 'asset_id_3' => 'Asset 3' ),
-      // Multiple assets will only be accepted if the source field allows
-      // more than one value.
-      '#multiple' => $field_cardinality != 1 && $this->configuration['multiple'],
+    $trigger_elem = $form_state->getTriggeringElement();
+//    ksm($trigger_elem);
+    $current_folder_id = 0;
+    if (isset($trigger_elem['#name']) && $trigger_elem['#name'] == 'webdam_folder') {
+      $current_folder_id = $form_state->getTriggeringElement()['#parents'][0];
+    }
+    if($current_folder_id !== 0){
+      $folder_assets = $this->webdam_interface->getFolderAssets($current_folder_id);
+//      ksm($folder_assets);
+      $folders = $folder_assets->folders;
+      $folder_items = $folder_assets->items;
+    }else{
+      $folders = $this->webdam_interface->getTopLevelFolders();
+    }
+    $form['folder-container'] = [
+      '#type' => 'fieldset',
+      '#title' => 'Folders',
+      '#collapsible' => FALSE,
+      '#collapsed' => FALSE,
     ];
+    if($current_folder_id !==0 ){
+      $current_folder = $this->webdam_interface->getFolder($current_folder_id);
+//      ksm($current_folder);
+      $form['folder-container'][$current_folder->parent] = [
+        '#type' => 'button',
+        '#value' => 'Up',
+        '#name' => 'webdam_folder'
+      ];
+    }
+    foreach ($folders as $folder){
+      $form['folder-container'][$folder->id] = [
+        '#type' => 'button',
+        '#value' => $folder->name,
+        '#name' => 'webdam_folder'
+      ];
+    }
+    $assets = [];
+    foreach ($folder_items as $folder_item) {
+      if($folder_item->type == 'asset'){
+        $assets[$folder_item->id] = $folder_item->name;
+        if(!empty($folder_item->thumbnailurls)){
+          $assets[$folder_item->id] .= '<img src="'.$folder_item->thumbnailurls[0]->url.'" alt="'.$folder_item->name.'" />';
+        }
 
+      }
+    }
+    if(!empty($assets)){
+      $form['asset-container'] = [
+        '#type' => 'fieldset',
+        '#title' => 'Files',
+        '#collapsible' => FALSE,
+        '#collapsed' => FALSE,
+      ];
+      $form['asset-container']['assets'] = [
+        '#type' => 'checkboxes',
+        '#title' => $this->t('Choose one or more assets'),
+        '#title_display' => 'invisible',
+        '#options' => $assets,
+        // Multiple assets will only be accepted if the source field allows
+        // more than one value.
+        '#multiple' => $field_cardinality != 1 && $this->configuration['multiple'],
+      ];
+    }
     return $form;
   }
+
 
   /**
    * {@inheritdoc}
