@@ -116,7 +116,7 @@ class WebdamUpload extends FormBase {
       // Uploading asset to AWS.
       $this->webdam->uploadAsset($file_uri, $file_name, $folderID);
 
-      // Print success message
+      // Print success message.
       drupal_set_message(
        $this->t(
          '@filename has been successfully uploaded to Webdam!',

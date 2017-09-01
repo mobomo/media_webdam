@@ -10,8 +10,6 @@ use Drupal\media_webdam\Form\WebdamUpload;
 use Drupal\media_webdam\WebdamInterface;
 use Drupal\Tests\UnitTestCase;
 use Drupal\Core\Entity\EntityTypeManager;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Entity\EntityStorageInterface;
 use GuzzleHttp\Client as GClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
@@ -35,12 +33,8 @@ class WebdamUploadFormTest extends UnitTestCase {
     $container = new Container();
     $container->set('string_translation', $this->getStringTranslationStub());
     $configFactory = $this->getConfigFactoryStub();
-    $entityTypeManager = new EntityTypeManagerTestStub();
-
     $container->set('config.factory', $configFactory);
-    // $container->set('entity_type.manager', $entityTypeManager);
     $drupal_root = $this->root;
-
     require_once ($drupal_root . '/core/includes/file.inc');
 
     \Drupal::setContainer($container);
@@ -56,8 +50,8 @@ class WebdamUploadFormTest extends UnitTestCase {
         'secret' => 'WDsecret',
       ],
       'system.file' => [
-        'path.temporary' => '/path/to/temp/dir'
-      ]
+        'path.temporary' => '/path/to/temp/dir',
+      ],
     ]);
   }
 
@@ -71,9 +65,9 @@ class WebdamUploadFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testGetFormId() {
-    $WebdamStubTest = new WebdamStubTest();
+    $webdamStubTest = new WebdamStubTest();
     $entityTypeManager = new EntityTypeManagerTestStub();
-    $form = new WebdamUpload($WebdamStubTest, $entityTypeManager);
+    $form = new WebdamUpload($webdamStubTest, $entityTypeManager);
     $this->assertEquals('webdam_upload', $form->getFormId());
   }
 
@@ -81,10 +75,10 @@ class WebdamUploadFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testBuildForm() {
-    $WebdamStubTest = new WebdamStubTest();
+    $webdamStubTest = new WebdamStubTest();
     $entityTypeManager = new EntityTypeManagerTestStub();
 
-    $form_obj = new WebdamUpload($WebdamStubTest, $entityTypeManager);
+    $form_obj = new WebdamUpload($webdamStubTest, $entityTypeManager);
     $form = $form_obj->buildForm([], new FormState());
 
     $this->assertArrayHasKey('managed_file', $form['upload_media']);
@@ -92,16 +86,18 @@ class WebdamUploadFormTest extends UnitTestCase {
     $this->assertEquals(FALSE, $form['upload_media']['managed_file']['#multiple']);
 
   }
+
   /**
-  * Mocks drupal_set_message Drupal global function.
-  * @return mixed
-  *    String or null.
-  */
-  public function drupal_set_message() {
-
-      return 'Filename has been successfully uploaded to Webdam!';
-
-  }
+   * Mocks drupal_set_message Drupal global function.
+   *
+   * @return mixed
+   *   String or null.
+   *
+   * @todo: mock drupal_set_message.
+   */
+  /*  public function drupal_set_message() {
+  return 'Filename has been successfully uploaded to Webdam!';
+  }*/
 
   public function testSubmitForm() {
     $mock = new MockHandler([
@@ -114,12 +110,10 @@ class WebdamUploadFormTest extends UnitTestCase {
     $guzzleClient = new GClient(['handler' => $handler]);
     $client = new Client($guzzleClient, '', '', '', '');
 
-    // mocking form_state and webdam client.
+    // Mocking form_state and webdam client.
     $form_state = new FormState();
-    $WebdamStubTest = new WebdamStubTest();
+    $webdamStubTest = new WebdamStubTest();
 
-    // Test entityManager getstorage(), load().
-    // @todo: test save().
     // File object mock.
     $file = $this->getMockBuilder('Drupal\file\Entity\File')
       ->disableOriginalConstructor()
@@ -128,30 +122,28 @@ class WebdamUploadFormTest extends UnitTestCase {
       ->method('id')
       ->willReturn(2);
 
-    // fileStorage create() mock.
+    // fileStorage mock.
     $fileStorage = $this->getMock('Drupal\Core\Entity\EntityStorageInterface');
-    $fileStorage->expects($this->any())
-      ->method('create')
-      ->willReturn($file);
+
     // entityTypeManager mock.
     $entityTypeManager = $this->getMock('Drupal\Core\Entity\EntityTypeManagerInterface');
-    $entityTypeManager->expects($this->any())
+    $entityTypeManager->expects($this->atLeastOnce())
       ->method('getStorage')
       ->with('file')
       ->willReturn($fileStorage);
 
     // fileStorage load() mock.
-    $fileStorage->expects($this->any())
+    $fileStorage->expects($this->atLeastOnce())
       ->method('load')
       ->willReturn($file);
 
-    $form_obj = new WebdamUpload($WebdamStubTest, $entityTypeManager);
+    $form_obj = new WebdamUpload($webdamStubTest, $entityTypeManager);
 
     // @todo: Test drupal_set_message.
     // $message = $this->drupal_set_message();
     // $this->assertEquals('Filename has been successfully uploaded to Webdam!', $message);
 
-    // Test Webdam Folder and Managed File ID
+    // Test Webdam Folder and Managed File ID.
     $form_state->setValue('webdam_folder', 123456);
     $form_state->setValue('managed_file', 2);
 
@@ -164,7 +156,6 @@ class WebdamUploadFormTest extends UnitTestCase {
     $folderID = 112233;
     $client->uploadAsset($file_uri, $file_name, $folderID);
 
-    // @todo: Test submitForm().
     $form = $form_obj->buildForm([], $form_state);
     $form_obj->submitForm($form, $form_state);
 
