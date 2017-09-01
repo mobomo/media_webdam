@@ -120,18 +120,36 @@ class WebdamUploadFormTest extends UnitTestCase {
 
     // Test entityManager getstorage(), load().
     // @todo: test save().
-    $fileStorage = $this->getMock(EntityStorageInterface::class);
-    $entityTypeManager = $this->getMock(EntityTypeManagerInterface::class);
+    // File object mock.
+    $file = $this->getMockBuilder('Drupal\file\Entity\File')
+      ->disableOriginalConstructor()
+      ->getMock();
+    $file->expects($this->any())
+      ->method('id')
+      ->willReturn(2);
+
+    // fileStorage create() mock.
+    $fileStorage = $this->getMock('Drupal\Core\Entity\EntityStorageInterface');
+    $fileStorage->expects($this->any())
+      ->method('create')
+      ->willReturn($file);
+    // entityTypeManager mock.
+    $entityTypeManager = $this->getMock('Drupal\Core\Entity\EntityTypeManagerInterface');
     $entityTypeManager->expects($this->any())
       ->method('getStorage')
       ->with('file')
       ->willReturn($fileStorage);
 
+    // fileStorage load() mock.
+    $fileStorage->expects($this->any())
+      ->method('load')
+      ->willReturn($file);
+
     $form_obj = new WebdamUpload($WebdamStubTest, $entityTypeManager);
 
     // @todo: Test drupal_set_message.
-    $message = $this->drupal_set_message();
-    $this->assertEquals('Filename has been successfully uploaded to Webdam!', $message);
+    // $message = $this->drupal_set_message();
+    // $this->assertEquals('Filename has been successfully uploaded to Webdam!', $message);
 
     // Test Webdam Folder and Managed File ID
     $form_state->setValue('webdam_folder', 123456);
@@ -147,8 +165,8 @@ class WebdamUploadFormTest extends UnitTestCase {
     $client->uploadAsset($file_uri, $file_name, $folderID);
 
     // @todo: Test submitForm().
-    // $form = $form_obj->buildForm([], $form_state);
-    // $form_obj->submitForm($form, $form_state);
+    $form = $form_obj->buildForm([], $form_state);
+    $form_obj->submitForm($form, $form_state);
 
   }
 
@@ -244,8 +262,8 @@ class EntityTypeManagerTestStub extends EntityTypeManager {
 }
 
 // @todo: Replace with messenger service after https://www.drupal.org/node/2278383.
-// namespace Drupal\media_webdam\WebdamUpload;
-//
-// if (!function_exists('drupal_set_message')) {
-//   function drupal_set_message() {}
-// }
+namespace Drupal\media_webdam\Form;
+
+if (!function_exists('drupal_set_message')) {
+  function drupal_set_message() {}
+}
