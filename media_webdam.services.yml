@@ -5,3 +5,6 @@ services:
   media_webdam.webdam:
     class: Drupal\media_webdam\Webdam
     arguments: ['@media_webdam.client_factory']
+  media_webdam.oauth:
+    class: Drupal\media_webdam\Oauth
+    arguments: ['@config.factory', '@csrf_token', '@url_generator.non_bubbling', '@http_client']
