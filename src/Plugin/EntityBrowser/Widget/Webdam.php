@@ -44,33 +44,22 @@ class Webdam extends WidgetBase {
    *
    * @var \Drupal\media_webdam\WebdamInterface
    */
-  protected $webdam_interface;
+  protected $webdam;
 
   /**
-   * Upload constructor.
+   * Webdam constructor.
    *
    * @param array $configuration
-   *   A configuration array containing information about the plugin instance.
    * @param string $plugin_id
-   *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
-   *   The plugin implementation definition.
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
-   *   Event dispatcher service.
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
-   *   The entity type manager service.
    * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
-   *   The Widget Validation Manager service.
-   * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
-   *   The module handler.
-   * @param \Drupal\Core\Utility\Token $token
-   *   The token service.
+   * @param \Drupal\media_webdam\WebdamInterface $webdam_interface
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, ModuleHandlerInterface $module_handler, Token $token, WebdamInterface $webdam_interface){
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam){
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
-    $this->moduleHandler = $module_handler;
-    $this->token = $token;
-    $this->webdam_interface = $webdam_interface;
+    $this->webdam = $webdam;
   }
 
   /**
@@ -84,8 +73,6 @@ class Webdam extends WidgetBase {
       $container->get('event_dispatcher'),
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
-      $container->get('module_handler'),
-      $container->get('token'),
       $container->get('media_webdam.webdam')
     );
   }
@@ -127,16 +114,16 @@ class Webdam extends WidgetBase {
     //If the current folder is not zero then fetch information about the sub folder being rendered
     if($current_folder_id !== 0){
       //Fetch the folder object from webdam
-      $current_folder = $this->webdam_interface->getFolder($current_folder_id);
+      $current_folder = $this->webdam->getFolder($current_folder_id);
       //Fetch a list of assets for the folder from webdam
-      $folder_assets = $this->webdam_interface->getFolderAssets($current_folder_id);
+      $folder_assets = $this->webdam->getFolderAssets($current_folder_id);
       //Store the list of folders for rendering later
       $folders = $folder_assets->folders;
       //Store the list of items/assets for rendering later
       $folder_items = $folder_assets->items;
     }else{
       //The webdam root folder is fetched differently because it can only contain subfolders (not assets)
-      $folders = $this->webdam_interface->getTopLevelFolders();
+      $folders = $this->webdam->getTopLevelFolders();
     }
 
     //Initial breadcrumb array representing the root folder only
@@ -257,7 +244,7 @@ class Webdam extends WidgetBase {
     if (!empty($form_state->getTriggeringElement()['#eb_widget_main_submit'])) {
       foreach ($form_state->getValue(['assets'], []) as $aid) {
         if ($aid !== 0) {
-          $webdam_asset = $this->webdam_interface->getAsset($aid);
+          $webdam_asset = $this->webdam->getAsset($aid);
           ksm($webdam_asset);
           $media_asset = Media::create([
             'bundle' => 'webdam',
