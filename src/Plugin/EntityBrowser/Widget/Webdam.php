@@ -165,6 +165,9 @@ class Webdam extends WidgetBase {
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder_id,
         '#webdam_parent_folder_id' => $folder_name,
+        '#attributes' => [
+          'class' => ['webdam-browser-breadcrumb-container'],
+        ]
       ];
     }
 
@@ -180,21 +183,16 @@ class Webdam extends WidgetBase {
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder->id,
         '#webdam_parent_folder_id' => $current_folder->parent,
+        '#attributes' => [
+          'class' => ['webdam-browser-breadcrumb'],
+        ]
       ];
     }
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.
     $assets = [];
     //Add to the assets array
     foreach ($folder_items as $folder_item) {
-      if($folder_item->type == 'asset'){
-        //wrap asset name in a paragraph tag
-        $assets[$folder_item->id] = '<p class="webdam-asset-fielname">'.$folder_item->name.'</p>';
-        //If the asset has a thumbnail it should be rendered
-        if(!empty($folder_item->thumbnailurls)){
-          //Multiple thumbnail sizes are available.  Using the 220 width version for now
-          $assets[$folder_item->id] .= '<img class="webdam-asset-thumbnail" src="'.$folder_item->thumbnailurls[2]->url.'" alt="'.$folder_item->name.'" />';
-        }
-      }
+      $assets[$folder_item->id] = $this->layoutMediaEntity($folder_item);
     }
     //If the assets array is not empty then add the assets to the form as checkboxes
     if(!empty($assets)){
@@ -205,6 +203,11 @@ class Webdam extends WidgetBase {
         '#options' => $assets,
         // Multiple assets will only be accepted if the source field allows more than one value.
         '#multiple' => $field_cardinality != 1 && $this->configuration['multiple'],
+        '#attached' => [
+          'library' => [
+            'media_webdam/webdam',
+          ]
+        ]
       ];
     }
     return $form;
@@ -282,5 +285,26 @@ class Webdam extends WidgetBase {
       '#description' => $this->t('Multiple assets will only be accepted if the source field allows more than one value.'),
     ];
     return $form;
+  }
+
+  /**
+   * Format display of one asset in media browser.
+   * 
+   * @var \Drupal\media_webdam\Webdam $webdamAsset
+   *
+   * @return string
+   */
+  public function layoutMediaEntity($webdamAsset) {
+    $assetName = $webdamAsset->name;
+
+    if (!empty($webdamAsset->thumbnailurls)) {
+      $thumbnail = '<img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" />';
+    } else {
+      $thumbnail = '<span class="webdam-browser-empty">No preview available.</span';
+    }
+
+    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p>' . $assetName . '</p></div>';
+
+    return $element;
   }
 }
