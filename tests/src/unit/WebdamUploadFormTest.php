@@ -195,6 +195,8 @@ class WebdamStubTest implements WebdamInterface {
     return '55697118';
   }
 
+  public function __call($name, $arguments) {}
+
 }
 
 /**
