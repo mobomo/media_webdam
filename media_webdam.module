@@ -1,0 +1,38 @@
+<?php
+
+/**
+ * @file
+ * Integrates Drupal with Webdam.
+ */
+
+use Drupal\user\Entity\User;
+
+/**
+ * Implements hook_entity_type_alter().
+ */
+function media_webdam_entity_type_alter(array &$entity_types) {
+  /** #var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
+  $entity_types['user']->setLinkTemplate('webdam-auth-form', '/user/{user}/webdam');
+}
+
+/**
+ * Implements hook_menu_local_tasks_alter().
+ *
+ * Hides the 'Webdam' tab on the user profile if the user is not viewing their
+ * own profile.
+ */
+function media_webdam_menu_local_tasks_alter(&$data, $route_name) {
+  if ($route_name == 'entity.user.canonical') {
+    foreach ($data['tabs'][0] as $href => $tab_data) {
+      if ($href == 'entity.user.webdam_auth') {
+        $link_params = $tab_data['#link']['url']->getRouteParameters();
+        $account = User::load($link_params['user']);
+        $current_user = \Drupal::currentUser();
+        if ($account->id() !== $current_user->id()) {
+          unset($data['tabs'][0]['entity.user.webdam_auth']);
+        }
+      }
+    }
+  }
+}
+
