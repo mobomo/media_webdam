@@ -194,22 +194,20 @@ class Webdam extends WidgetBase {
     foreach ($folder_items as $folder_item) {
       $assets[$folder_item->id] = $this->layoutMediaEntity($folder_item);
     }
-    //If the assets array is not empty then add the assets to the form as checkboxes
-    if(!empty($assets)){
-      $form['asset-container']['assets'] = [
-        '#type' => 'checkboxes',
-        '#title' => $this->t('Choose one or more assets'),
-        '#title_display' => 'invisible',
-        '#options' => $assets,
-        // Multiple assets will only be accepted if the source field allows more than one value.
-        '#multiple' => $field_cardinality != 1 && $this->configuration['multiple'],
-        '#attached' => [
-          'library' => [
-            'media_webdam/webdam',
-          ]
+    // Add assets to form.
+    $form['asset-container']['assets'] = [
+      '#type' => 'checkboxes',
+      '#title' => $this->t('Choose one or more assets'),
+      '#title_display' => 'invisible',
+      '#options' => $assets,
+      // Multiple assets will only be accepted if the source field allows more than one value.
+      '#multiple' => $field_cardinality != 1 && $this->configuration['multiple'],
+      '#attached' => [
+        'library' => [
+          'media_webdam/webdam',
         ]
-      ];
-    }
+      ]
+    ];
     return $form;
   }
 
