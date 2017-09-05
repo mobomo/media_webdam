@@ -26,20 +26,6 @@ use Drupal\media_entity\Entity\Media;
 class Webdam extends WidgetBase {
 
   /**
-   * The module handler service.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $moduleHandler;
-
-  /**
-   * The token service.
-   *
-   * @var \Drupal\Core\Utility\Token
-   */
-  protected $token;
-
-  /**
    * The webdam interface.
    *
    * @var \Drupal\media_webdam\WebdamInterface
