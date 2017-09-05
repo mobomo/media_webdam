@@ -186,14 +186,12 @@ class Webdam extends WidgetBase {
     $assets = [];
     //Add to the assets array
     foreach ($folder_items as $folder_item) {
-      if($folder_item->type == 'asset'){
-        //wrap asset name in a paragraph tag
-        $assets[$folder_item->id] = '<p class="webdam-asset-fielname">'.$folder_item->name.'</p>';
-        //If the asset has a thumbnail it should be rendered
-        if(!empty($folder_item->thumbnailurls)){
-          //Multiple thumbnail sizes are available.  Using the 220 width version for now
-          $assets[$folder_item->id] .= '<img class="webdam-asset-thumbnail" src="'.$folder_item->thumbnailurls[2]->url.'" alt="'.$folder_item->name.'" />';
-        }
+      //wrap asset name in a paragraph tag
+      $assets[$folder_item->id] = '<p class="webdam-asset-filename">'.$folder_item->name.'</p>';
+      //If the asset has a thumbnail it should be rendered
+      if(!empty($folder_item->thumbnailurls)){
+        //Multiple thumbnail sizes are available.  Using the 220 width version for now
+        $assets[$folder_item->id] .= '<img class="webdam-asset-thumbnail" src="'.$folder_item->thumbnailurls[2]->url.'" alt="'.$folder_item->name.'" />';
       }
     }
     //If the assets array is not empty then add the assets to the form as checkboxes
@@ -231,7 +229,6 @@ class Webdam extends WidgetBase {
       foreach ($form_state->getValue(['assets'], []) as $aid) {
         if ($aid !== 0) {
           $webdam_asset = $this->webdam->getAsset($aid);
-          ksm($webdam_asset);
           $media_asset = Media::create([
             'bundle' => 'webdam',
             'uid' => '1',
@@ -249,25 +246,7 @@ class Webdam extends WidgetBase {
     $this->selectEntities($assets, $form_state);
   }
 
-  /**
-   * Clear values from upload form element.
-   *
-   * @param array $element
-   *   Upload form element.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   Form state object.
-   *
-   * TODO: Determine if this function is still needed.  It was initially copied from Upload widget class in the entity browser module
-   *
-   */
-  protected function clearFormValues(array &$element, FormStateInterface $form_state) {
-    // We propagated entities to the other parts of the system. We can now remove
-    // them from our values.
-    // $form_state->setValueForElement($element['upload']['fids'], '');
-    // NestedArray::setValue($form_state->getUserInput(), $element['upload']['fids']['#parents'], '');
-  }
-
-  /**
+   /**
    * {@inheritdoc}
    *
    * TODO: Add more settings for configuring this widget
