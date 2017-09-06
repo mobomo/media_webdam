@@ -95,7 +95,7 @@ class Webdam extends WidgetBase {
     //If a button has been clicked that represents a webdam folder
     if (isset($trigger_elem['#name']) && $trigger_elem['#name'] == 'webdam_folder') {
       //Set the current folder id to the id of the folder that was clicked
-      $current_folder_id = intval($form_state->getTriggeringElement()['#webdam_folder_id']);
+      $current_folder_id = intval($trigger_elem['#webdam_folder_id']);
     }
     //If the current folder is not zero then fetch information about the sub folder being rendered
     if($current_folder_id !== 0){
@@ -213,14 +213,13 @@ class Webdam extends WidgetBase {
       '#title' => $this->t('Choose one or more assets'),
       '#title_display' => 'invisible',
       '#options' => $assets,
-      // Multiple assets will only be accepted if the source field allows more than one value.
-      '#multiple' => $field_cardinality != 1 && $this->configuration['multiple'],
       '#attached' => [
         'library' => [
           'media_webdam/webdam',
         ]
       ]
     ];
+//    ksm($form);
     return $form;
   }
 
@@ -228,12 +227,36 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
-    foreach ($form_state->getValue(['upload'], []) as $aid) {
+    foreach ($form_state->getValue(['assets'], []) as $aid) {
       if ($aid !== 0) {
-        //TODO: validate form selection
+        $webdam_asset = $this->webdam->getAsset($aid);
+        $media_asset = Media::create([
+          'bundle' => 'webdam',
+          'uid' => '1',
+          'langcode' => 'en',
+          'status' => Media::PUBLISHED,
+          'name' => $webdam_asset->name,
+          'field_asset_id' => $aid,
+        ]);
+        $media_asset->save();
+        $assets[] = $media_asset;
       }
     }
-    return [];
+    return $assets;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validate(array &$form, FormStateInterface $form_state) {
+    if (!empty($form_state->getTriggeringElement()['#eb_widget_main_submit'])) {
+      $assets = array_filter($form_state->getValue('assets'), function($var){ return $var !== 0;} );
+      $field_cardinality = $form_state->get(['entity_browser', 'validators', 'cardinality', 'cardinality']);
+      if($field_cardinality > 0 && count($assets) > $field_cardinality){
+        $message = $this->formatPlural($field_cardinality, 'You can not select more than 1 entity.', 'You can not select more than @count entities.');
+        $form_state->setError($form['widget']['asset-container']['assets'], $message);
+      }
+    }
   }
 
   /**
@@ -242,23 +265,8 @@ class Webdam extends WidgetBase {
   public function submit(array &$element, array &$form, FormStateInterface $form_state) {
     $assets = [];
     if (!empty($form_state->getTriggeringElement()['#eb_widget_main_submit'])) {
-      foreach ($form_state->getValue(['assets'], []) as $aid) {
-        if ($aid !== 0) {
-          $webdam_asset = $this->webdam->getAsset($aid);
-          $media_asset = Media::create([
-            'bundle' => 'webdam',
-            'uid' => '1',
-            'langcode' => 'en',
-            'status' => Media::PUBLISHED,
-            'name' => $webdam_asset->name,
-            'field_asset_id' => $aid,
-          ]);
-          $media_asset->save();
-          $assets[] = $media_asset;
-        }
-      }
+      $assets = $this->prepareEntities($form,$form_state);
     }
-    // $this->clearFormValues($element, $form_state);
     $this->selectEntities($assets, $form_state);
   }
 
