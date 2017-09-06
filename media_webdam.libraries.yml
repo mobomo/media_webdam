@@ -4,4 +4,4 @@ webdam:
   js: {}
   css:
     theme:
-      css/main-style.css: {}
+      css/asset-browser.css: {}

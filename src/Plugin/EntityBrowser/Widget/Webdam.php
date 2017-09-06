@@ -140,7 +140,7 @@ class Webdam extends WidgetBase {
       }while($id != $current_folder_id && count($breadcrumbs) > 1);
     }
     //If the parent folder id of the current folder is in the breadcrumb trail then the user MIGHT have navigated down into a subfolder
-    if(array_key_exists($current_folder->parent,$breadcrumbs)){
+    if(is_object($current_folder) && property_exists($current_folder, 'parent') && array_key_exists($current_folder->parent, $breadcrumbs)){
       //Go to the end of the breadcrumb array
       end($breadcrumbs);
       //If the last folder id in the breadcrumb equals the parent folder id of the current folder the the user HAS navigated down into a subfolder
@@ -166,7 +166,7 @@ class Webdam extends WidgetBase {
         '#webdam_folder_id' => $folder_id,
         '#webdam_parent_folder_id' => $folder_name,
         '#attributes' => [
-          'class' => ['webdam-browser-breadcrumb-container'],
+          'class' => ['webdam-browser-breadcrumb'],
         ]
       ];
     }
@@ -174,26 +174,37 @@ class Webdam extends WidgetBase {
     //Add container for assets (and folder buttons)
     $form['asset-container'] = [
       '#type' => 'container',
+
     ];
-    //Add folder buttons to form
+
+    $parent = 0;
+    if (is_object($current_folder) && property_exists($current_folder, 'parent')) {
+      $parent = $current_folder->parent;
+    }
+
+    // Add folder buttons to form
     foreach ($folders as $folder){
       $form['asset-container'][$folder->id] = [
         '#type' => 'button',
         '#value' => $folder->name,
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder->id,
-        '#webdam_parent_folder_id' => $current_folder->parent,
+        '#webdam_parent_folder_id' => $parent,
         '#attributes' => [
-          'class' => ['webdam-browser-breadcrumb'],
-        ]
+          'class' => ['webdam-browser-asset'],
+        ],
       ];
     }
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.
     $assets = [];
+
     //Add to the assets array
-    foreach ($folder_items as $folder_item) {
-      $assets[$folder_item->id] = $this->layoutMediaEntity($folder_item);
+    if (isset($folder_items)) {
+      foreach ($folder_items as $folder_item) {
+        $assets[$folder_item->id] = $this->layoutMediaEntity($folder_item);
+      }
     }
+
     // Add assets to form.
     $form['asset-container']['assets'] = [
       '#type' => 'checkboxes',
