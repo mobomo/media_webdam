@@ -3,15 +3,15 @@
 namespace Drupal\media_webdam\Plugin\EntityBrowser\Widget;
 
 use Drupal\Core\Entity\EntityTypeManagerInterface;
-use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Utility\Token;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
 use Drupal\media_webdam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\media_entity\Entity\Media;
+use Drupal\media_entity\Entity\MediaBundle;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 
 /**
  * Uses a view to provide entity listing in a browser's widget.
@@ -33,6 +33,13 @@ class Webdam extends WidgetBase {
   protected $webdam;
 
   /**
+   * The entity type bundle info service.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
+   */
+  protected $entityTypeBundleInfo;
+
+  /**
    * Webdam constructor.
    *
    * @param array $configuration
@@ -42,10 +49,12 @@ class Webdam extends WidgetBase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
    * @param \Drupal\media_webdam\WebdamInterface $webdam_interface
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam){
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, EntityTypeBundleInfoInterface $entity_type_bundle_info){
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
     $this->webdam = $webdam;
+    $this->entityTypeBundleInfo = $entity_type_bundle_info;
   }
 
   /**
@@ -59,22 +68,12 @@ class Webdam extends WidgetBase {
       $container->get('event_dispatcher'),
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
-      $container->get('media_webdam.webdam')
+      $container->get('media_webdam.webdam'),
+      $container->get('entity_type.bundle.info')
     );
   }
 
-  /**
-   * {@inheritdoc}
-   */
-  public function defaultConfiguration() {
-    return [
-      'submit_text' => $this->t('Select assets'),
-      'multiple' => TRUE,
-    ] +
-    parent::defaultConfiguration();
-  }
-
-  /**
+    /**
    * {@inheritdoc}
    *
    * TODO: This is a mega-function which needs to be refactored.  Therefore it has been thouroughly documented
@@ -217,7 +216,6 @@ class Webdam extends WidgetBase {
         ]
       ]
     ];
-//    ksm($form);
     return $form;
   }
 
@@ -225,16 +223,17 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
+    $asset_id_field = MediaBundle::load($this->configuration['bundle'])->type_configuration['source_field'];
     foreach ($form_state->getValue(['assets'], []) as $aid) {
       if ($aid !== 0) {
         $webdam_asset = $this->webdam->getAsset($aid);
         $media_asset = Media::create([
-          'bundle' => 'webdam',
-          'uid' => '1',
-          'langcode' => 'en',
+          'bundle' => $this->configuration['bundle'],
+          'uid' => \Drupal::currentUser()->id(),
+          'langcode' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
           'status' => Media::PUBLISHED,
           'name' => $webdam_asset->name,
-          'field_asset_id' => $aid,
+          $asset_id_field => $aid,
         ]);
         $media_asset->save();
         $assets[] = $media_asset;
@@ -268,7 +267,17 @@ class Webdam extends WidgetBase {
     $this->selectEntities($assets, $form_state);
   }
 
-   /**
+  /**
+   * {@inheritdoc}
+   */
+  public function defaultConfiguration() {
+    return [
+        'submit_text' => $this->t('Select assets'),
+      ] +
+      parent::defaultConfiguration();
+  }
+
+  /**
    * {@inheritdoc}
    *
    * TODO: Add more settings for configuring this widget
@@ -276,13 +285,30 @@ class Webdam extends WidgetBase {
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildConfigurationForm($form, $form_state);
-    $form['multiple'] = [
-      '#type' => 'checkbox',
-      '#title' => $this->t('Accept multiple files'),
-      '#default_value' => $this->configuration['multiple'],
-      '#description' => $this->t('Multiple assets will only be accepted if the source field allows more than one value.'),
+    $bundle_info = $this->entityTypeBundleInfo->getBundleInfo('media');
+    $media_bundles = MediaBundle::loadMultiple(array_keys($bundle_info));
+    $bundles = array_map( function($item){
+        return $item->label;
+      },array_filter($media_bundles, function($item){
+        return $item->type == 'webdam_asset';
+      })
+    );
+    $form['bundle'] = [
+      '#type' => 'container',
+      'select' => [
+        '#type' => 'select',
+        '#title' => $this->t('Bundle'),
+        '#options' => $bundles,
+        '#default_value' => $bundle,
+      ],
+      '#attributes' => ['id' => 'bundle-wrapper-' . $this->uuid()],
     ];
     return $form;
+  }
+
+  public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
+    parent::submitConfigurationForm($form, $form_state);
+    $this->configuration['bundle'] = $this->configuration['bundle']['select'];
   }
 
   /**
