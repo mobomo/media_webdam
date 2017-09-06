@@ -279,7 +279,7 @@ class Webdam extends WidgetBase {
     if (!empty($webdamAsset->thumbnailurls)) {
       $thumbnail = '<img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" />';
     } else {
-      $thumbnail = '<span class="webdam-browser-empty">No preview available.</span';
+      $thumbnail = '<span class="webdam-browser-empty">No preview available.</span>';
     }
 
     $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p>' . $assetName . '</p></div>';
