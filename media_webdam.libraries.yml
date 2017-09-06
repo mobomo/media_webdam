@@ -1,0 +1,7 @@
+webdam:
+  version: 1.x
+
+  js: {}
+  css:
+    theme:
+      css/main-style.css: {}
