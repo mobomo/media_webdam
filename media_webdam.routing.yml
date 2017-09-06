@@ -6,15 +6,6 @@ media_webdam.config:
   requirements:
     _permission: 'administer site configuration'
 
-media_webdam.webdam_upload:
-  path: '/admin/content/media/webdam'
-  defaults:
-    _form: '\Drupal\media_webdam\Form\WebdamUpload'
-    _title: 'Webdam Upload'
-  requirements:
-    #@todo: check / modify permissions.
-    _permission: 'administer site configuration'
-
 entity.user.webdam_auth:
   path: '/user/{user}/webdam'
   defaults:
