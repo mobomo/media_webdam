@@ -48,6 +48,7 @@ input.webdam-browser-breadcrumb {
   margin: 5px 0;
   text-decoration: underline;
   padding-left: 5px;
+  padding-right: 5px;
 }
 
 input.webdam-browser-breadcrumb:hover,
@@ -56,3 +57,13 @@ input.webdam-browser-breadcrumb:focus {
   box-shadow: none;
   border: none;
 }
+
+.webdam-breadcrumb-trail::before {
+  content: ">>";
+  font-size: 80%;
+}
+
+.webdam-breadcrumb-trail:first-of-type::before {
+  content: none;
+}
+
