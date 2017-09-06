@@ -165,6 +165,8 @@ class Webdam extends WidgetBase {
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder_id,
         '#webdam_parent_folder_id' => $folder_name,
+        '#prefix' => '<span class="webdam-breadcrumb-trail">',
+        '#suffix' => '</span>',
         '#attributes' => [
           'class' => ['webdam-browser-breadcrumb'],
         ]
