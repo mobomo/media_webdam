@@ -32,7 +32,7 @@ class WebdamUpload extends FormBase {
   /**
    * The EntityManagerInterface.
    *
-   * @var \Drupal\Core\Entity\EntityManagerInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
   protected $entityManager;
 
@@ -105,6 +105,7 @@ class WebdamUpload extends FormBase {
     $folderID = $form_state->getValue('webdam_folder');
     $fid = $form_state->getValue('managed_file');
     if (!empty($fid)) {
+
       $file = $this->entityManager->getStorage('file')->load($fid[0]);
       $file->save();
 
@@ -114,6 +115,14 @@ class WebdamUpload extends FormBase {
 
       // Uploading asset to AWS.
       $this->webdam->uploadAsset($file_uri, $file_name, $folderID);
+
+      // Print success message.
+      drupal_set_message(
+       $this->t(
+         '@filename has been successfully uploaded to Webdam!',
+         ['@filename' => $file_name]
+       )
+      );
 
     }
 
