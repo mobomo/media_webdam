@@ -42,8 +42,7 @@ input.webdam-browser-breadcrumb-container {
   margin: 5px 0;
 }
 
-input.webdam-browser-breadcrumb,
-input.webdam-browser-breadcrumb-container {
+input.webdam-browser-breadcrumb {
   border: none;
   background: transparent;
   margin: 5px 0;
@@ -52,9 +51,7 @@ input.webdam-browser-breadcrumb-container {
 }
 
 input.webdam-browser-breadcrumb:hover,
-input.webdam-browser-breadcrumb:focus,
-input.webdam-browser-breadcrumb-container:hover,
-input.webdam-browser-breadcrumb-container:focus {
+input.webdam-browser-breadcrumb:focus {
   background: none;
   box-shadow: none;
   border: none;

@@ -166,7 +166,7 @@ class Webdam extends WidgetBase {
         '#webdam_folder_id' => $folder_id,
         '#webdam_parent_folder_id' => $folder_name,
         '#attributes' => [
-          'class' => ['webdam-browser-breadcrumb-container'],
+          'class' => ['webdam-browser-breadcrumb'],
         ]
       ];
     }
@@ -174,6 +174,7 @@ class Webdam extends WidgetBase {
     //Add container for assets (and folder buttons)
     $form['asset-container'] = [
       '#type' => 'container',
+
     ];
     //Add folder buttons to form
     foreach ($folders as $folder){
@@ -184,8 +185,8 @@ class Webdam extends WidgetBase {
         '#webdam_folder_id' => $folder->id,
         '#webdam_parent_folder_id' => $current_folder->parent,
         '#attributes' => [
-          'class' => ['webdam-browser-breadcrumb'],
-        ]
+          'class' => ['webdam-browser-asset'],
+        ],
       ];
     }
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.
