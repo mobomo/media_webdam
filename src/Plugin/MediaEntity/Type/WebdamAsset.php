@@ -56,9 +56,7 @@ class WebdamAsset extends MediaTypeBase {
     // @TODO: Determine how to support custom metadata.
     $fields = [
       'type_id' => $this->t('Type ID'),
-      'status' => $this->t('Asset status'),
       'filename' => $this->t('Filename'),
-      'name' => $this->t('Name'),
       'filesize' => $this->t('Filesize'),
       'width' => $this->t('Width'),
       'height' => $this->t('Height'),
@@ -125,12 +123,8 @@ class WebdamAsset extends MediaTypeBase {
     switch ($name) {
       case 'type_id':
         return $asset->type_id;
-      case 'status':
-        return $asset->status;
       case 'filename':
         return $asset->filename;
-      case 'name':
-        return $asset->name;
       case 'filesize':
         return $asset->filesize;
       case 'width':
