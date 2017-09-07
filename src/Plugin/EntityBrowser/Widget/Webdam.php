@@ -225,23 +225,39 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
-    $asset_id_field = MediaBundle::load($this->configuration['bundle'])->type_configuration['source_field'];
-    foreach ($form_state->getValue(['assets'], []) as $aid) {
-      if ($aid !== 0) {
-        $webdam_asset = $this->webdam->getAsset($aid);
-        $media_asset = Media::create([
-          'bundle' => $this->configuration['bundle'],
-          'uid' => \Drupal::currentUser()->id(),
-          'langcode' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
-          'status' => Media::PUBLISHED,
-          'name' => $webdam_asset->name,
-          $asset_id_field => $aid,
-        ]);
-        $media_asset->save();
-        $assets[] = $media_asset;
+    $entities = [];
+    $media_bundle = MediaBundle::load($this->configuration['bundle']);
+    $asset_ids = $form_state->getValue(['assets'], []);
+    $assets = $this->webdam->getAssetMultiple($asset_ids);
+    foreach ($assets as $asset) {
+      $entity_values = [
+        'bundle' => $this->configuration['bundle'],
+        'uid' => \Drupal::currentUser()->id(),
+        'langcode' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
+        'status' => ($asset->status == 'active' ? Media::PUBLISHED : Media::NOT_PUBLISHED),
+        'name' => $asset->name,
+        $media_bundle->type_configuration['source_field'] => $asset->id,
+      ];
+      foreach ($media_bundle->field_map as $entity_field => $mapped_field) {
+        switch ($entity_field){
+          case 'datecreated':
+            $entity_values[$mapped_field] = $asset->date_created_unix;
+            break;
+          case 'datemodified':
+            $entity_values[$mapped_field] = $asset->date_modified_unix;
+            break;
+          case 'datecaptured':
+            $entity_values[$mapped_field] = $asset->datecapturedUnix;
+            break;
+          default:
+            $entity_values[$mapped_field] = $asset->$entity_field;
+        }
       }
+      $entity = Media::create($entity_values);
+      $entity->save();
+      $entities[] = $entity;
     }
-    return $assets;
+    return $entities;
   }
 
   /**
