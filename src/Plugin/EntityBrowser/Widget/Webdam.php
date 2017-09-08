@@ -5,14 +5,15 @@ namespace Drupal\media_webdam\Plugin\EntityBrowser\Widget;
 use cweagans\webdam\Entity\Folder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\Core\Session\AccountInterface;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
 use Drupal\media_webdam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\media_entity\Entity\Media;
-use Drupal\media_entity\Entity\MediaBundle;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
+use Drupal\Core\Language\LanguageManagerInterface;
 
 /**
  * Uses a view to provide entity listing in a browser's widget.
@@ -25,7 +26,6 @@ use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
  * )
  */
 class Webdam extends WidgetBase {
-
   /**
    * The webdam interface.
    *
@@ -34,11 +34,25 @@ class Webdam extends WidgetBase {
   protected $webdam;
 
   /**
+   * The current user account.
+   *
+   * @var AccountInterface
+   */
+  protected $user;
+
+  /**
+   * The current user account.
+   *
+   * @var LanguageManagerInterface
+   */
+  protected $language_manager;
+
+  /**
    * The entity type bundle info service.
    *
    * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
    */
-  protected $entityTypeBundleInfo;
+  protected $entity_type_bundle_info;
 
   /**
    * Webdam constructor.
@@ -49,13 +63,17 @@ class Webdam extends WidgetBase {
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
-   * @param \Drupal\media_webdam\WebdamInterface $webdam_interface
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
+   * @param \Drupal\media_webdam\WebdamInterface $webdam
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_manager
+   * @param \Drupal\Core\Session\AccountInterface $account
+   * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, EntityTypeBundleInfoInterface $entity_type_bundle_info){
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, EntityTypeBundleInfoInterface $entity_type_bundle_info, AccountInterface $account, LanguageManagerInterface $language_manager){
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
     $this->webdam = $webdam;
-    $this->entityTypeBundleInfo = $entity_type_bundle_info;
+    $this->entity_type_bundle_info = $entity_type_bundle_info;
+    $this->user = $account;
+    $this->language_manager = $language_manager;
   }
 
   /**
@@ -70,7 +88,9 @@ class Webdam extends WidgetBase {
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
       $container->get('media_webdam.webdam'),
-      $container->get('entity_type.bundle.info')
+      $container->get('entity_type.bundle.info'),
+      $container->get('current_user'),
+      $container->get('language_manager')
     );
   }
 
@@ -78,8 +98,6 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   public function getBreadcrumb(Folder $current_folder, array $breadcrumbs) {
-
-
     //If the folder being rendered is already in the breadcrumb trail and the breadcrumb trail is longer than 1 (i.e. root folder only)
     if(array_key_exists($current_folder->id,$breadcrumbs) && count($breadcrumbs) > 1){
       //This indicates that the user has navigated "Up" the folder structure 1 or more levels
@@ -134,14 +152,20 @@ class Webdam extends WidgetBase {
 
   /**
    * {@inheritdoc}
+   *
+   * Create a custom pager
+   *
    */
   public function getPager(Folder $current_folder, int $page, int $num_per_page) {
-    // Create a custom pager.
+    // Add container for pager
     $form['pager-container'] = [
       '#type' => 'container',
+      //Store page number in container so it can be retrieved from the form state
       '#page' => $page,
     ];
+    //If not on the first page
     if($page > 0){
+      //Add a button to go to the first page
       $form['pager-container']['first'] = [
         '#type' => 'button',
         '#value' => 'First',
@@ -151,6 +175,7 @@ class Webdam extends WidgetBase {
           'class' => ['page-button','page-first'],
         ]
       ];
+      //Add a button to go to the previous page
       $form['pager-container']['previous'] = [
         '#type' => 'button',
         '#value' => 'Previous',
@@ -161,9 +186,13 @@ class Webdam extends WidgetBase {
         ]
       ];
     }
+    //Last available page based on number of assets in folder divided by number of assets to show per page
     $last_page = floor($current_folder->numassets / $num_per_page);
+    //First page to show in the pager.  Try to put the button for the current page in the middle by starting at the current page number minus 4
     $start_page = max(0, $page - 4);
+    //Last page to show in the pager.  Don't go beyond the last available page
     $end_page = min($start_page + 9, $last_page);
+    //Create buttons for pages from start to end
     for($i = $start_page; $i <= $end_page; $i++){
       $form['pager-container']['page_'.$i] = [
         '#type' => 'button',
@@ -175,7 +204,9 @@ class Webdam extends WidgetBase {
         ]
       ];
     }
+    //If not on the last page
     if($end_page > $page){
+      //Add a button to go to the next page
       $form['pager-container']['next'] = [
         '#type' => 'button',
         '#value' => 'Next',
@@ -185,6 +216,7 @@ class Webdam extends WidgetBase {
           'class' => ['page-button', 'page-next'],
         ]
       ];
+      //Add a button to go to the last page
       $form['pager-container']['last'] = [
         '#type' => 'button',
         '#value' => 'Last',
@@ -198,11 +230,38 @@ class Webdam extends WidgetBase {
     return $form;
   }
 
-    /**
+  /**
    * {@inheritdoc}
    *
-   * TODO: This is a mega-function which needs to be refactored.  Therefore it has been thouroughly documented
+   * Create form elements for sorting and filtering/searching
    *
+   */
+  public function getFilterSort(Folder $current_folder, array $filter_sort_options) {
+    // Add container for pager
+    $form['filter-sort-container'] = [
+      '#type' => 'container',
+      //Store filter/sort options in container so they can be retrieved from the form state
+      '#filter_sort_options' => $filter_sort_options
+    ];
+    $form['filter-sort-container']['sortby'] = [
+      '#type' => 'select',
+      '#title' => 'Sort by',
+      '$options' => 'filename'
+    ];
+    $form['filter-sort-container']['sortdir'] = [
+
+    ];
+    $form['filter-sort-container']['types'] = [
+
+    ];
+    $form['filter-sort-container']['search'] = [
+
+    ];
+    return $form;
+  }
+
+    /**
+   * {@inheritdoc}
    */
   public function getForm(array &$original_form, FormStateInterface $form_state, array $additional_widget_parameters) {
     //Start by inheriting parent form
@@ -324,14 +383,14 @@ class Webdam extends WidgetBase {
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
     $entities = [];
-    $media_bundle = MediaBundle::load($this->configuration['bundle']);
+    $media_bundle = $this->entityTypeManager->getStorage('media_bundle')->load($this->configuration['bundle']);
     $asset_ids = $form_state->getValue(['assets'], []);
     $assets = $this->webdam->getAssetMultiple($asset_ids);
     foreach ($assets as $asset) {
       $entity_values = [
         'bundle' => $this->configuration['bundle'],
-        'uid' => \Drupal::currentUser()->id(),
-        'langcode' => \Drupal::languageManager()->getCurrentLanguage()->getId(),
+        'uid' => $this->user->id(),
+        'langcode' => $this->language_manager->getCurrentLanguage()->getId(),
         'status' => ($asset->status == 'active' ? Media::PUBLISHED : Media::NOT_PUBLISHED),
         'name' => $asset->name,
         $media_bundle->type_configuration['source_field'] => $asset->id,
@@ -351,7 +410,7 @@ class Webdam extends WidgetBase {
             $entity_values[$mapped_field] = $asset->$entity_field;
         }
       }
-      $entity = Media::create($entity_values);
+      $entity = $this->entityTypeManager->getStorage('media')->create($entity_values);
       $entity->save();
       $entities[] = $entity;
     }
@@ -400,22 +459,26 @@ class Webdam extends WidgetBase {
    *
    */
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
+    //Start with parent form
     $form = parent::buildConfigurationForm($form, $form_state);
-    $bundle_info = $this->entityTypeBundleInfo->getBundleInfo('media');
-    $media_bundles = MediaBundle::loadMultiple(array_keys($bundle_info));
-    $bundles = array_map( function($item){
+    //Get list of media bundles
+    $media_bundle_info = $this->entity_type_bundle_info->getBundleInfo('media');
+    //Load media bundles
+    $media_bundles = $this->entityTypeManager->getStorage('media_bundle')->loadMultiple(array_keys(($media_bundle_info)));
+    //Filter out bundles that do not have type = webdam_asset
+    $webdam_bundles = array_map( function($item){
         return $item->label;
       },array_filter($media_bundles, function($item){
         return $item->type == 'webdam_asset';
       })
     );
+    //Add bundle dropdown to form
     $form['bundle'] = [
       '#type' => 'container',
       'select' => [
         '#type' => 'select',
         '#title' => $this->t('Bundle'),
-        '#options' => $bundles,
-        '#default_value' => $bundle,
+        '#options' => $webdam_bundles,
       ],
       '#attributes' => ['id' => 'bundle-wrapper-' . $this->uuid()],
     ];
@@ -436,15 +499,12 @@ class Webdam extends WidgetBase {
    */
   public function layoutMediaEntity($webdamAsset) {
     $assetName = $webdamAsset->name;
-
     if (!empty($webdamAsset->thumbnailurls)) {
       $thumbnail = '<img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" />';
     } else {
       $thumbnail = '<span class="webdam-browser-empty">No preview available.</span>';
     }
-
     $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p>' . $assetName . '</p></div>';
-
     return $element;
   }
 }
