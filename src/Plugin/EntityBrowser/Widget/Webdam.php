@@ -64,7 +64,7 @@ class Webdam extends WidgetBase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
    * @param \Drupal\media_webdam\WebdamInterface $webdam
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_manager
+   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    * @param \Drupal\Core\Session\AccountInterface $account
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    */
@@ -236,26 +236,42 @@ class Webdam extends WidgetBase {
    * Create form elements for sorting and filtering/searching
    *
    */
-  public function getFilterSort(Folder $current_folder, array $filter_sort_options) {
+  public function getFilterSort() {
     // Add container for pager
     $form['filter-sort-container'] = [
       '#type' => 'container',
-      //Store filter/sort options in container so they can be retrieved from the form state
-      '#filter_sort_options' => $filter_sort_options
     ];
+    // Add dropdown for sort by
     $form['filter-sort-container']['sortby'] = [
       '#type' => 'select',
       '#title' => 'Sort by',
-      '$options' => 'filename'
+      '#options' => ['filename' => 'File name', 'filesize' => 'File size', 'datecreated' => 'Date created', 'datemodified' => 'Date modified'],
+      '#default_value' => 'datecreated',
     ];
+    // Add dropdown for sort direction
     $form['filter-sort-container']['sortdir'] = [
-
+      '#type' => 'select',
+      '#title' => 'Sort direction',
+      '#options' => ['asc' => 'Ascending', 'desc' => 'Descending'],
+      '#default_value' => 'asc',
     ];
+    // Add dropdown for filtering on asset type
     $form['filter-sort-container']['types'] = [
-
+      '#type' => 'select',
+      '#title' => 'File type',
+      '#options' => ['' => 'All', 'image' => 'Image', 'audiovideo' => 'Audio/Video', 'document' => 'Document', 'presentation' => 'Presentation', 'other' => 'Other'],
+      '#default_value' => '',
     ];
-    $form['filter-sort-container']['search'] = [
-
+    // Add textfield for keyword search
+    $form['filter-sort-container']['query'] = [
+      '#type' => 'textfield',
+      '#title' => 'Search'
+    ];
+    // Add submit button to apply sort/filter criteria
+    $form['filter-sort-container']['filter-sort-submit'] = [
+      '#type' => 'button',
+      '#value' => 'Go',
+      '#name' => 'filter_sort_submit',
     ];
     return $form;
   }
@@ -295,42 +311,65 @@ class Webdam extends WidgetBase {
       //Set the breadcrumbs to the value stored in the form state
       $breadcrumbs = $widget['breadcrumb-container']['#breadcrumbs'];
     }
-
-    //If a button has been clicked that represents a webdam folder
-    if (isset($trigger_elem['#name']) && $trigger_elem['#name'] == 'webdam_folder') {
-      //Set the current folder id to the id of the folder that was clicked
-      $current_folder->id = intval($trigger_elem['#webdam_folder_id']);
-      //Reset page to zero if we have navigated to a new folder
-      $page = 0;
+    //If the form has been submitted
+    if (isset($trigger_elem)){
+      //If a folder button has been clicked
+      if ($trigger_elem['#name'] == 'webdam_folder') {
+        //Set the current folder id to the id of the folder that was clicked
+        $current_folder->id = intval($trigger_elem['#webdam_folder_id']);
+        //Reset page to zero if we have navigated to a new folder
+        $page = 0;
+      }
+      //If a pager button has been clicked
+      if ($trigger_elem['#name'] == 'webdam_pager') {
+        //Set the current folder id to the id of the folder that was clicked
+        $page = intval($trigger_elem['#webdam_page']);
+      }
+      //If the filter/sort submit button has been clicked
+      if ($trigger_elem['#name'] == 'filter_sort_submit') {
+        //Reset page to zero
+        $page = 0;
+      }
     }
-    //If a pager button has been clicked
-    if (isset($trigger_elem['#name']) && $trigger_elem['#name'] == 'webdam_pager') {
-      //Set the current folder id to the id of the folder that was clicked
-      $page = intval($trigger_elem['#webdam_page']);
-    }
+    //Offset used for pager
+    $offset = $num_per_page * $page;
+    //Parameters for searching, sorting, and filtering
+    $params = [
+      'limit' => $num_per_page,
+      'offset' => $offset,
+      'sortby' => $form_state->getValue('sortby'),
+      'sortdir' => $form_state->getValue('sortdir'),
+      'types' => $form_state->getValue('types'),
+      'query' => $form_state->getValue('query'),
+      'folderid' => $current_folder->id,
+    ];
     //If the current folder is not zero then fetch information about the sub folder being rendered
     if($current_folder->id !== 0){
       //Fetch the folder object from webdam
       $current_folder = $this->webdam->getFolder($current_folder->id);
-      //Set the offset based on the current page value
-      $offset = $num_per_page * $page;
-      //Set the query params for the getFolderAssets call to webdam
-      $params = [
-        'limit' => $num_per_page,
-        'offset' => $offset
-      ];
       //Fetch a list of assets for the folder from webdam
       $folder_assets = $this->webdam->getFolderAssets($current_folder->id, $params);
       //Store the list of folders for rendering later
       $folders = $folder_assets->folders;
-      //Store the list of items/assets for rendering later
-      $folder_items = $folder_assets->items;
+      //Set items to array of assets in the current folder
+      $items = $folder_assets->items;
     }else{
       //The webdam root folder is fetched differently because it can only contain subfolders (not assets)
       $folders = $this->webdam->getTopLevelFolders();
     }
+    //If searching by keyword
+    if(!empty($params['query'])){
+      //Fetch search results from webdam
+      $search_results = $this->webdam->searchAssets($params);
+      //Override number of assets on current folder to make number of search results so pager works correctly
+      $current_folder->numassets = $search_results['total_count'];
+      //Set items to array of assets in the search result
+      $items = $search_results['assets'];
+    }
     //Add the breadcrumb to the form
     $form += $this->getBreadcrumb($current_folder, $breadcrumbs);
+    //Add the filter and sort options to the form
+    $form += $this->getFilterSort($current_folder, $breadcrumbs);
     //Add container for assets (and folder buttons)
     $form['asset-container'] = [
       '#type' => 'container',
@@ -353,8 +392,8 @@ class Webdam extends WidgetBase {
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.
     $assets = [];
     //Add to the assets array
-    if (isset($folder_items)) {
-      foreach ($folder_items as $folder_item) {
+    if (isset($items)) {
+      foreach ($items as $folder_item) {
         $assets[$folder_item->id] = $this->layoutMediaEntity($folder_item);
       }
     }
@@ -382,20 +421,50 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
-    $entities = [];
-    $media_bundle = $this->entityTypeManager->getStorage('media_bundle')->load($this->configuration['bundle']);
-    $asset_ids = $form_state->getValue(['assets'], []);
+    //Get webdam asset id's from form state
+    $asset_ids = array_filter($form_state->getValue(['assets'], []));
+    //Load bundle information
+    $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($this->configuration['bundle']);
+    //Get the source field for this bundle which stores the webdam asset id
+    $source_field = $bundle->type_configuration['source_field'];
+    //Query for existing entities
+    $existing_ids = $this->entityTypeManager->getStorage('media')->getQuery()
+      ->condition('bundle',$bundle->id())
+      ->condition($source_field,$asset_ids,'IN')
+      ->execute();
+    //Load the entities found
+    $entities = $this->entityTypeManager->getStorage('media')->loadMultiple($existing_ids);
+    //Loop through the existing entities
+    foreach ($entities as $entity) {
+      //Set the webdam asset id of the current entity
+      $asset_id = $entity->get($source_field)->value;
+      //If the asset id of the entity is in the list of asset id's selected in the form
+      if(in_array($asset_id,$asset_ids)){
+        //Remove the asset id from the input so it does not get fetched from webdam and does not get created as a duplicate
+        unset($asset_ids[$asset_id]);
+      }
+    }
+    //Fetch the assets from webdam
     $assets = $this->webdam->getAssetMultiple($asset_ids);
+    //Loop through the returned webdam assets
     foreach ($assets as $asset) {
+      //Initialize entity values
       $entity_values = [
-        'bundle' => $this->configuration['bundle'],
+        'bundle' => $bundle->id(),
+        //This should be the current user id
         'uid' => $this->user->id(),
+        //This should be the current language code
         'langcode' => $this->language_manager->getCurrentLanguage()->getId(),
+        //This should map the webdam asset status to the drupal entity status
         'status' => ($asset->status == 'active' ? Media::PUBLISHED : Media::NOT_PUBLISHED),
+        //Set the entity name to the webdam asset name
         'name' => $asset->name,
-        $media_bundle->type_configuration['source_field'] => $asset->id,
+        //Set the chosen source field for this entity to the webdam asset id
+        $source_field => $asset->id,
       ];
-      foreach ($media_bundle->field_map as $entity_field => $mapped_field) {
+      //Loop through the mapped fields for this bundle
+      foreach ($bundle->field_map as $entity_field => $mapped_field) {
+        //Switch for special handling of fields that don't map directly from webdam to the entity
         switch ($entity_field){
           case 'datecreated':
             $entity_values[$mapped_field] = $asset->date_created_unix;
@@ -406,14 +475,19 @@ class Webdam extends WidgetBase {
           case 'datecaptured':
             $entity_values[$mapped_field] = $asset->datecapturedUnix;
             break;
+          //Default handling of fields that should map directly from webdam to the entity
           default:
             $entity_values[$mapped_field] = $asset->$entity_field;
         }
       }
+      //Create a new entity to represent the webdam asset
       $entity = $this->entityTypeManager->getStorage('media')->create($entity_values);
+      //Save the entity
       $entity->save();
+      //Add the new entity to the array of returned entities
       $entities[] = $entity;
     }
+    //Return the entities
     return $entities;
   }
 
@@ -421,11 +495,17 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   public function validate(array &$form, FormStateInterface $form_state) {
+    //If the primary submit button was clicked to select assets
     if (!empty($form_state->getTriggeringElement()['#eb_widget_main_submit'])) {
-      $assets = array_filter($form_state->getValue('assets'), function($var){ return $var !== 0;} );
+      //The form input uses checkboxes which returns zero for unchecked assets.  Remove these unchecked assets
+      $assets = array_filter($form_state->getValue('assets'));
+      //Get the cardinality for the media field that is being populated
       $field_cardinality = $form_state->get(['entity_browser', 'validators', 'cardinality', 'cardinality']);
+      //If the field cardinality is limited and the number of assets selected is greater than the field cardinality
       if($field_cardinality > 0 && count($assets) > $field_cardinality){
+        //Format the error message for singular or plural depending on cardinality
         $message = $this->formatPlural($field_cardinality, 'You can not select more than 1 entity.', 'You can not select more than @count entities.');
+        //Set the error message on the form
         $form_state->setError($form['widget']['asset-container']['assets'], $message);
       }
     }
