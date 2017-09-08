@@ -236,26 +236,37 @@ class Webdam extends WidgetBase {
    * Create form elements for sorting and filtering/searching
    *
    */
-  public function getFilterSort(Folder $current_folder, array $filter_sort_options) {
+  public function getFilterSort() {
     // Add container for pager
     $form['filter-sort-container'] = [
       '#type' => 'container',
-      //Store filter/sort options in container so they can be retrieved from the form state
-      '#filter_sort_options' => $filter_sort_options
     ];
     $form['filter-sort-container']['sortby'] = [
       '#type' => 'select',
       '#title' => 'Sort by',
-      '$options' => 'filename'
+      '#options' => ['filename' => 'File name', 'filesize' => 'File size', 'datecreated' => 'Date created', 'datemodified' => 'Date modified'],
+      '#default_value' => 'datecreated',
     ];
     $form['filter-sort-container']['sortdir'] = [
-
+      '#type' => 'select',
+      '#title' => 'Sort direction',
+      '#options' => ['asc' => 'Ascending', 'desc' => 'Descending'],
+      '#default_value' => 'asc',
     ];
     $form['filter-sort-container']['types'] = [
-
+      '#type' => 'select',
+      '#title' => 'File type',
+      '#options' => ['' => 'All', 'image' => 'Image', 'audiovideo' => 'Audio/Video', 'document' => 'Document', 'presentation' => 'Presentation', 'other' => 'Other'],
+      '#default_value' => '',
     ];
-    $form['filter-sort-container']['search'] = [
-
+    $form['filter-sort-container']['query'] = [
+      '#type' => 'textfield',
+      '#title' => 'Search'
+    ];
+    $form['filter-sort-container']['filter-sort-submit'] = [
+      '#type' => 'button',
+      '#value' => 'Go',
+      '#name' => 'filter_sort_submit',
     ];
     return $form;
   }
@@ -295,42 +306,65 @@ class Webdam extends WidgetBase {
       //Set the breadcrumbs to the value stored in the form state
       $breadcrumbs = $widget['breadcrumb-container']['#breadcrumbs'];
     }
-
-    //If a button has been clicked that represents a webdam folder
-    if (isset($trigger_elem['#name']) && $trigger_elem['#name'] == 'webdam_folder') {
-      //Set the current folder id to the id of the folder that was clicked
-      $current_folder->id = intval($trigger_elem['#webdam_folder_id']);
-      //Reset page to zero if we have navigated to a new folder
-      $page = 0;
+    //If the form has been submitted
+    if (isset($trigger_elem)){
+      //If a folder button has been clicked
+      if ($trigger_elem['#name'] == 'webdam_folder') {
+        //Set the current folder id to the id of the folder that was clicked
+        $current_folder->id = intval($trigger_elem['#webdam_folder_id']);
+        //Reset page to zero if we have navigated to a new folder
+        $page = 0;
+      }
+      //If a pager button has been clicked
+      if ($trigger_elem['#name'] == 'webdam_pager') {
+        //Set the current folder id to the id of the folder that was clicked
+        $page = intval($trigger_elem['#webdam_page']);
+      }
+      //If the filter/sort submit button has been clicked
+      if ($trigger_elem['#name'] == 'filter_sort_submit') {
+        //Reset page to zero
+        $page = 0;
+      }
     }
-    //If a pager button has been clicked
-    if (isset($trigger_elem['#name']) && $trigger_elem['#name'] == 'webdam_pager') {
-      //Set the current folder id to the id of the folder that was clicked
-      $page = intval($trigger_elem['#webdam_page']);
-    }
+    //Offset used for pager
+    $offset = $num_per_page * $page;
+    //Parameters for searching, sorting, and filtering
+    $params = [
+      'limit' => $num_per_page,
+      'offset' => $offset,
+      'sortby' => $form_state->getValue('sortby'),
+      'sortdir' => $form_state->getValue('sortdir'),
+      'types' => $form_state->getValue('types'),
+      'query' => $form_state->getValue('query'),
+      'folderid' => $current_folder->id,
+    ];
     //If the current folder is not zero then fetch information about the sub folder being rendered
     if($current_folder->id !== 0){
       //Fetch the folder object from webdam
       $current_folder = $this->webdam->getFolder($current_folder->id);
-      //Set the offset based on the current page value
-      $offset = $num_per_page * $page;
-      //Set the query params for the getFolderAssets call to webdam
-      $params = [
-        'limit' => $num_per_page,
-        'offset' => $offset
-      ];
       //Fetch a list of assets for the folder from webdam
       $folder_assets = $this->webdam->getFolderAssets($current_folder->id, $params);
       //Store the list of folders for rendering later
       $folders = $folder_assets->folders;
-      //Store the list of items/assets for rendering later
-      $folder_items = $folder_assets->items;
+      //Set items to array of assets in the current folder
+      $items = $folder_assets->items;
     }else{
       //The webdam root folder is fetched differently because it can only contain subfolders (not assets)
       $folders = $this->webdam->getTopLevelFolders();
     }
+    //If searching by keyword
+    if(!empty($params['query'])){
+      //Fetch search results from webdam
+      $search_results = $this->webdam->searchAssets($params);
+      //Override number of assets on current folder to make number of search results so pager works correctly
+      $current_folder->numassets = $search_results['total_count'];
+      //Set items to array of assets in the search result
+      $items = $search_results['assets'];
+    }
     //Add the breadcrumb to the form
     $form += $this->getBreadcrumb($current_folder, $breadcrumbs);
+    //Add the filter and sort options to the form
+    $form += $this->getFilterSort($current_folder, $breadcrumbs);
     //Add container for assets (and folder buttons)
     $form['asset-container'] = [
       '#type' => 'container',
@@ -353,8 +387,8 @@ class Webdam extends WidgetBase {
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.
     $assets = [];
     //Add to the assets array
-    if (isset($folder_items)) {
-      foreach ($folder_items as $folder_item) {
+    if (isset($items)) {
+      foreach ($items as $folder_item) {
         $assets[$folder_item->id] = $this->layoutMediaEntity($folder_item);
       }
     }
