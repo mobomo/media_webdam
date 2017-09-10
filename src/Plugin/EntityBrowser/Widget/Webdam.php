@@ -280,6 +280,11 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   public function getForm(array &$original_form, FormStateInterface $form_state, array $additional_widget_parameters) {
+    //If this is not the current entity browser widget being rendered
+    if($this->uuid() != $form_state->getStorage()['entity_browser_current_widget']){
+      //return an empty array
+      return [];
+    }
     //Start by inheriting parent form
     $form = parent::getForm($original_form, $form_state, $additional_widget_parameters);
     //This form is submitted and rebuilt when a folder is clicked.  The triggering element identifies which folder button was clicked
@@ -300,7 +305,7 @@ class Webdam extends WidgetBase {
     $breadcrumbs = [
       '0' => 'Home'
     ];
-    //If the form is being rebuilt then $form_state['widget'] will be set
+    //If the form state contains the widget then pull values for the current state
     if(isset($form_state->getCompleteForm()['widget'])){
       //assign $widget for convenience
       $widget = $form_state->getCompleteForm()['widget'];
@@ -344,11 +349,16 @@ class Webdam extends WidgetBase {
       'folderid' => $current_folder->id,
     ];
     //If the current folder is not zero then fetch information about the sub folder being rendered
-    if($current_folder->id !== 0){
+    if($current_folder->id){
       //Fetch the folder object from webdam
       $current_folder = $this->webdam->getFolder($current_folder->id);
       //Fetch a list of assets for the folder from webdam
       $folder_assets = $this->webdam->getFolderAssets($current_folder->id, $params);
+      //If there is a filter applied for the file type
+      if(!empty($params['types'])){
+        //Override number of assets on current folder to make number of search results so pager works correctly
+        $current_folder->numassets = $folder_assets->facets->types->{$params['types']};
+      }
       //Store the list of folders for rendering later
       $folders = $folder_assets->folders;
       //Set items to array of assets in the current folder
