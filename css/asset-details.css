@@ -1,0 +1,9 @@
+.asset-preview {
+    width: 60%;
+    float: left;
+}
+
+.asset-data {
+    width: 40%;
+    float: left;
+}

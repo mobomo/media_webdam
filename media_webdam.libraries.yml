@@ -1,7 +1,13 @@
-webdam:
+asset_browser:
   version: 1.x
-
   js: {}
   css:
     theme:
       css/asset-browser.css: {}
+
+asset_details:
+  version: 1.x
+  js: {}
+  css:
+    theme:
+      css/asset-details.css: {}

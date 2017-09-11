@@ -6,6 +6,21 @@
  */
 
 /**
+ * Implements hook_theme().
+ */
+function media_webdam_theme($existing, $type, $theme, $path) {
+  return [
+    'asset_details' => [
+      'variables' => [
+        'asset_data' => [],
+        'asset_preview' => NULL,
+        'asset_link' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
  * Implements hook_entity_type_alter().
  */
 function media_webdam_entity_type_alter(array &$entity_types) {
