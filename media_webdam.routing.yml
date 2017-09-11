@@ -30,3 +30,12 @@ media_webdam.auth_finish:
     _controller: '\Drupal\media_webdam\Controller\OauthController::authFinish'
   requirements:
     _user_is_logged_in: 'TRUE'
+
+media_webdam.asset_details:
+  path: 'webdam/asset/{assetId}'
+  defaults:
+    _controller: '\Drupal\media_webdam\Controller\WebdamController:assetDetailsPage'
+    _title_callback: '\Drupal\media_webdam\Controller\WebdamController:assetDetailsPageTitle'
+  requirements:
+    _user_is_logged_in: 'TRUE'
+    assetId: \d+

@@ -97,7 +97,7 @@ class Webdam extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function getBreadcrumb(Folder $current_folder, array $breadcrumbs) {
+  public function getBreadcrumb(Folder $current_folder, $breadcrumbs = []) {
     //If the folder being rendered is already in the breadcrumb trail and the breadcrumb trail is longer than 1 (i.e. root folder only)
     if(array_key_exists($current_folder->id,$breadcrumbs) && count($breadcrumbs) > 1){
       //This indicates that the user has navigated "Up" the folder structure 1 or more levels
@@ -287,6 +287,8 @@ class Webdam extends WidgetBase {
     }
     //Start by inheriting parent form
     $form = parent::getForm($original_form, $form_state, $additional_widget_parameters);
+    // Attach the modal library.
+    $form['#attached']['library'][] = 'core/drupal.dialog.ajax';
     //This form is submitted and rebuilt when a folder is clicked.  The triggering element identifies which folder button was clicked
     $trigger_elem = $form_state->getTriggeringElement();
     //Initialize current_folder
@@ -415,7 +417,7 @@ class Webdam extends WidgetBase {
       '#options' => $assets,
       '#attached' => [
         'library' => [
-          'media_webdam/webdam',
+          'media_webdam/asset_browser',
         ]
       ]
     ];
@@ -594,7 +596,7 @@ class Webdam extends WidgetBase {
     } else {
       $thumbnail = '<span class="webdam-browser-empty">No preview available.</span>';
     }
-    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p>' . $assetName . '</p></div>';
+    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p>' . $assetName . '</p><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal">Details</a></div>';
     return $element;
   }
 }
