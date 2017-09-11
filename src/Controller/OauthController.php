@@ -127,8 +127,6 @@ class OauthController extends ControllerBase {
 
     $access_token = $this->oauth->getAccessToken($this->request->get('code'));
 
-    // {"access_token":"fc1ecf1ad6c6c3b8626852cd412d3f64685147ad","expires_in":3600,"token_type":"bearer","scope":null,"refresh_token":"e4a8082560754c311847c1a75c2d4f74d2272361"}
-
     $this->userData->set('media_webdam', $this->currentUser->id(), 'webdam_access_token', $access_token['access_token']);
     $this->userData->set('media_webdam', $this->currentUser->id(), 'webdam_access_token_expiration', $access_token['expire_time']);
 
