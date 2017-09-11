@@ -18,7 +18,7 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 /**
  * Controller routines for webdam routes.
  */
-class WebdamController extends ControllerBase {
+class OauthController extends ControllerBase {
 
   protected $webdamApiBase = "https://apiv2.webdamdb.com";
 
@@ -104,19 +104,6 @@ class WebdamController extends ControllerBase {
         ]
       ];
     }
-  }
-
-  /**
-   * Get a link to the authStart url.
-   *
-   * @param $text
-   *   The text to use for the link.
-   *
-   * @return
-   */
-  protected function getAuthLink($text) {
-    \Drupal\Core\Link::createFromRoute();
-
   }
 
   /**

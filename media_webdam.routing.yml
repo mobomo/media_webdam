@@ -10,7 +10,7 @@ entity.user.webdam_auth:
   path: '/user/{user}/webdam'
   defaults:
     _title: 'Webdam'
-    _controller: '\Drupal\media_webdam\Controller\WebdamController::authPage'
+    _controller: '\Drupal\media_webdam\Controller\OauthController::authPage'
   requirements:
     _user_is_logged_in: 'TRUE'
     user: \d+
@@ -19,7 +19,7 @@ media_webdam.auth_start:
   path: '/webdam/authStart'
   defaults:
     _title: 'Redirect to Webdam'
-    _controller: '\Drupal\media_webdam\Controller\WebdamController::authStart'
+    _controller: '\Drupal\media_webdam\Controller\OauthController::authStart'
   requirements:
     _user_is_logged_in: 'TRUE'
 
@@ -27,6 +27,6 @@ media_webdam.auth_finish:
   path: '/webdam/authFinish'
   defaults:
     _title: 'Authentication finalization'
-    _controller: '\Drupal\media_webdam\Controller\WebdamController::authFinish'
+    _controller: '\Drupal\media_webdam\Controller\OauthController::authFinish'
   requirements:
     _user_is_logged_in: 'TRUE'
