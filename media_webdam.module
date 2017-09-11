@@ -5,8 +5,6 @@
  * Integrates Drupal with Webdam.
  */
 
-use Drupal\user\Entity\User;
-
 /**
  * Implements hook_entity_type_alter().
  */
