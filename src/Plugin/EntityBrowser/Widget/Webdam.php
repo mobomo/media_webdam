@@ -97,7 +97,7 @@ class Webdam extends WidgetBase {
   /**
    * {@inheritdoc}
    */
-  public function getBreadcrumb(Folder $current_folder, $breadcrumbs = []) {
+  public function getBreadcrumb(Folder $current_folder, array $breadcrumbs = []) {
     //If the folder being rendered is already in the breadcrumb trail and the breadcrumb trail is longer than 1 (i.e. root folder only)
     if(array_key_exists($current_folder->id,$breadcrumbs) && count($breadcrumbs) > 1){
       //This indicates that the user has navigated "Up" the folder structure 1 or more levels
@@ -311,12 +311,18 @@ class Webdam extends WidgetBase {
     if(isset($form_state->getCompleteForm()['widget'])){
       //assign $widget for convenience
       $widget = $form_state->getCompleteForm()['widget'];
-      //Set the page number to the value stored in the form state
-      $page = $widget['pager-container']['#page'];
-      //Set current folder id to the value stored in the form state
-      $current_folder->id = $widget['asset-container']['#webdam_folder_id'];
-      //Set the breadcrumbs to the value stored in the form state
-      $breadcrumbs = $widget['breadcrumb-container']['#breadcrumbs'];
+      if(isset($widget['pager-container']) && is_numeric($widget['pager-container']['#page'])){
+        //Set the page number to the value stored in the form state
+        $page = intval($widget['pager-container']['#page']);
+      }
+      if(isset($widget['asset-container']) && is_numeric($widget['asset-container']['#webdam_folder_id'])) {
+        //Set current folder id to the value stored in the form state
+        $current_folder->id = $widget['asset-container']['#webdam_folder_id'];
+      }
+      if(isset($widget['breadcrumb-container']) && is_array($widget['breadcrumb-container']['#breadcrumbs'])) {
+        //Set the breadcrumbs to the value stored in the form state
+        $breadcrumbs = $widget['breadcrumb-container']['#breadcrumbs'];
+      }
     }
     //If the form has been submitted
     if (isset($trigger_elem)){
@@ -381,7 +387,7 @@ class Webdam extends WidgetBase {
     //Add the breadcrumb to the form
     $form += $this->getBreadcrumb($current_folder, $breadcrumbs);
     //Add the filter and sort options to the form
-    $form += $this->getFilterSort($current_folder, $breadcrumbs);
+    $form += $this->getFilterSort();
     //Add container for assets (and folder buttons)
     $form['asset-container'] = [
       '#type' => 'container',
@@ -477,19 +483,21 @@ class Webdam extends WidgetBase {
       //Loop through the mapped fields for this bundle
       foreach ($bundle->field_map as $entity_field => $mapped_field) {
         //Switch for special handling of fields that don't map directly from webdam to the entity
-        switch ($entity_field){
-          case 'datecreated':
-            $entity_values[$mapped_field] = $asset->date_created_unix;
-            break;
-          case 'datemodified':
-            $entity_values[$mapped_field] = $asset->date_modified_unix;
-            break;
-          case 'datecaptured':
-            $entity_values[$mapped_field] = $asset->datecapturedUnix;
-            break;
-          //Default handling of fields that should map directly from webdam to the entity
-          default:
-            $entity_values[$mapped_field] = $asset->$entity_field;
+        if(isset($asset->$entity_field)) {
+          switch ($entity_field) {
+            case 'datecreated':
+              $entity_values[$mapped_field] = $asset->date_created_unix;
+              break;
+            case 'datemodified':
+              $entity_values[$mapped_field] = $asset->date_modified_unix;
+              break;
+            case 'datecaptured':
+              $entity_values[$mapped_field] = $asset->datecapturedUnix;
+              break;
+            //Default handling of fields that should map directly from webdam to the entity
+            default:
+              $entity_values[$mapped_field] = $asset->$entity_field;
+          }
         }
       }
       //Create a new entity to represent the webdam asset
@@ -566,20 +574,21 @@ class Webdam extends WidgetBase {
     );
     //Add bundle dropdown to form
     $form['bundle'] = [
-      '#type' => 'container',
-      'select' => [
+//      '#type' => 'container',
+//      'select' => [
         '#type' => 'select',
         '#title' => $this->t('Bundle'),
         '#options' => $webdam_bundles,
-      ],
-      '#attributes' => ['id' => 'bundle-wrapper-' . $this->uuid()],
+//      ],
+//      '#attributes' => ['id' => 'bundle-wrapper-' . $this->uuid()],
     ];
     return $form;
   }
 
   public function submitConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::submitConfigurationForm($form, $form_state);
-    $this->configuration['bundle'] = $this->configuration['bundle']['select'];
+    $values = $form_state->getValues()['table'][$this->uuid()]['form'];
+    $this->configuration['bundle'] = $values['bundle'];
   }
 
   /**
