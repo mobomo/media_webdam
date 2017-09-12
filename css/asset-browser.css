@@ -8,6 +8,13 @@ div.filter-sort-container > div {
   display: inline-block;
 }
 
+div.filter-sort-container .button {
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
 .form-item.form-type-checkbox {
   border: 1px solid #f0f0f0;
   border-radius: 5px;
@@ -54,6 +61,7 @@ input[type="checkbox"] {
   padding-top: 60px;
 }
 
+/* Start breadcrumb styles */
 input.webdam-browser-breadcrumb-container {
   margin: 5px 0;
 }
@@ -82,10 +90,15 @@ input.webdam-browser-breadcrumb:focus {
 .webdam-breadcrumb-trail:first-of-type::before {
   content: none;
 }
+/* end breadcrumb styles */
+
+.webdam-asset-browser-pager {
+  text-align: center;
+}
 
 /* Allow sticky footer to work. */
 div#edit-asset-container {
-  height: 300px;
+  height: 370px;
   overflow-y: scroll;
 }
 
@@ -96,4 +109,6 @@ div#edit-actions {
   height: 30px;
   width: 100%;
   background: white;
+  border-top: 1px solid #999;
+  padding-top: 5px;
 }
