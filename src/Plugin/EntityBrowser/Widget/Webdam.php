@@ -131,6 +131,9 @@ class Webdam extends WidgetBase {
       '#type' => 'container',
       //custom element property to store breadcrumbs array.  This is fetched from the form state every time the form is rebuilt due to navigating between folders
       '#breadcrumbs' => $breadcrumbs,
+      '#attributes' => [
+        'class' => ['webdam-browser-breadcrumb-container']
+      ]
     ];
     //Add the breadcrumb buttons to the form
     foreach ($breadcrumbs as $folder_id => $folder_name){
@@ -401,10 +404,10 @@ class Webdam extends WidgetBase {
       //Set items to array of assets in the search result
       $items = $search_results['assets'];
     }
-    //Add the breadcrumb to the form
-    $form += $this->getBreadcrumb($current_folder, $breadcrumbs);
     //Add the filter and sort options to the form
     $form += $this->getFilterSort();
+    //Add the breadcrumb to the form
+    $form += $this->getBreadcrumb($current_folder, $breadcrumbs);
     //Add container for assets (and folder buttons)
     $form['asset-container'] = [
       '#type' => 'container',
