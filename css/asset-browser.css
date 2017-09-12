@@ -83,3 +83,17 @@ input.webdam-browser-breadcrumb:focus {
   content: none;
 }
 
+/* Allow sticky footer to work. */
+div#edit-asset-container {
+  height: 300px;
+  overflow-y: scroll;
+}
+
+/* Sticky footer */
+div#edit-actions {
+  position: absolute;
+  bottom: 0;
+  height: 30px;
+  width: 100%;
+  background: white;
+}

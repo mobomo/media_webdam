@@ -162,6 +162,9 @@ class Webdam extends WidgetBase {
       '#type' => 'container',
       //Store page number in container so it can be retrieved from the form state
       '#page' => $page,
+      '#attributes' => [
+        'class' => ['webdam-asset-browser-pager']
+      ]
     ];
     //If not on the first page
     if($page > 0){
@@ -436,7 +439,7 @@ class Webdam extends WidgetBase {
     //If the number of assets in the current folder is greater than the number of assets to show per page
     if($current_folder->numassets > $num_per_page) {
       //Add the pager to the form
-      $form += $this->getPager($current_folder, $page, $num_per_page);
+      $form['asset-container'] += $this->getPager($current_folder, $page, $num_per_page);
     }
     return $form;
   }
