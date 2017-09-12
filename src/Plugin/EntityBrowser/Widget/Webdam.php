@@ -425,17 +425,32 @@ class Webdam extends WidgetBase {
       //Store the current folder id in the form so it can be retrieved from the form state
       '#webdam_folder_id' => $current_folder->id,
     ];
+
+    // Fetch path to module for image file.
+    $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
+
     // Add folder buttons to form
     foreach ($folders as $folder){
       $form['asset-container'][$folder->id] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['webdam-browser-folder-link']
+        ]
+      ];
+      $form['asset-container'][$folder->id]['link'] = [
         '#type' => 'button',
-        '#value' => $folder->name,
+        'value' => '',
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder->id,
         '#webdam_parent_folder_id' => $current_folder->parent,
         '#attributes' => [
-          'class' => ['webdam-browser-asset'],
-        ],
+          'class' => ['webdam-folder-link-button'],
+        ]
+      ];
+      $form['asset-container'][$folder->id]['title'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'p',
+        '#value' => $folder->name,
       ];
     }
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.
