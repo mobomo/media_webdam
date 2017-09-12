@@ -604,11 +604,11 @@ class Webdam extends WidgetBase {
   public function layoutMediaEntity($webdamAsset) {
     $assetName = $webdamAsset->name;
     if (!empty($webdamAsset->thumbnailurls)) {
-      $thumbnail = '<img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" />';
+      $thumbnail = '<div class="webdam-asset-thumb"><img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" /></div>';
     } else {
       $thumbnail = '<span class="webdam-browser-empty">No preview available.</span>';
     }
-    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p>' . $assetName . '</p><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal">Details</a></div>';
+    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p class="webdam-asset-filename">' . $assetName . '</p><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal">Details</a></div>';
     return $element;
   }
 }

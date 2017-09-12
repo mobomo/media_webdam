@@ -18,19 +18,25 @@ div.filter-sort-container > div {
   width: 30%;
 }
 
-.form-item.form-type-checkbox img {
-  max-width: 100%;
-}
-
 .webdam-asset-checkbox {
   display: flex;
   flex-direction: column;
   margin-top: -15px;
 }
 
-.webdam-asset-checkbox p {
+div.webdam-asset-thumb {
+  height: 140px;
+  overflow-y: scroll;
+}
+
+.webdam-asset-thumb img {
+  max-width: 100%;
+}
+
+p.webdam-asset-filename {
+  height: 40px;
+  overflow-y: scroll;
   margin-bottom: 0.5em;
-  overflow-x: scroll;
 }
 
 input[type="checkbox"] {
@@ -41,11 +47,11 @@ input[type="checkbox"] {
 }
 
 .webdam-browser-empty {
-  height: 60px;
+  height: 80px;
   width: 100%;
   background-color: #efefef;
   font-size: 1.4em;
-  padding-top: 40px;
+  padding-top: 60px;
 }
 
 input.webdam-browser-breadcrumb-container {
