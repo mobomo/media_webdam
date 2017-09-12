@@ -40,10 +40,21 @@ div.webdam-asset-thumb {
   max-width: 100%;
 }
 
+.webdam-asset-details {
+  width: 100%;
+}
+
 p.webdam-asset-filename {
   height: 40px;
+  width: 80%;
   overflow-y: scroll;
   margin-bottom: 0.5em;
+}
+
+img.webdam-asset-browser-icon {
+  height: 18px;
+  float: right;
+  margin: 1em 1em 1em 0;
 }
 
 input[type="checkbox"] {

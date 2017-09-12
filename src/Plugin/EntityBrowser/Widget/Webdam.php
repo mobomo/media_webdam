@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\media_entity\Entity\Media;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Uses a view to provide entity listing in a browser's widget.
@@ -55,6 +56,13 @@ class Webdam extends WidgetBase {
   protected $entity_type_bundle_info;
 
   /**
+   * Module handler to get module path.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $module_handler;
+
+  /**
    * Webdam constructor.
    *
    * @param array $configuration
@@ -68,12 +76,13 @@ class Webdam extends WidgetBase {
    * @param \Drupal\Core\Session\AccountInterface $account
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, EntityTypeBundleInfoInterface $entity_type_bundle_info, AccountInterface $account, LanguageManagerInterface $language_manager){
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, EntityTypeBundleInfoInterface $entity_type_bundle_info, AccountInterface $account, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler){
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
     $this->webdam = $webdam;
     $this->entity_type_bundle_info = $entity_type_bundle_info;
     $this->user = $account;
     $this->language_manager = $language_manager;
+    $this->module_handler = $module_handler;
   }
 
   /**
@@ -90,7 +99,9 @@ class Webdam extends WidgetBase {
       $container->get('media_webdam.webdam'),
       $container->get('entity_type.bundle.info'),
       $container->get('current_user'),
-      $container->get('language_manager')
+      $container->get('language_manager'),
+      $container->get('module_handler')
+      // $modulePath = \Drupal::service('module_handler')->getModule('media_webdam')->getPath();      
     );
   }
 
@@ -622,13 +633,15 @@ class Webdam extends WidgetBase {
    * @return string
    */
   public function layoutMediaEntity($webdamAsset) {
+    $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
+    // $modulePath = \Drupal::service('module_handler')->getModule('media_webdam')->getPath();      
     $assetName = $webdamAsset->name;
     if (!empty($webdamAsset->thumbnailurls)) {
       $thumbnail = '<div class="webdam-asset-thumb"><img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" /></div>';
     } else {
       $thumbnail = '<span class="webdam-browser-empty">No preview available.</span>';
     }
-    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p class="webdam-asset-filename">' . $assetName . '</p><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal">Details</a></div>';
+    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<div class="webdam-asset-details"><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal"><img src="/' . $modulePath . '/img/ext-link.png" alt="Folder link" class="webdam-asset-browser-icon" /></a><p class="webdam-asset-filename">' . $assetName . '</p></div></div>';
     return $element;
   }
 }
