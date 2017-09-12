@@ -174,7 +174,7 @@ class Webdam extends WidgetBase {
       //Add a button to go to the first page
       $form['pager-container']['first'] = [
         '#type' => 'button',
-        '#value' => 'First',
+        '#value' => '<<',
         '#name' => 'webdam_pager',
         '#webdam_page' => 0,
         '#attributes' => [
@@ -184,7 +184,7 @@ class Webdam extends WidgetBase {
       //Add a button to go to the previous page
       $form['pager-container']['previous'] = [
         '#type' => 'button',
-        '#value' => 'Previous',
+        '#value' => '<',
         '#name' => 'webdam_pager',
         '#webdam_page' => $page - 1,
         '#attributes' => [
@@ -215,7 +215,7 @@ class Webdam extends WidgetBase {
       //Add a button to go to the next page
       $form['pager-container']['next'] = [
         '#type' => 'button',
-        '#value' => 'Next',
+        '#value' => '>',
         '#name' => 'webdam_pager',
         '#webdam_page' => $page + 1,
         '#attributes' => [
@@ -225,7 +225,7 @@ class Webdam extends WidgetBase {
       //Add a button to go to the last page
       $form['pager-container']['last'] = [
         '#type' => 'button',
-        '#value' => 'Last',
+        '#value' => '>>',
         '#name' => 'webdam_pager',
         '#webdam_page' => $last_page,
         '#attributes' => [

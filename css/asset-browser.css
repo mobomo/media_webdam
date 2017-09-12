@@ -94,6 +94,51 @@ input.webdam-browser-breadcrumb:focus {
 
 .webdam-asset-browser-pager {
   text-align: center;
+  position: relative;
+  height: 60px;
+  /* margin: 5px 0; */
+}
+
+/* Unset default style to control below. */
+.webdam-asset-browser-pager .button,
+.webdam-asset-browser-pager .button:hover,
+.webdam-asset-browser-pager .button:active,
+.webdam-asset-browser-pager .button:focus {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.webdam-asset-browser-pager .button,
+.webdam-asset-browser-pager .button:hover,
+.webdam-asset-browser-pager .button:active,
+.webdam-asset-browser-pager .button:focus {
+  color: blue;
+  text-decoration: underline;
+  border-left: 2px solid #999;
+  margin-left: 5px;
+  margin-right: 0;
+  padding-left: 10px;
+  padding-right: 0;
+}
+
+.webdam-asset-browser-pager .button:first-child,
+.webdam-asset-browser-pager .button:last-child {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 10px;
+  padding-right: 0;
+}
+
+.webdam-asset-browser-pager .button:first-child {
+  border-left: none;
+}
+
+.webdam-asset-browser-pager .page-current {
+  color: black;
+  text-decoration: none;
 }
 
 /* Allow sticky footer to work. */
