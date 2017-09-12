@@ -271,13 +271,24 @@ class Webdam extends WidgetBase {
     // Add textfield for keyword search
     $form['filter-sort-container']['query'] = [
       '#type' => 'textfield',
-      '#title' => 'Search'
+      '#title' => 'Search',
+      '#size' => 24,
     ];
     // Add submit button to apply sort/filter criteria
     $form['filter-sort-container']['filter-sort-submit'] = [
       '#type' => 'button',
-      '#value' => 'Go',
+      '#value' => 'Apply',
       '#name' => 'filter_sort_submit',
+    ];
+    // Add form reset button.
+    $form['filter-sort-container']['filter-sort-reset'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'input',
+      '#attributes' => [
+        'class' => 'button',
+        'type' => 'reset',
+        'value' => 'Reset',
+      ],
     ];
     return $form;
   }
