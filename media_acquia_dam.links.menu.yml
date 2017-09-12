@@ -1,7 +1,7 @@
-media_webdam.config:
+media_acquia_dam.config:
   title: 'Webdam'
   description: 'Configure Webdam access credentials.'
-  route_name: media_webdam.config
+  route_name: media_acquia_dam.config
   menu_name: admin
   parent: system.admin_config_media
 

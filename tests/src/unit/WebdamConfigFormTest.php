@@ -1,18 +1,18 @@
 <?php
 
-namespace Drupal\Tests\media_webdam\unit;
+namespace Drupal\Tests\media_acquia_dam\unit;
 
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Form\FormState;
-use Drupal\media_webdam\Form\WebdamConfig;
+use Drupal\media_acquia_dam\Form\WebdamConfig;
 use Drupal\Tests\UnitTestCase;
 
 /**
  * Webdam config form test.
  *
- * @group media_webdam
+ * @group media_acquia_dam
  */
 class WebdamConfigFormTest extends UnitTestCase {
 
@@ -39,7 +39,7 @@ class WebdamConfigFormTest extends UnitTestCase {
    */
   public function testBuildForm() {
     $wconfig = new WebdamConfig($this->getConfigFactoryStub([
-      'media_webdam.settings' => [
+      'media_acquia_dam.settings' => [
         'username' => 'WDusername',
         'password' => 'WDpassword',
         'client_id' => 'WDclient-id',
@@ -65,7 +65,7 @@ class WebdamConfigFormTest extends UnitTestCase {
   //  public function testSubmitForm() {
   //    $config_stub = new FormConfigStub();
   //    $config_factory_stub = new FormConfigFactoryStub();
-  //    $config_factory_stub->set('media_webdam.settings', $config_stub);
+  //    $config_factory_stub->set('media_acquia_dam.settings', $config_stub);
   //
   //    $wconfig = new WebdamConfig($config_factory_stub);
   //

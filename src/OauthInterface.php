@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_webdam;
+namespace Drupal\media_acquia_dam;
 
 interface OauthInterface {
 

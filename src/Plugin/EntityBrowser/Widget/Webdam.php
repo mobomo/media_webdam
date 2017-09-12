@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_webdam\Plugin\EntityBrowser\Widget;
+namespace Drupal\media_acquia_dam\Plugin\EntityBrowser\Widget;
 
 use cweagans\webdam\Entity\Folder;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -8,7 +8,7 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
-use Drupal\media_webdam\WebdamInterface;
+use Drupal\media_acquia_dam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\media_entity\Entity\Media;
@@ -29,7 +29,7 @@ class Webdam extends WidgetBase {
   /**
    * The webdam interface.
    *
-   * @var \Drupal\media_webdam\WebdamInterface
+   * @var \Drupal\media_acquia_dam\WebdamInterface
    */
   protected $webdam;
 
@@ -63,7 +63,7 @@ class Webdam extends WidgetBase {
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
-   * @param \Drupal\media_webdam\WebdamInterface $webdam
+   * @param \Drupal\media_acquia_dam\WebdamInterface $webdam
    * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    * @param \Drupal\Core\Session\AccountInterface $account
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
@@ -87,7 +87,7 @@ class Webdam extends WidgetBase {
       $container->get('event_dispatcher'),
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
-      $container->get('media_webdam.webdam'),
+      $container->get('media_acquia_dam.webdam'),
       $container->get('entity_type.bundle.info'),
       $container->get('current_user'),
       $container->get('language_manager')
@@ -417,7 +417,7 @@ class Webdam extends WidgetBase {
       '#options' => $assets,
       '#attached' => [
         'library' => [
-          'media_webdam/asset_browser',
+          'media_acquia_dam/asset_browser',
         ]
       ]
     ];
@@ -585,7 +585,7 @@ class Webdam extends WidgetBase {
   /**
    * Format display of one asset in media browser.
    *
-   * @var \Drupal\media_webdam\Webdam $webdamAsset
+   * @var \Drupal\media_acquia_dam\Webdam $webdamAsset
    *
    * @return string
    */

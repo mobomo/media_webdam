@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_webdam;
+namespace Drupal\media_acquia_dam;
 
 use cweagans\webdam\Client;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -9,7 +9,7 @@ use GuzzleHttp\ClientInterface;
 /**
  * Class ClientFactory.
  *
- * @package Drupal\media_webdam
+ * @package Drupal\media_acquia_dam
  */
 class ClientFactory {
 
@@ -36,7 +36,7 @@ class ClientFactory {
    *   A fully configured Guzzle client to pass to the webdam client.
    */
   public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $gclient) {
-    $this->config = $config_factory->get('media_webdam.settings');
+    $this->config = $config_factory->get('media_acquia_dam.settings');
     $this->client = $gclient;
   }
 

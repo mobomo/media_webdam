@@ -1,12 +1,12 @@
 <?php
 
-namespace Drupal\media_webdam\Controller;
+namespace Drupal\media_acquia_dam\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
-use Drupal\media_webdam\OauthInterface;
+use Drupal\media_acquia_dam\OauthInterface;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -24,7 +24,7 @@ class OauthController extends ControllerBase {
 
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('media_webdam.oauth'),
+      $container->get('media_acquia_dam.oauth'),
       $container->get('request_stack'),
       $container->get('user.data'),
       $container->get('current_user')
@@ -32,7 +32,7 @@ class OauthController extends ControllerBase {
   }
 
   /**
-   * The media_webdam oauth service.
+   * The media_acquia_dam oauth service.
    *
    * @var OauthInterface $oauth
    */
@@ -55,7 +55,7 @@ class OauthController extends ControllerBase {
   /**
    * WebdamController constructor.
    *
-   * @param \Drupal\media_webdam\OauthInterface $oauth
+   * @param \Drupal\media_acquia_dam\OauthInterface $oauth
    * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    * @param \Drupal\user\UserDataInterface $user_data
    * @param \Drupal\Core\Session\AccountProxyInterface $currentUser
@@ -78,8 +78,8 @@ class OauthController extends ControllerBase {
       throw new NotFoundHttpException();
     }
 
-    $access_token = $this->userData->get('media_webdam', $this->currentUser->id(), 'webdam_access_token');
-    $access_token_expiration = $this->userData->get('media_webdam', $this->currentUser->id(), 'webdam_access_token_expiration');
+    $access_token = $this->userData->get('media_acquia_dam', $this->currentUser->id(), 'webdam_access_token');
+    $access_token_expiration = $this->userData->get('media_acquia_dam', $this->currentUser->id(), 'webdam_access_token_expiration');
 
     if ($access_token !== NULL && $access_token_expiration > time()) {
       return [
@@ -87,20 +87,20 @@ class OauthController extends ControllerBase {
           '#markup' => '<p>' . $this->t('You are authenticated with Webdam.') . '</p>',
         ],
         [
-          '#markup' => $this->getLinkGenerator()->generate('Reauthenticate', Url::fromRoute('media_webdam.auth_start')),
+          '#markup' => $this->getLinkGenerator()->generate('Reauthenticate', Url::fromRoute('media_acquia_dam.auth_start')),
         ]
       ];
     }
     else {
-      $this->userData->delete('media_webdam', $this->currentUser->id(), 'webdam_access_token');
-      $this->userData->delete('media_webdam', $this->currentUser->id(), 'webdam_access_token_expiration');
+      $this->userData->delete('media_acquia_dam', $this->currentUser->id(), 'webdam_access_token');
+      $this->userData->delete('media_acquia_dam', $this->currentUser->id(), 'webdam_access_token_expiration');
 
       return [
         [
           '#markup' => '<p>' . $this->t('You are not authenticated with Webdam.') . '</p>',
         ],
         [
-          '#markup' => $this->getLinkGenerator()->generate('Authenticate', Url::fromRoute('media_webdam.auth_start')),
+          '#markup' => $this->getLinkGenerator()->generate('Authenticate', Url::fromRoute('media_acquia_dam.auth_start')),
         ]
       ];
     }
@@ -127,8 +127,8 @@ class OauthController extends ControllerBase {
 
     $access_token = $this->oauth->getAccessToken($this->request->get('code'));
 
-    $this->userData->set('media_webdam', $this->currentUser->id(), 'webdam_access_token', $access_token['access_token']);
-    $this->userData->set('media_webdam', $this->currentUser->id(), 'webdam_access_token_expiration', $access_token['expire_time']);
+    $this->userData->set('media_acquia_dam', $this->currentUser->id(), 'webdam_access_token', $access_token['access_token']);
+    $this->userData->set('media_acquia_dam', $this->currentUser->id(), 'webdam_access_token_expiration', $access_token['expire_time']);
 
     return new RedirectResponse("/user/{$this->currentUser->id()}/webdam");
   }

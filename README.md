@@ -1,7 +1,7 @@
 # Media: Webdam
 
-[![Build Status](https://travis-ci.org/mobomo/media_webdam.svg?branch=8.x-1.x)](https://travis-ci.org/mobomo/media_webdam)
-[![Coverage Status](https://coveralls.io/repos/github/mobomo/media_webdam/badge.svg?branch=8.x-1.x)](https://coveralls.io/github/mobomo/media_webdam?branch=8.x-1.x)
+[![Build Status](https://travis-ci.org/mobomo/media_acquia_dam.svg?branch=8.x-1.x)](https://travis-ci.org/mobomo/media_acquia_dam)
+[![Coverage Status](https://coveralls.io/repos/github/mobomo/media_acquia_dam/badge.svg?branch=8.x-1.x)](https://coveralls.io/github/mobomo/media_acquia_dam?branch=8.x-1.x)
 
 This module provides integration with Webdam.
 
