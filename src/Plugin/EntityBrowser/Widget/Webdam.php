@@ -240,6 +240,9 @@ class Webdam extends WidgetBase {
     // Add container for pager
     $form['filter-sort-container'] = [
       '#type' => 'container',
+      '#attributes' => [
+        'class' => ['filter-sort-container']
+      ]
     ];
     // Add dropdown for sort by
     $form['filter-sort-container']['sortby'] = [

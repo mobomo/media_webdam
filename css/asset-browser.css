@@ -1,3 +1,13 @@
+div.filter-sort-container {
+  background-color: #efefef;
+  padding: 5px;
+  margin-bottom: 10px;
+}
+
+div.filter-sort-container > div {
+  display: inline-block;
+}
+
 .form-item.form-type-checkbox {
   border: 1px solid #f0f0f0;
   border-radius: 5px;
