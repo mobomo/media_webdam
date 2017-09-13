@@ -145,8 +145,7 @@ input.webdam-browser-breadcrumb:focus {
 .webdam-asset-browser-pager {
   text-align: center;
   position: relative;
-  height: 60px;
-  /* margin: 5px 0; */
+  height: 30px;
 }
 
 /* Unset default style to control below. */
@@ -191,16 +190,18 @@ input.webdam-browser-breadcrumb:focus {
   text-decoration: none;
 }
 
-/* Allow sticky footer to work. */
-div#edit-asset-container {
-  height: 370px;
+/* Height is important to make sticky footer appear. Assuming window height is > 600px. */
+.entity-browser-media-browser-form{
+  height:540px;
   overflow-y: scroll;
 }
 
-/* Sticky footer */
+div#edit-asset-container {
+  height: 330px;
+  overflow-y: scroll;
+}
+
 div#edit-actions {
-  position: absolute;
-  bottom: 0;
   height: 30px;
   width: 100%;
   background: white;
