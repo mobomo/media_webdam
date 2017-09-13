@@ -426,9 +426,6 @@ class Webdam extends WidgetBase {
       '#webdam_folder_id' => $current_folder->id,
     ];
 
-    // Fetch path to module for image file.
-    $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
-
     // Add folder buttons to form
     foreach ($folders as $folder){
       $form['asset-container'][$folder->id] = [
@@ -649,7 +646,7 @@ class Webdam extends WidgetBase {
    */
   public function layoutMediaEntity($webdamAsset) {
     $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
-    // $modulePath = \Drupal::service('module_handler')->getModule('media_webdam')->getPath();      
+
     $assetName = $webdamAsset->name;
     if (!empty($webdamAsset->thumbnailurls)) {
       $thumbnail = '<div class="webdam-asset-thumb"><img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" /></div>';
