@@ -102,7 +102,6 @@ function media_webdam_cron(){
       //Increment counter and stop if all entities have been processed
     }while($count+=$batch_size < count($all_ids));
     //Set the next execution time
-    \Drupal::logger('media_webdam')->notice('Peak memory usage: '. memory_get_peak_usage());
     \Drupal::state()->set('media_webdam.next_execution', $request_time + $interval);
 //  }
 }
