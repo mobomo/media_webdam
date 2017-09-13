@@ -439,7 +439,7 @@ class Webdam extends WidgetBase {
       ];
       $form['asset-container'][$folder->id]['link'] = [
         '#type' => 'button',
-        'value' => '',
+        '#value' => '',
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder->id,
         '#webdam_parent_folder_id' => $current_folder->parent,
