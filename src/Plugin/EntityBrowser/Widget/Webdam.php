@@ -416,9 +416,12 @@ class Webdam extends WidgetBase {
       }
     }
     // Add assets to form.
+    // IMPORTANT: Do not add #title or #description properties as this will cause this element to get wrapped
+    //            in a fieldset which will cause styling problems.
+    //            See: \core\lib\Drupal\Core\Render\Element\CompositeFormElementTrait.php
     $form['asset-container']['assets'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Choose one or more assets'),
+      '#theme_wrappers' => ['checkboxes__webdam_assets'],
       '#title_display' => 'invisible',
       '#options' => $assets,
       '#attached' => [
