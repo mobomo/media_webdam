@@ -60,5 +60,4 @@ function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
   $element = $variables['element'];
   $variables['children'] = $element['#children'];
   $variables['element']['#theme'] = 'checkboxes__webdam_assets';
-  ksm($variables);
 }
