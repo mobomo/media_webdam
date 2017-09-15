@@ -333,7 +333,7 @@ class Webdam extends WidgetBase {
     //Default current page to first page
     $page = 0;
     //Number of assets to show per page
-    $num_per_page = 10;
+    $num_per_page = 12;
     //Initial breadcrumb array representing the root folder only
     $breadcrumbs = [
       '0' => 'Home'
