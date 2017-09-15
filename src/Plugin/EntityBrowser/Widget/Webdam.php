@@ -424,19 +424,22 @@ class Webdam extends WidgetBase {
       '#type' => 'container',
       //Store the current folder id in the form so it can be retrieved from the form state
       '#webdam_folder_id' => $current_folder->id,
+      '#attributes' => [
+        'class' => ['webdam-asset-browser']
+      ]
     ];
 
     // Add folder buttons to form
     foreach ($folders as $folder){
-      $form['asset-container'][$folder->id] = [
+      $form['asset-container'][$folder->name] = [
         '#type' => 'container',
         '#attributes' => [
           'class' => ['webdam-browser-folder-link']
         ]
       ];
-      $form['asset-container'][$folder->id]['link'] = [
+      $form['asset-container'][$folder->name][$folder->id] = [
         '#type' => 'button',
-        '#value' => '',
+        '#value' => $folder->name,
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder->id,
         '#webdam_parent_folder_id' => $current_folder->parent,
@@ -444,7 +447,7 @@ class Webdam extends WidgetBase {
           'class' => ['webdam-folder-link-button'],
         ]
       ];
-      $form['asset-container'][$folder->id]['title'] = [
+      $form['asset-container'][$folder->name]['title'] = [
         '#type' => 'html_tag',
         '#tag' => 'p',
         '#value' => $folder->name,
