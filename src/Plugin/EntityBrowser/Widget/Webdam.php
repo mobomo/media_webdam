@@ -49,20 +49,6 @@ class Webdam extends WidgetBase {
   protected $language_manager;
 
   /**
-   * The entity type bundle info service.
-   *
-   * @var \Drupal\Core\Entity\EntityTypeBundleInfoInterface
-   */
-  protected $entity_type_bundle_info;
-
-  /**
-   * Module handler to get module path.
-   *
-   * @var \Drupal\Core\Extension\ModuleHandlerInterface
-   */
-  protected $module_handler;
-
-  /**
    * Webdam constructor.
    *
    * @param array $configuration
@@ -72,14 +58,12 @@ class Webdam extends WidgetBase {
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
    * @param \Drupal\media_webdam\WebdamInterface $webdam
-   * @param \Drupal\Core\Entity\EntityTypeBundleInfoInterface $entity_type_bundle_info
    * @param \Drupal\Core\Session\AccountInterface $account
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, EntityTypeBundleInfoInterface $entity_type_bundle_info, AccountInterface $account, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler){
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, AccountInterface $account, LanguageManagerInterface $language_manager){
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
     $this->webdam = $webdam;
-    $this->entity_type_bundle_info = $entity_type_bundle_info;
     $this->user = $account;
     $this->language_manager = $language_manager;
     $this->module_handler = $module_handler;
@@ -97,7 +81,6 @@ class Webdam extends WidgetBase {
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
       $container->get('media_webdam.webdam'),
-      $container->get('entity_type.bundle.info'),
       $container->get('current_user'),
       $container->get('language_manager'),
       $container->get('module_handler')
@@ -529,26 +512,6 @@ class Webdam extends WidgetBase {
         //Set the chosen source field for this entity to the webdam asset id
         $source_field => $asset->id,
       ];
-      //Loop through the mapped fields for this bundle
-      foreach ($bundle->field_map as $entity_field => $mapped_field) {
-        //Switch for special handling of fields that don't map directly from webdam to the entity
-        if(isset($asset->$entity_field)) {
-          switch ($entity_field) {
-            case 'datecreated':
-              $entity_values[$mapped_field] = $asset->date_created_unix;
-              break;
-            case 'datemodified':
-              $entity_values[$mapped_field] = $asset->date_modified_unix;
-              break;
-            case 'datecaptured':
-              $entity_values[$mapped_field] = $asset->datecapturedUnix;
-              break;
-            //Default handling of fields that should map directly from webdam to the entity
-            default:
-              $entity_values[$mapped_field] = $asset->$entity_field;
-          }
-        }
-      }
       //Create a new entity to represent the webdam asset
       $entity = $this->entityTypeManager->getStorage('media')->create($entity_values);
       //Save the entity
@@ -610,10 +573,8 @@ class Webdam extends WidgetBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     //Start with parent form
     $form = parent::buildConfigurationForm($form, $form_state);
-    //Get list of media bundles
-    $media_bundle_info = $this->entity_type_bundle_info->getBundleInfo('media');
     //Load media bundles
-    $media_bundles = $this->entityTypeManager->getStorage('media_bundle')->loadMultiple(array_keys(($media_bundle_info)));
+    $media_bundles = $this->entityTypeManager->getStorage('media_bundle')->loadMultiple();
     //Filter out bundles that do not have type = webdam_asset
     $webdam_bundles = array_map( function($item){
         return $item->label;
@@ -623,13 +584,9 @@ class Webdam extends WidgetBase {
     );
     //Add bundle dropdown to form
     $form['bundle'] = [
-//      '#type' => 'container',
-//      'select' => [
         '#type' => 'select',
         '#title' => $this->t('Bundle'),
         '#options' => $webdam_bundles,
-//      ],
-//      '#attributes' => ['id' => 'bundle-wrapper-' . $this->uuid()],
     ];
     return $form;
   }

@@ -61,3 +61,62 @@ function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
   $variables['children'] = $element['#children'];
   $variables['element']['#theme'] = 'checkboxes__webdam_assets';
 }
+
+/**
+ * Implements hook_cron().
+ *
+ * Refresh webdam metadata and sync to media entities
+ */
+function media_webdam_cron(){
+  // We access our configuration.
+  $cron_config = \Drupal::configFactory()->getEditable('media_webdam.settings');
+  // Default to an hourly interval. Of course, cron has to be running at least
+  // hourly for this to work.
+  $interval = $cron_config->get('interval');
+  $interval = !empty($interval) ? $interval : 3600;
+  // We usually don't want to act every time cron runs (which could be every
+  // minute) so keep a time for the next run in the site state.
+  $next_execution = \Drupal::state()->get('media_webdam.next_execution');
+  $next_execution = !empty($next_execution) ? $next_execution : 0;
+  $request_time = \Drupal::time()->getRequestTime();
+  if ($request_time >= $next_execution) {
+    //Load all media bundles
+    $media_bundles = \Drupal::entityTypeManager()->getStorage('media_bundle')->loadMultiple();
+    //Filter out bundles that do not have type = webdam_asset
+    $webdam_bundles = array_map( function($item){
+      return $item->label;
+    },array_filter($media_bundles, function($item){
+        return $item->type == 'webdam_asset';
+      })
+    );
+    //fetch all webdam asset entity ID's
+    $all_ids = \Drupal::entityQuery('media')
+      ->condition('bundle',array_keys($webdam_bundles), 'IN')
+      ->execute();
+    //Set the number of entities to fetch from the database in each batch
+    $batch_size = 50;
+    //Initialize counter
+    $count = 0;
+    do{
+      //Get a batch of id's.  Number of ID's = $batch_size
+      $batch_ids = array_slice($all_ids,$count,$count+$batch_size);
+      //Fetch the batch of entities
+      $batch_entities = \Drupal::entityTypeManager()->getStorage('media')->loadMultiple($batch_ids);
+      //Loop through batch of entities
+      foreach ($batch_entities as $entity) {
+        //Get the bundle for this entity
+        $bundle = $entity->bundle();
+        //Loop through the mapped fields for this bundle
+        foreach ($media_bundles[$bundle]->field_map as $entity_field => $mapped_field){
+          //Set the value to NULL so that it gets repopulated from webdam on save
+          $entity->$mapped_field->value = NULL;
+        }
+        //Save the entity
+        $entity->save();
+      }
+      //Increment counter and stop if all entities have been processed
+    }while($count+=$batch_size < count($all_ids));
+    //Set the next execution time
+    \Drupal::state()->set('media_webdam.next_execution', $request_time + $interval);
+  }
+}
