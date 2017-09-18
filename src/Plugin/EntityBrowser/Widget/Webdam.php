@@ -80,7 +80,7 @@ class Webdam extends WidgetBase {
       $container->get('event_dispatcher'),
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
-      $container->get('media_webdam.webdam'),
+      $container->get('media_webdam.webdam_user_creds'),
       $container->get('current_user'),
       $container->get('language_manager'),
       $container->get('module_handler')
@@ -294,6 +294,19 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   public function getForm(array &$original_form, FormStateInterface $form_state, array $additional_widget_parameters) {
+
+    /**
+     *
+     * @TODO
+     *
+     * If the user doesn't have valid credentials, we need to display a message
+     * asking them to reauthenticate.
+     *
+     * Send them to the route media_webdam.auth_start.
+     *
+     *
+     */
+
     //If this is not the current entity browser widget being rendered
     if($this->uuid() != $form_state->getStorage()['entity_browser_current_widget']){
       //return an empty array
