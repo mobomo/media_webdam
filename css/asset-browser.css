@@ -38,7 +38,7 @@ div.filter-sort-container .button {
 
 div.webdam-asset-thumb {
   height: 140px;
-  overflow-y: scroll;
+  overflow: hidden;
 }
 
 .webdam-asset-thumb img {
@@ -52,7 +52,7 @@ div.webdam-asset-thumb {
 p.webdam-asset-filename {
   height: 40px;
   width: 80%;
-  overflow-y: scroll;
+  overflow: hidden;
   margin-bottom: 0.5em;
 }
 
@@ -201,7 +201,7 @@ input.webdam-browser-breadcrumb:focus {
 /* Height is important to make sticky footer appear. Assuming window height is > 600px. */
 .entity-browser-media-browser-form{
   height:540px;
-  overflow-y: scroll;
+  overflow: hidden;
 }
 
 div#edit-asset-container {
