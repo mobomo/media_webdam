@@ -17,6 +17,10 @@ function media_webdam_theme($existing, $type, $theme, $path) {
         'asset_link' => NULL,
       ],
     ],
+    'checkboxes__webdam_assets' => [
+      'render element' => 'element',
+      'template' => 'checkboxes--webdam-assets',
+    ],
   ];
 }
 
@@ -52,7 +56,7 @@ function media_webdam_menu_local_tasks_alter(&$data, $route_name) {
  *
  * Refresh webdam metadata and sync to media entities
  */
-function media_webdam_cron(){
+function media_webdam_cron() {
   // We access our configuration.
   $cron_config = \Drupal::configFactory()->getEditable('media_webdam.settings');
   // Default to an hourly interval. Of course, cron has to be running at least
@@ -68,23 +72,23 @@ function media_webdam_cron(){
     //Load all media bundles
     $media_bundles = \Drupal::entityTypeManager()->getStorage('media_bundle')->loadMultiple();
     //Filter out bundles that do not have type = webdam_asset
-    $webdam_bundles = array_map( function($item){
+    $webdam_bundles = array_map(function ($item) {
       return $item->label;
-    },array_filter($media_bundles, function($item){
+    }, array_filter($media_bundles, function ($item) {
         return $item->type == 'webdam_asset';
       })
     );
     //fetch all webdam asset entity ID's
     $all_ids = \Drupal::entityQuery('media')
-      ->condition('bundle',array_keys($webdam_bundles), 'IN')
+      ->condition('bundle', array_keys($webdam_bundles), 'IN')
       ->execute();
     //Set the number of entities to fetch from the database in each batch
     $batch_size = 50;
     //Initialize counter
     $count = 0;
-    do{
+    do {
       //Get a batch of id's.  Number of ID's = $batch_size
-      $batch_ids = array_slice($all_ids,$count,$count+$batch_size);
+      $batch_ids = array_slice($all_ids, $count, $count + $batch_size);
       //Fetch the batch of entities
       $batch_entities = \Drupal::entityTypeManager()->getStorage('media')->loadMultiple($batch_ids);
       //Loop through batch of entities
@@ -92,7 +96,7 @@ function media_webdam_cron(){
         //Get the bundle for this entity
         $bundle = $entity->bundle();
         //Loop through the mapped fields for this bundle
-        foreach ($media_bundles[$bundle]->field_map as $entity_field => $mapped_field){
+        foreach ($media_bundles[$bundle]->field_map as $entity_field => $mapped_field) {
           //Set the value to NULL so that it gets repopulated from webdam on save
           $entity->$mapped_field->value = NULL;
         }
@@ -100,8 +104,19 @@ function media_webdam_cron(){
         $entity->save();
       }
       //Increment counter and stop if all entities have been processed
-    }while($count+=$batch_size < count($all_ids));
+    } while ($count += $batch_size < count($all_ids));
     //Set the next execution time
     \Drupal::state()->set('media_webdam.next_execution', $request_time + $interval);
   }
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ *
+ * Allow custom markup for webdam asset checkboxes
+ */
+function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
+  $element = $variables['element'];
+  $variables['children'] = $element['#children'];
+  $variables['element']['#theme'] = 'checkboxes__webdam_assets';
 }
