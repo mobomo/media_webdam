@@ -1,15 +1,33 @@
-.form-item.form-type-checkbox {
-  border: 1px solid #f0f0f0;
-  border-radius: 5px;
-  display: inline-block;
-  margin: 5px;
-  vertical-align: top;
+div.filter-sort-container {
+  background-color: #efefef;
   padding: 5px;
-  width: 30%;
+  margin-bottom: 10px;
 }
 
-.form-item.form-type-checkbox img {
-  max-width: 100%;
+div.filter-sort-container > div {
+  display: inline-block;
+}
+
+div.filter-sort-container .button {
+  margin-left: 2px;
+  margin-right: 2px;
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Folders and assets take same basic sizing, width, etc. */
+.webdam-asset-browser .form-item.form-type-checkbox,
+.webdam-browser-folder-link {
+  width: 30%;
+  display: inline-block;
+  margin: 5px;
+  padding: 5px;
+}
+
+.webdam-asset-browser .form-item.form-type-checkbox {
+  border: 1px solid #f0f0f0;
+  border-radius: 5px;
+  vertical-align: top;
 }
 
 .webdam-asset-checkbox {
@@ -18,9 +36,71 @@
   margin-top: -15px;
 }
 
-.webdam-asset-checkbox p {
+div.webdam-asset-thumb {
+  height: 140px;
+  overflow: hidden;
+}
+
+.webdam-asset-thumb img {
+  max-width: 100%;
+}
+
+.webdam-asset-details {
+  width: 100%;
+}
+
+p.webdam-asset-filename {
+  height: 40px;
+  width: 80%;
+  overflow: hidden;
   margin-bottom: 0.5em;
-  overflow-x: scroll;
+}
+
+img.webdam-asset-browser-icon {
+  height: 18px;
+  float: right;
+  margin: 1em 1em 1em 0;
+}
+
+/* Unset values here to set below. */
+.webdam-browser-folder-link .button,
+.webdam-browser-folder-link .button:hover,
+.webdam-browser-folder-link .button:active,
+.webdam-browser-folder-link .button:focus {
+  background: none;
+  border: 0;
+  box-shadow: none;
+}
+
+.webdam-browser-folder-link .webdam-folder-link-button,
+.webdam-browser-folder-link .webdam-folder-link-button:hover,
+.webdam-browser-folder-link .webdam-folder-link-button:active,
+.webdam-browser-folder-link .webdam-folder-link-button:focus {
+  background: url('/modules/contrib/media_webdam/img/folder.png') no-repeat;
+  background-position-x: 10px;
+  background-size: contain;
+  width: 100%;
+  height: 120px;
+  border: none;
+  border-radius: 0;
+  padding: 0 10px;
+}
+
+.webdam-browser-folder-link .webdam-folder-link-button:active,
+.webdam-browser-folder-link .webdam-folder-link-button:focus {
+  background-color: aliceblue;
+}
+
+.webdam-browser-folder-link input,
+.webdam-browser-folder-link input:hover,
+.webdam-browser-folder-link input:active,
+.webdam-browser-folder-link input:focus {
+  color: transparent;
+  text-shadow: none;
+}
+
+.webdam-browser-folder-link p {
+  padding-left: 10px;
 }
 
 input[type="checkbox"] {
@@ -31,13 +111,15 @@ input[type="checkbox"] {
 }
 
 .webdam-browser-empty {
-  height: 60px;
+  height: 80px;
   width: 100%;
   background-color: #efefef;
   font-size: 1.4em;
-  padding-top: 40px;
+  text-align: center;
+  padding-top: 60px;
 }
 
+/* Start breadcrumb styles */
 input.webdam-browser-breadcrumb-container {
   margin: 5px 0;
 }
@@ -66,4 +148,71 @@ input.webdam-browser-breadcrumb:focus {
 .webdam-breadcrumb-trail:first-of-type::before {
   content: none;
 }
+/* end breadcrumb styles */
 
+.webdam-asset-browser-pager {
+  text-align: center;
+  position: relative;
+  height: 30px;
+}
+
+/* Unset default style to control below. */
+.webdam-asset-browser-pager .button,
+.webdam-asset-browser-pager .button:hover,
+.webdam-asset-browser-pager .button:active,
+.webdam-asset-browser-pager .button:focus {
+  background: none;
+  border: none;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.webdam-asset-browser-pager .button,
+.webdam-asset-browser-pager .button:hover,
+.webdam-asset-browser-pager .button:active,
+.webdam-asset-browser-pager .button:focus {
+  color: blue;
+  text-decoration: underline;
+  border-left: 2px solid #999;
+  margin-left: 5px;
+  margin-right: 0;
+  padding-left: 10px;
+  padding-right: 0;
+}
+
+.webdam-asset-browser-pager .button:first-child,
+.webdam-asset-browser-pager .button:last-child {
+  margin-left: 0;
+  margin-right: 0;
+  padding-left: 10px;
+  padding-right: 0;
+}
+
+.webdam-asset-browser-pager .button:first-child {
+  border-left: none;
+}
+
+.webdam-asset-browser-pager .page-current {
+  color: black;
+  text-decoration: none;
+}
+
+/* Height is important to make sticky footer appear. Assuming window height is > 600px. */
+.entity-browser-media-browser-form{
+  height:540px;
+  overflow: hidden;
+}
+
+div#edit-asset-container {
+  height: 330px;
+  overflow-y: scroll;
+}
+
+div#edit-actions {
+  height: 30px;
+  width: 100%;
+  background: white;
+  border-top: 1px solid #999;
+  padding-top: 5px;
+}

@@ -14,6 +14,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\media_entity\Entity\Media;
 use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
+use Drupal\Core\Extension\ModuleHandlerInterface;
 
 /**
  * Uses a view to provide entity listing in a browser's widget.
@@ -65,6 +66,7 @@ class Webdam extends WidgetBase {
     $this->webdam = $webdam;
     $this->user = $account;
     $this->language_manager = $language_manager;
+    $this->module_handler = $module_handler;
   }
 
   /**
@@ -80,7 +82,9 @@ class Webdam extends WidgetBase {
       $container->get('plugin.manager.entity_browser.widget_validation'),
       $container->get('media_webdam.webdam'),
       $container->get('current_user'),
-      $container->get('language_manager')
+      $container->get('language_manager'),
+      $container->get('module_handler')
+      // $modulePath = \Drupal::service('module_handler')->getModule('media_webdam')->getPath();      
     );
   }
 
@@ -121,6 +125,9 @@ class Webdam extends WidgetBase {
       '#type' => 'container',
       //custom element property to store breadcrumbs array.  This is fetched from the form state every time the form is rebuilt due to navigating between folders
       '#breadcrumbs' => $breadcrumbs,
+      '#attributes' => [
+        'class' => ['webdam-browser-breadcrumb-container']
+      ]
     ];
     //Add the breadcrumb buttons to the form
     foreach ($breadcrumbs as $folder_id => $folder_name){
@@ -152,13 +159,16 @@ class Webdam extends WidgetBase {
       '#type' => 'container',
       //Store page number in container so it can be retrieved from the form state
       '#page' => $page,
+      '#attributes' => [
+        'class' => ['webdam-asset-browser-pager']
+      ]
     ];
     //If not on the first page
     if($page > 0){
       //Add a button to go to the first page
       $form['pager-container']['first'] = [
         '#type' => 'button',
-        '#value' => 'First',
+        '#value' => '<<',
         '#name' => 'webdam_pager',
         '#webdam_page' => 0,
         '#attributes' => [
@@ -168,7 +178,7 @@ class Webdam extends WidgetBase {
       //Add a button to go to the previous page
       $form['pager-container']['previous'] = [
         '#type' => 'button',
-        '#value' => 'Previous',
+        '#value' => '<',
         '#name' => 'webdam_pager',
         '#webdam_page' => $page - 1,
         '#attributes' => [
@@ -199,7 +209,7 @@ class Webdam extends WidgetBase {
       //Add a button to go to the next page
       $form['pager-container']['next'] = [
         '#type' => 'button',
-        '#value' => 'Next',
+        '#value' => '>',
         '#name' => 'webdam_pager',
         '#webdam_page' => $page + 1,
         '#attributes' => [
@@ -209,7 +219,7 @@ class Webdam extends WidgetBase {
       //Add a button to go to the last page
       $form['pager-container']['last'] = [
         '#type' => 'button',
-        '#value' => 'Last',
+        '#value' => '>>',
         '#name' => 'webdam_pager',
         '#webdam_page' => $last_page,
         '#attributes' => [
@@ -230,6 +240,9 @@ class Webdam extends WidgetBase {
     // Add container for pager
     $form['filter-sort-container'] = [
       '#type' => 'container',
+      '#attributes' => [
+        'class' => ['filter-sort-container']
+      ]
     ];
     // Add dropdown for sort by
     $form['filter-sort-container']['sortby'] = [
@@ -255,13 +268,24 @@ class Webdam extends WidgetBase {
     // Add textfield for keyword search
     $form['filter-sort-container']['query'] = [
       '#type' => 'textfield',
-      '#title' => 'Search'
+      '#title' => 'Search',
+      '#size' => 24,
     ];
     // Add submit button to apply sort/filter criteria
     $form['filter-sort-container']['filter-sort-submit'] = [
       '#type' => 'button',
-      '#value' => 'Go',
+      '#value' => 'Apply',
       '#name' => 'filter_sort_submit',
+    ];
+    // Add form reset button.
+    $form['filter-sort-container']['filter-sort-reset'] = [
+      '#type' => 'html_tag',
+      '#tag' => 'input',
+      '#attributes' => [
+        'class' => 'button',
+        'type' => 'reset',
+        'value' => 'Reset',
+      ],
     ];
     return $form;
   }
@@ -292,7 +316,7 @@ class Webdam extends WidgetBase {
     //Default current page to first page
     $page = 0;
     //Number of assets to show per page
-    $num_per_page = 10;
+    $num_per_page = 12;
     //Initial breadcrumb array representing the root folder only
     $breadcrumbs = [
       '0' => 'Home'
@@ -374,27 +398,42 @@ class Webdam extends WidgetBase {
       //Set items to array of assets in the search result
       $items = $search_results['assets'];
     }
-    //Add the breadcrumb to the form
-    $form += $this->getBreadcrumb($current_folder, $breadcrumbs);
     //Add the filter and sort options to the form
     $form += $this->getFilterSort();
+    //Add the breadcrumb to the form
+    $form += $this->getBreadcrumb($current_folder, $breadcrumbs);
     //Add container for assets (and folder buttons)
     $form['asset-container'] = [
       '#type' => 'container',
       //Store the current folder id in the form so it can be retrieved from the form state
       '#webdam_folder_id' => $current_folder->id,
+      '#attributes' => [
+        'class' => ['webdam-asset-browser']
+      ]
     ];
+
     // Add folder buttons to form
     foreach ($folders as $folder){
-      $form['asset-container'][$folder->id] = [
+      $form['asset-container'][$folder->name] = [
+        '#type' => 'container',
+        '#attributes' => [
+          'class' => ['webdam-browser-folder-link']
+        ]
+      ];
+      $form['asset-container'][$folder->name][$folder->id] = [
         '#type' => 'button',
         '#value' => $folder->name,
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder->id,
         '#webdam_parent_folder_id' => $current_folder->parent,
         '#attributes' => [
-          'class' => ['webdam-browser-asset'],
-        ],
+          'class' => ['webdam-folder-link-button'],
+        ]
+      ];
+      $form['asset-container'][$folder->name]['title'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'p',
+        '#value' => $folder->name,
       ];
     }
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.
@@ -406,9 +445,12 @@ class Webdam extends WidgetBase {
       }
     }
     // Add assets to form.
+    // IMPORTANT: Do not add #title or #description properties as this will cause this element to get wrapped
+    //            in a fieldset which will cause styling problems.
+    //            See: \core\lib\Drupal\Core\Render\Element\CompositeFormElementTrait.php
     $form['asset-container']['assets'] = [
       '#type' => 'checkboxes',
-      '#title' => $this->t('Choose one or more assets'),
+      '#theme_wrappers' => ['checkboxes__webdam_assets'],
       '#title_display' => 'invisible',
       '#options' => $assets,
       '#attached' => [
@@ -420,7 +462,7 @@ class Webdam extends WidgetBase {
     //If the number of assets in the current folder is greater than the number of assets to show per page
     if($current_folder->numassets > $num_per_page) {
       //Add the pager to the form
-      $form += $this->getPager($current_folder, $page, $num_per_page);
+      $form['asset-container'] += $this->getPager($current_folder, $page, $num_per_page);
     }
     return $form;
   }
@@ -563,13 +605,15 @@ class Webdam extends WidgetBase {
    * @return string
    */
   public function layoutMediaEntity($webdamAsset) {
+    $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
+
     $assetName = $webdamAsset->name;
     if (!empty($webdamAsset->thumbnailurls)) {
-      $thumbnail = '<img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" />';
+      $thumbnail = '<div class="webdam-asset-thumb"><img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" /></div>';
     } else {
       $thumbnail = '<span class="webdam-browser-empty">No preview available.</span>';
     }
-    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<p>' . $assetName . '</p><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal">Details</a></div>';
+    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<div class="webdam-asset-details"><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal"><img src="/' . $modulePath . '/img/ext-link.png" alt="Folder link" class="webdam-asset-browser-icon" /></a><p class="webdam-asset-filename">' . $assetName . '</p></div></div>';
     return $element;
   }
 }
