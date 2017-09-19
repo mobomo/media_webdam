@@ -3,9 +3,11 @@
 namespace Drupal\media_webdam\Plugin\EntityBrowser\Widget;
 
 use cweagans\webdam\Entity\Folder;
+use cweagans\webdam\Exception\InvalidCredentialsException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\Core\Url;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
 use Drupal\media_webdam\WebdamInterface;
@@ -49,6 +51,13 @@ class Webdam extends WidgetBase {
   protected $language_manager;
 
   /**
+   * A module handler object.
+   *
+   * @var \Drupal\Core\Extension\ModuleHandlerInterface
+   */
+  protected $module_handler;
+
+  /**
    * Webdam constructor.
    *
    * @param array $configuration
@@ -61,7 +70,7 @@ class Webdam extends WidgetBase {
    * @param \Drupal\Core\Session\AccountInterface $account
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, AccountInterface $account, LanguageManagerInterface $language_manager){
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, AccountInterface $account, LanguageManagerInterface $language_manager, ModuleHandlerInterface $module_handler){
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
     $this->webdam = $webdam;
     $this->user = $account;
@@ -84,7 +93,6 @@ class Webdam extends WidgetBase {
       $container->get('current_user'),
       $container->get('language_manager'),
       $container->get('module_handler')
-      // $modulePath = \Drupal::service('module_handler')->getModule('media_webdam')->getPath();      
     );
   }
 
@@ -295,17 +303,25 @@ class Webdam extends WidgetBase {
    */
   public function getForm(array &$original_form, FormStateInterface $form_state, array $additional_widget_parameters) {
 
-    /**
-     *
-     * @TODO
-     *
-     * If the user doesn't have valid credentials, we need to display a message
-     * asking them to reauthenticate.
-     *
-     * Send them to the route media_webdam.auth_start.
-     *
-     *
-     */
+    try {
+      $this->webdam->getAccountSubscriptionDetails();
+    }
+    catch (InvalidCredentialsException $e) {
+      $form['message'] = [
+        '#theme' => 'asset_browser_message',
+        '#message' => $this->t('You are not authenticated. Please %authenticate to browse Webdam assets.', [
+          // @TODO: Remove usage of \Drupal here.
+          '%authenticate' => \Drupal::l('authenticate', Url::fromRoute('media_webdam.auth_start')),
+        ]),
+        '#attached' => [
+          'library' => [
+            'media_webdam/asset_browser',
+          ]
+        ],
+      ];
+
+      return $form;
+    }
 
     //If this is not the current entity browser widget being rendered
     if($this->uuid() != $form_state->getStorage()['entity_browser_current_widget']){
@@ -470,7 +486,7 @@ class Webdam extends WidgetBase {
         'library' => [
           'media_webdam/asset_browser',
         ]
-      ]
+      ],
     ];
     //If the number of assets in the current folder is greater than the number of assets to show per page
     if($current_folder->numassets > $num_per_page) {

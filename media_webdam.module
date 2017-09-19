@@ -21,6 +21,11 @@ function media_webdam_theme($existing, $type, $theme, $path) {
       'render element' => 'element',
       'template' => 'checkboxes--webdam-assets',
     ],
+    'asset_browser_message' => [
+      'variables' => [
+        'message' => [],
+      ],
+    ],
   ];
 }
 
