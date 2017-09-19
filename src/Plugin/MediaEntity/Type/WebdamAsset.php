@@ -55,6 +55,7 @@ class WebdamAsset extends MediaTypeBase {
     // @TODO: Determine if other properties need to be added here.
     // @TODO: Determine how to support custom metadata.
     $fields = [
+      'file' => $this->t('File'),
       'type_id' => $this->t('Type ID'),
       'filename' => $this->t('Filename'),
       'filesize' => $this->t('Filesize'),
@@ -147,6 +148,18 @@ class WebdamAsset extends MediaTypeBase {
         return $asset->datecapturedUnix;
       case 'folderID':
         return $asset->folder->id;
+      case 'file':
+        //Download the file from webdam
+        $file_contents = $this->webdam->downloadAsset($asset->id);
+        //Set the path for webdam assets.
+        $path = 'public://webdam_assets/';
+        //Prepare webdam directory for writing and only proceed if successful
+        if(file_prepare_directory($path,FILE_CREATE_DIRECTORY)) {
+          $file = file_save_data($file_contents, 'public://webdam_assets/' . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
+          if($file instanceof FileInterface){
+            return $file->id;
+          }
+        }
     }
 
     return FALSE;
