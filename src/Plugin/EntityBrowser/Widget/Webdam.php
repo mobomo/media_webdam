@@ -5,6 +5,7 @@ namespace Drupal\media_webdam\Plugin\EntityBrowser\Widget;
 use cweagans\webdam\Entity\Folder;
 use cweagans\webdam\Exception\InvalidCredentialsException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
@@ -287,14 +288,11 @@ class Webdam extends WidgetBase {
     ];
     // Add form reset button.
     $form['filter-sort-container']['filter-sort-reset'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'input',
-      '#attributes' => [
-        'class' => 'button',
-        'type' => 'reset',
-        'value' => 'Reset',
-      ],
+      '#type' => 'button',
+      '#value' => 'Reset',
+      '#name' => 'filter_sort_reset',
     ];
+
     return $form;
   }
 
@@ -386,6 +384,13 @@ class Webdam extends WidgetBase {
         //Reset page to zero
         $page = 0;
       }
+      // @TODO Make the reset button work.
+      if ($trigger_elem['#name'] == 'filter_sort_reset') {
+        $page = 0;
+        $current_folder->name = 'Home';
+        $current_folder->id = 0;
+        $current_folder->parent = 0;
+      }
     }
     //Offset used for pager
     $offset = $num_per_page * $page;
@@ -425,6 +430,7 @@ class Webdam extends WidgetBase {
       //Override number of assets on current folder to make number of search results so pager works correctly
       $current_folder->numassets = $search_results['total_count'];
       //Set items to array of assets in the search result
+      // @TODO: What if there are no results?
       $items = $search_results['assets'];
     }
     //Add the filter and sort options to the form
