@@ -58,7 +58,7 @@ class WebdamController extends ControllerBase {
    */
   protected function getAsset($assetId) {
     if (!isset($this->asset)) {
-      $this->asset = $this->webdam->getAsset($assetId);
+      $this->asset = $this->webdam->getAsset($assetId, TRUE);
     }
 
     return $this->asset;
@@ -95,6 +95,12 @@ class WebdamController extends ControllerBase {
     $asset_attributes['Date modified'] = $asset->datemodified;
     $asset_attributes["Owner"] = $asset->user->name;
     $asset_attributes["Folder"] = $asset->folder->name;
+
+    if (!empty($asset->xmp_metadata)) {
+      foreach ($asset->xmp_metadata as $metadata) {
+        $asset_attributes[$metadata['label']] = $metadata['value'];
+      }
+    }
 
     // Get an asset preview.
     $asset_preview = $asset->thumbnailurls[3]->url;
