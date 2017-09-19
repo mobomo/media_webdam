@@ -583,7 +583,6 @@ class Webdam extends WidgetBase {
 //      }else{
 //        // TODO: Add error handling for when preparing directory fails
 //      }
-//>>>>>>> WIP
     }
     //Return the entities
     return $entities;
