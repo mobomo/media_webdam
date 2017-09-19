@@ -298,7 +298,7 @@ class Webdam extends WidgetBase {
     return $form;
   }
 
-    /**
+  /**
    * {@inheritdoc}
    */
   public function getForm(array &$original_form, FormStateInterface $form_state, array $additional_widget_parameters) {
@@ -491,7 +491,8 @@ class Webdam extends WidgetBase {
     //If the number of assets in the current folder is greater than the number of assets to show per page
     if($current_folder->numassets > $num_per_page) {
       //Add the pager to the form
-      $form['asset-container'] += $this->getPager($current_folder, $page, $num_per_page);
+//      $form['asset-container'] += $this->getPager($current_folder, $page, $num_per_page);
+      $form['actions'] += $this->getPager($current_folder, $page, $num_per_page);
     }
     return $form;
   }
@@ -606,16 +607,16 @@ class Webdam extends WidgetBase {
     $media_bundles = $this->entityTypeManager->getStorage('media_bundle')->loadMultiple();
     //Filter out bundles that do not have type = webdam_asset
     $webdam_bundles = array_map( function($item){
-        return $item->label;
-      },array_filter($media_bundles, function($item){
+      return $item->label;
+    },array_filter($media_bundles, function($item){
         return $item->type == 'webdam_asset';
       })
     );
     //Add bundle dropdown to form
     $form['bundle'] = [
-        '#type' => 'select',
-        '#title' => $this->t('Bundle'),
-        '#options' => $webdam_bundles,
+      '#type' => 'select',
+      '#title' => $this->t('Bundle'),
+      '#options' => $webdam_bundles,
     ];
     return $form;
   }

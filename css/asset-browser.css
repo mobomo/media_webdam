@@ -1,14 +1,14 @@
-div.filter-sort-container {
+.filter-sort-container {
   background-color: #efefef;
-  padding: 5px;
-  margin-bottom: 10px;
+  padding: 10px;
 }
 
-div.filter-sort-container > div {
+.filter-sort-container > div {
   display: inline-block;
+  padding-right: 10px;
 }
 
-div.filter-sort-container .button {
+.filter-sort-container .button {
   margin-left: 2px;
   margin-right: 2px;
   padding-left: 10px;
@@ -18,7 +18,7 @@ div.filter-sort-container .button {
 /* Folders and assets take same basic sizing, width, etc. */
 .webdam-asset-browser .form-item.form-type-checkbox,
 .webdam-browser-folder-link {
-  width: 30%;
+  width: 220px;
   display: inline-block;
   margin: 5px;
   padding: 5px;
@@ -36,13 +36,13 @@ div.filter-sort-container .button {
   margin-top: -15px;
 }
 
-div.webdam-asset-thumb {
+.webdam-asset-thumb {
   height: 140px;
   overflow: hidden;
 }
 
 .webdam-asset-thumb img {
-  max-width: 100%;
+  width: 100%;
 }
 
 .webdam-asset-details {
@@ -50,16 +50,16 @@ div.webdam-asset-thumb {
 }
 
 p.webdam-asset-filename {
-  height: 40px;
   width: 80%;
   overflow: hidden;
-  margin-bottom: 0.5em;
+  margin-top: 5px;
+  margin-left: 5px;
 }
 
 img.webdam-asset-browser-icon {
-  height: 18px;
+  height: 20px;
   float: right;
-  margin: 1em 1em 1em 0;
+  margin: 5px;
 }
 
 /* Unset values here to set below. */
@@ -120,8 +120,8 @@ input[type="checkbox"] {
 }
 
 /* Start breadcrumb styles */
-input.webdam-browser-breadcrumb-container {
-  margin: 5px 0;
+.webdam-browser-breadcrumb-container {
+  margin: 5px;
 }
 
 input.webdam-browser-breadcrumb {
@@ -154,6 +154,9 @@ input.webdam-browser-breadcrumb:focus {
   text-align: center;
   position: relative;
   height: 30px;
+  display: inline-block;
+  float: right;
+  padding-right: 10px;
 }
 
 /* Unset default style to control below. */
@@ -200,21 +203,19 @@ input.webdam-browser-breadcrumb:focus {
 
 /* Height is important to make sticky footer appear. Assuming window height is > 600px. */
 .entity-browser-media-browser-form{
-  height:540px;
   overflow: hidden;
 }
 
-div#edit-asset-container {
+#edit-asset-container {
   height: 330px;
   overflow-y: scroll;
 }
 
-div#edit-actions {
-  height: 30px;
+#edit-actions {
   width: 100%;
-  background: white;
-  border-top: 1px solid #999;
-  padding-top: 5px;
+  border-top: 1px solid #efefef;
+  padding: 15px 5px;
+  margin: 0;
 }
 
 .asset-browser-message {
