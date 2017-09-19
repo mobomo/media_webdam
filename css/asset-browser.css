@@ -227,3 +227,11 @@ input.webdam-browser-breadcrumb:focus {
   text-align: center;
   margin-top: 15px;
 }
+
+/**
+ * This is gross, but it works.
+ */
+.ui-dialog {
+  width: 97% !important;
+  left: 15px !important;
+}
