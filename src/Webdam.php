@@ -23,9 +23,11 @@ class Webdam implements WebdamInterface {
    *
    * @param \Drupal\media_acquia_dam\ClientFactory $client_factory
    *   An instance of ClientFactory that we can get a webdam client from.
+   * @param string $credential_type
+   *   The type of credentials to use.
    */
-  public function __construct(ClientFactory $client_factory) {
-    $this->client = $client_factory->get();
+  public function __construct(ClientFactory $client_factory, $credential_type) {
+    $this->client = $client_factory->get($credential_type);
   }
 
   /**

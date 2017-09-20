@@ -2,8 +2,10 @@
 
 namespace Drupal\Tests\media_acquia_dam\unit;
 
-use Drupal\media_acquia_dam\ClientFactory;
+use Drupal\Core\Session\AccountProxy;
+use Drupal\media_webdam\ClientFactory;
 use Drupal\Tests\UnitTestCase;
+use Drupal\user\UserDataInterface;
 use GuzzleHttp\Client as GClient;
 
 /**
@@ -23,9 +25,9 @@ class WebdamClientFactoryTest extends UnitTestCase {
       ]
     ]);
     $guzzle_client = new GClient();
-    $client_factory = new ClientFactory($config_factory, $guzzle_client);
+    $client_factory = new ClientFactory($config_factory, $guzzle_client, $this->getMock(UserDataInterface::class), $this->getMock(AccountProxy::class));
 
-    $client = $client_factory->get();
+    $client = $client_factory->get('background');
 
     $this->assertInstanceOf('cweagans\webdam\Client', $client);
   }

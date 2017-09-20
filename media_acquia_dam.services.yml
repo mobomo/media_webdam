@@ -1,10 +1,13 @@
 services:
   media_acquia_dam.client_factory:
     class: Drupal\media_acquia_dam\ClientFactory
-    arguments: ['@config.factory', '@http_client']
+    arguments: ['@config.factory', '@http_client', '@user.data', '@current_user']
   media_acquia_dam.webdam:
     class: Drupal\media_acquia_dam\Webdam
-    arguments: ['@media_acquia_dam.client_factory']
+    arguments: ['@media_acquia_dam.client_factory', 'background']
+  media_acquia_dam.webdam_user_creds:
+    class: Drupal\media_acquia_dam\Webdam
+    arguments: ['@media_acquia_dam.client_factory', 'current']
   media_acquia_dam.oauth:
     class: Drupal\media_acquia_dam\Oauth
     arguments: ['@config.factory', '@csrf_token', '@url_generator.non_bubbling', '@http_client']

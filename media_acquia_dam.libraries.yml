@@ -1,9 +1,12 @@
 asset_browser:
   version: 1.x
-  js: {}
   css:
     theme:
       css/asset-browser.css: {}
+  js:
+    js/asset-browser.js: {}
+  dependencies:
+    - core/jquery
 
 asset_details:
   version: 1.x
