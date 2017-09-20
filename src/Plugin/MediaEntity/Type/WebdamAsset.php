@@ -10,6 +10,7 @@ use Drupal\media_entity\MediaInterface;
 use Drupal\media_entity\MediaTypeBase;
 use Drupal\media_webdam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\file\Entity\File;
 
 /**
  * Provides media type plugin for Webdam Images.
@@ -149,17 +150,20 @@ class WebdamAsset extends MediaTypeBase {
       case 'folderID':
         return $asset->folder->id;
       case 'file':
-        //Download the file from webdam
-        $file_contents = $this->webdam->downloadAsset($asset->id);
-        //Set the path for webdam assets.
-        $path = 'public://webdam_assets/';
-        //Prepare webdam directory for writing and only proceed if successful
-        if(file_prepare_directory($path,FILE_CREATE_DIRECTORY)) {
-          $file = file_save_data($file_contents, 'public://webdam_assets/' . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
-          if($file instanceof FileInterface){
-            return $file->id;
+        //Get the media bundle for this asset
+        $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($media->bundle());
+        //If a field has been mapped for the file
+        if($file_field = $bundle->field_map['file']){
+          //Get the drupal file object
+          $file = $media->get($file_field)->first()->get('entity')->getValue();
+          //If a file object was returned
+          if($file instanceof FileInterface || $file instanceof File) {
+            //Return the file ID
+            return $file->id();
           }
         }
+        //Otherwise return NULL
+        return NULL;
     }
 
     return FALSE;
@@ -169,7 +173,41 @@ class WebdamAsset extends MediaTypeBase {
    * {@inheritdoc}
    */
   public function thumbnail(MediaInterface $media) {
-    // @TODO: Should this be a webdam thumbnail image?
+    //Get the media bundle for this asset
+    $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($media->bundle());
+    //If a field has been mapped for the file
+    if($file_field = $bundle->field_map['file']) {
+      //Get the drupal file object
+      $file = $media->get($file_field)->first()->get('entity')->getValue();
+      //If a file object was returned
+      if ($file instanceof FileInterface || $file instanceof File) {
+        //Get the mimetype of the file
+        $mimetype = $file->getMimeType();
+        //Split the mimetype into 2 parts (primary/secondary)
+        $mimetype = explode('/', $mimetype);
+        //If the primary mimetype is not an image
+        if ($mimetype[0] != 'image') {
+          //Try to get the icon for this type of file using both primary and secondary mimetype
+          $thumbnail = $this->config->get('icon_base') . "/{$mimetype[0]}-{$mimetype[1]}.png";
+          //If icon is not found
+          if (!is_file($thumbnail)) {
+            //Try to get the icon for this type of file using only the secondary mimetype
+            $thumbnail = $this->config->get('icon_base') . "/{$mimetype[1]}.png";
+            //If icon is still not found
+            if (!is_file($thumbnail)) {
+              //Use a generic document icon
+              $thumbnail = $this->config->get('icon_base') . '/document.png';
+            }
+          }
+        } else {
+          //Use the URI of the image
+          $thumbnail = $file->getFileUri();
+        }
+        //Return the file URI
+        return $thumbnail;
+      }
+    }
+    //If the file field is not mapped, use the default webdam icon
     return drupal_get_path('module', 'media_webdam') . '/img/webdam.png';
   }
 

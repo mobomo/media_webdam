@@ -10,13 +10,11 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
-use Drupal\file\FileInterface;
-use Drupal\image\Entity\ImageStyle;
+use Drupal\file\Entity\File;
 use Drupal\media_webdam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\media_entity\Entity\Media;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
@@ -544,45 +542,29 @@ class Webdam extends WidgetBase {
         //Set the chosen source field for this entity to the webdam asset id
         $source_field => $asset->id,
       ];
+      //If a field has been mapped for the file
+      if($file_field = $bundle->field_map['file']){
+        //Download the webdam asset file as a string
+        $file_contents = $this->webdam->downloadAsset($asset->id);
+        //Set the path for webdam assets.
+        $path = 'public://webdam_assets/';
+        //Prepare webdam directory for writing and only proceed if successful
+        if(file_prepare_directory($path,FILE_CREATE_DIRECTORY)) {
+          //Save the file into Drupal
+          $file = file_save_data($file_contents, 'public://webdam_assets/' . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
+          //If the file was saved
+          if($file instanceof FileInterface || $file instanceof File){
+            //Set the value for the file field on the entity
+            $entity_values[$file_field] = $file->id();
+          }
+        }
+      }
       //Create a new entity to represent the webdam asset
       $entity = $this->entityTypeManager->getStorage('media')->create($entity_values);
       //Save the entity
       $entity->save();
       //Add the new entity to the array of returned entities
       $entities[] = $entity;
-//=======
-//      //Download the file from webdam
-//      $file_contents = $this->webdam->downloadAsset($asset->id);
-//      //Set the path for webdam assets.
-//      $path = 'public://webdam_assets/';
-//      //Prepare webdam directory for writing and only proceed if successful
-//      if(file_prepare_directory($path,FILE_CREATE_DIRECTORY)) {
-//        //Save the file into Drupal
-//        $file = file_save_data($file_contents, 'public://webdam_assets/' . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
-//        if($file instanceof FileInterface){
-//          $image = \Drupal::service('image.factory')->get($file->getFileUri());
-//          /** @var \Drupal\Core\Image\Image $image */
-//          if ($image->isValid()) {
-//            $styles = ImageStyle::loadMultiple();
-//            $image_uri = $file->getFileUri();
-//            /** @var \Drupal\image\Entity\ImageStyle $style */
-//            foreach ($styles as $style) {
-//              $destination = $style->buildUri($image_uri);
-//              $style->createDerivative($image_uri, $destination);
-//            }
-//          }
-//          //Create a new entity to represent the webdam asset
-//          $entity = $this->entityTypeManager->getStorage('media')->create($entity_values);
-//          //Save the entity
-//          $entity->save();
-//          //Add the new entity to the array of returned entities
-//          $entities[] = $entity;
-//        }else{
-//          // TODO: Add error handling for when file save fails
-//        }
-//      }else{
-//        // TODO: Add error handling for when preparing directory fails
-//      }
     }
     //Return the entities
     return $entities;
