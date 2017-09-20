@@ -1,4 +1,4 @@
-name: "Media Webdam"
+name: "Media Acquia DAM"
 description: "Integrates the Media module ecosystem with Webdam"
 core: 8.x
 type: module
@@ -6,4 +6,4 @@ package: Media
 dependencies:
   - media_entity
   - taxonomy
-configure: media_webdam.config
+configure: media_acquia_dam.config

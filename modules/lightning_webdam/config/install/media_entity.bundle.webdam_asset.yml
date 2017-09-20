@@ -2,7 +2,7 @@ langcode: en
 status: true
 dependencies:
   module:
-    - media_webdam
+    - media_acquia_dam
 id: webdam_asset
 label: 'Webdam Asset'
 description: 'Represents an asset stored in Webdam'

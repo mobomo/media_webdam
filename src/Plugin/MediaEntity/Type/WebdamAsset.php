@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_webdam\Plugin\MediaEntity\Type;
+namespace Drupal\media_acquia_dam\Plugin\MediaEntity\Type;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -8,7 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\media_entity\MediaInterface;
 use Drupal\media_entity\MediaTypeBase;
-use Drupal\media_webdam\WebdamInterface;
+use Drupal\media_acquia_dam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -23,7 +23,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class WebdamAsset extends MediaTypeBase {
 
   /**
-   * @var \Drupal\media_webdam\Webdam $webdam
+   * @var \Drupal\media_acquia_dam\Webdam $webdam
    */
   protected $webdam;
 
@@ -43,7 +43,7 @@ class WebdamAsset extends MediaTypeBase {
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
       $container->get('config.factory'),
-      $container->get('media_webdam.webdam')
+      $container->get('media_acquia_dam.webdam')
     );
   }
 
@@ -157,7 +157,7 @@ class WebdamAsset extends MediaTypeBase {
    */
   public function thumbnail(MediaInterface $media) {
     // @TODO: Should this be a webdam thumbnail image?
-    return drupal_get_path('module', 'media_webdam') . '/img/webdam.png';
+    return drupal_get_path('module', 'media_acquia_dam') . '/img/webdam.png';
   }
 
 }

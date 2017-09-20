@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_webdam\Form;
+namespace Drupal\media_acquia_dam\Form;
 
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
@@ -10,7 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 /**
  * Class WebdamConfig.
  *
- * @package Drupal\media_webdam\Form
+ * @package Drupal\media_acquia_dam\Form
  */
 class WebdamConfig extends ConfigFormBase {
 
@@ -45,7 +45,7 @@ class WebdamConfig extends ConfigFormBase {
    */
   protected function getEditableConfigNames() {
     return [
-      'media_webdam.settings',
+      'media_acquia_dam.settings',
     ];
   }
 
@@ -53,7 +53,7 @@ class WebdamConfig extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $config = $this->config('media_webdam.settings');
+    $config = $this->config('media_acquia_dam.settings');
 
     $form['authentication'] = [
       '#type' => 'fieldset',
@@ -99,7 +99,7 @@ class WebdamConfig extends ConfigFormBase {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->config('media_webdam.settings')
+    $this->config('media_acquia_dam.settings')
       ->set('username', $form_state->getValue('username'))
       ->set('password', $form_state->getValue('password'))
       ->set('client_id', $form_state->getValue('client_id'))

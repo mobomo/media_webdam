@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_webdam;
+namespace Drupal\media_acquia_dam;
 
 use cweagans\webdam\Client;
 use Drupal\Core\Config\ConfigFactoryInterface;
@@ -11,7 +11,7 @@ use GuzzleHttp\ClientInterface;
 /**
  * Class ClientFactory.
  *
- * @package Drupal\media_webdam
+ * @package Drupal\media_acquia_dam
  */
 class ClientFactory {
 
@@ -52,7 +52,7 @@ class ClientFactory {
    *   A fully configured Guzzle client to pass to the webdam client.
    */
   public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $gclient, UserDataInterface $user_data, AccountProxyInterface $currentUser)  {
-    $this->config = $config_factory->get('media_webdam.settings');
+    $this->config = $config_factory->get('media_acquia_dam.settings');
     $this->client = $gclient;
     $this->userData = $user_data;
     $this->currentUser = $currentUser;
@@ -78,8 +78,8 @@ class ClientFactory {
 
     // Set the user's credentials in the client if necessary.
     if ($credentials == 'current') {
-      $access_token = $this->userData->get('media_webdam', $this->currentUser->id(), 'webdam_access_token');
-      $access_token_expiration = $this->userData->get('media_webdam', $this->currentUser->id(), 'webdam_access_token_expiration');
+      $access_token = $this->userData->get('media_acquia_dam', $this->currentUser->id(), 'webdam_access_token');
+      $access_token_expiration = $this->userData->get('media_acquia_dam', $this->currentUser->id(), 'webdam_access_token_expiration');
       $client->setToken($access_token, $access_token_expiration);
     }
 

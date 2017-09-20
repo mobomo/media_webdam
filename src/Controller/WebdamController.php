@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\media_webdam\Controller;
+namespace Drupal\media_acquia_dam\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\Core\Routing\TrustedRedirectResponse;
 use Drupal\Core\Session\AccountProxyInterface;
 use Drupal\Core\Url;
-use Drupal\media_webdam\OauthInterface;
-use Drupal\media_webdam\WebdamInterface;
+use Drupal\media_acquia_dam\OauthInterface;
+use Drupal\media_acquia_dam\WebdamInterface;
 use Drupal\user\UserDataInterface;
 use Drupal\user\UserInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -24,7 +24,7 @@ class WebdamController extends ControllerBase {
   /**
    * A configured webdam API object.
    *
-   * @var \Drupal\media_webdam\WebdamInterface
+   * @var \Drupal\media_acquia_dam\WebdamInterface
    */
   protected $webdam;
 
@@ -38,7 +38,7 @@ class WebdamController extends ControllerBase {
   /**
    * WebdamController constructor.
    *
-   * @param \Drupal\media_webdam\WebdamInterface $webdam
+   * @param \Drupal\media_acquia_dam\WebdamInterface $webdam
    */
   public function __construct(WebdamInterface $webdam) {
     $this->webdam = $webdam;
@@ -46,7 +46,7 @@ class WebdamController extends ControllerBase {
 
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('media_webdam.webdam')
+      $container->get('media_acquia_dam.webdam')
     );
   }
 
@@ -112,7 +112,7 @@ class WebdamController extends ControllerBase {
       '#asset_link' => "https://mobomotrial.webdamdb.com/cloud/#asset/" . $assetId,
       '#attached' => [
         'library' => [
-          'media_webdam/asset_details',
+          'media_acquia_dam/asset_details',
         ]
       ]
     ];

@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\Tests\media_webdam\unit;
+namespace Drupal\Tests\media_acquia_dam\unit;
 
 use cweagans\webdam\Entity\Asset;
 use cweagans\webdam\Entity\MiniFolder;
@@ -18,14 +18,14 @@ use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\entity_test\FieldStorageDefinition;
 use Drupal\media_entity\Entity\Media;
 use Drupal\media_entity\MediaInterface;
-use Drupal\media_webdam\Plugin\MediaEntity\Type\WebdamAsset;
-use Drupal\media_webdam\Webdam;
+use Drupal\media_acquia_dam\Plugin\MediaEntity\Type\WebdamAsset;
+use Drupal\media_acquia_dam\Webdam;
 use Drupal\Tests\UnitTestCase;
 
 /**
  * Webdam asset plugin test.
  *
- * @group media_webdam
+ * @group media_acquia_dam
  */
 class WebdamAssetPluginTest extends UnitTestCase {
 

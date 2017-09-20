@@ -1,5 +1,5 @@
 {
-	"name": "drupal/media_webdam",
+	"name": "drupal/media_acquia_dam",
 	"description": "Integrates the Media module ecosystem with Webdam.",
 	"authors": [
 		{

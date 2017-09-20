@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\media_webdam;
+namespace Drupal\media_acquia_dam;
 
 /**
  * Class Webdam.
  *
  * Abstracts away details of the REST API.
  *
- * @package Drupal\media_webdam
+ * @package Drupal\media_acquia_dam
  */
 class Webdam implements WebdamInterface {
 
@@ -21,7 +21,7 @@ class Webdam implements WebdamInterface {
   /**
    * Webdam constructor.
    *
-   * @param \Drupal\media_webdam\ClientFactory $client_factory
+   * @param \Drupal\media_acquia_dam\ClientFactory $client_factory
    *   An instance of ClientFactory that we can get a webdam client from.
    * @param string $credential_type
    *   The type of credentials to use.

@@ -6,7 +6,7 @@
  * Time: 17:01
  */
 
-namespace Drupal\media_webdam;
+namespace Drupal\media_acquia_dam;
 
 
 /**
@@ -14,7 +14,7 @@ namespace Drupal\media_webdam;
  *
  * Abstracts away details of the REST API.
  *
- * @package Drupal\media_webdam
+ * @package Drupal\media_acquia_dam
  */
 interface WebdamInterface {
 

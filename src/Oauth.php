@@ -2,10 +2,10 @@
 
 /**
  * @file
- * Contains Drupal\media_webdam\Oauth.
+ * Contains Drupal\media_acquia_dam\Oauth.
  */
 
-namespace Drupal\media_webdam;
+namespace Drupal\media_acquia_dam;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Config\ConfigFactory;
@@ -23,7 +23,7 @@ class Oauth implements OauthInterface {
   protected $webdamApiBase = "https://apiv2.webdamdb.com";
 
   /**
-   * The media_webdam configuration.
+   * The media_acquia_dam configuration.
    *
    * @var \Drupal\Core\Config\Config|\Drupal\Core\Config\ImmutableConfig
    */
@@ -59,7 +59,7 @@ class Oauth implements OauthInterface {
    * @param \GuzzleHttp\ClientInterface $httpClient
    */
   public function __construct(ConfigFactory $config_factory, CsrfTokenGenerator $csrfTokenGenerator, UrlGeneratorInterface $urlGenerator, ClientInterface $httpClient) {
-    $this->config = $config_factory->get('media_webdam.settings');
+    $this->config = $config_factory->get('media_acquia_dam.settings');
     $this->csrfTokenGenerator = $csrfTokenGenerator;
     $this->urlGenerator = $urlGenerator;
     $this->httpClient = $httpClient;
@@ -70,8 +70,8 @@ class Oauth implements OauthInterface {
    */
   public function getAuthLink() {
     $client_id = $this->config->get('client_id');
-    $token = $this->csrfTokenGenerator->get('media_webdam.oauth');
-    $redirect_uri = $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', [], ['absolute' => TRUE]);
+    $token = $this->csrfTokenGenerator->get('media_acquia_dam.oauth');
+    $redirect_uri = $this->urlGenerator->generateFromRoute('media_acquia_dam.auth_finish', [], ['absolute' => TRUE]);
 
     return "{$this->webdamApiBase}/oauth2/authorize?response_type=code&state={$token}&redirect_uri={$redirect_uri}&client_id={$client_id}";
   }
@@ -80,7 +80,7 @@ class Oauth implements OauthInterface {
    * {@inheritdoc}
    */
   public function authRequestStateIsValid($token) {
-    return $this->csrfTokenGenerator->validate($token, 'media_webdam.oauth');
+    return $this->csrfTokenGenerator->validate($token, 'media_acquia_dam.oauth');
   }
 
   /**
@@ -92,7 +92,7 @@ class Oauth implements OauthInterface {
       'form_params' => [
         'grant_type' => 'authorization_code',
         'code' => $auth_code,
-        'redirect_uri' => $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', [], ['absolute' => TRUE]),
+        'redirect_uri' => $this->urlGenerator->generateFromRoute('media_acquia_dam.auth_finish', [], ['absolute' => TRUE]),
         'client_id' => $this->config->get('client_id'),
         'client_secret' => $this->config->get('secret'),
       ],
