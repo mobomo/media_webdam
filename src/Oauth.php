@@ -92,7 +92,7 @@ class Oauth implements OauthInterface {
       'form_params' => [
         'grant_type' => 'authorization_code',
         'code' => $auth_code,
-        'redirect_uri' => $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', [], ['absolute' => TRUE]),
+        'redirect_uri' => $this->urlGenerator->generateFromRoute('media_acquia_dam.auth_finish', [], ['absolute' => TRUE]),
         'client_id' => $this->config->get('client_id'),
         'client_secret' => $this->config->get('secret'),
       ],

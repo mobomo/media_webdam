@@ -76,7 +76,7 @@ img.webdam-asset-browser-icon {
 .webdam-browser-folder-link .webdam-folder-link-button:hover,
 .webdam-browser-folder-link .webdam-folder-link-button:active,
 .webdam-browser-folder-link .webdam-folder-link-button:focus {
-  background: url('/modules/contrib/media_webdam/img/folder.png') no-repeat;
+  background: url('/modules/contrib/media_acquia_dam/img/folder.png') no-repeat;
   background-position-x: 10px;
   background-size: contain;
   width: 100%;

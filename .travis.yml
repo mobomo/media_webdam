@@ -26,15 +26,15 @@ mysql:
 
 before_install:
   - echo 'sendmail_path="$(which true)"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
-  # Travis automatically CDs into mobomo/media_webdam
+  # Travis automatically CDs into mobomo/media_acquia_dam
   - cd ../../
   - git clone https://github.com/mobomo/media_webdam_dev
   - cd media_webdam_dev
 
 install:
   - make dependencies
-  - rm -r ./modules/contrib/media_webdam/*
-  - mv $TRAVIS_BUILD_DIR/* ./modules/contrib/media_webdam/
+  - rm -r ./modules/contrib/media_acquia_dam/*
+  - mv $TRAVIS_BUILD_DIR/* ./modules/contrib/media_acquia_dam/
   - make travis-install-site
 
 script:

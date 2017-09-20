@@ -66,7 +66,7 @@ class Webdam extends WidgetBase {
    * @param \Symfony\Component\EventDispatcher\EventDispatcherInterface $event_dispatcher
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
    * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
-   * @param \Drupal\media_webdam\WebdamInterface $webdam
+   * @param \Drupal\media_acquia_dam\WebdamInterface $webdam
    * @param \Drupal\Core\Session\AccountInterface $account
    * @param \Drupal\Core\Language\LanguageManagerInterface $language_manager
    */
@@ -89,7 +89,7 @@ class Webdam extends WidgetBase {
       $container->get('event_dispatcher'),
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
-      $container->get('media_webdam.webdam_user_creds'),
+      $container->get('media_acquia_dam.webdam_user_creds'),
       $container->get('current_user'),
       $container->get('language_manager'),
       $container->get('module_handler')
@@ -311,11 +311,11 @@ class Webdam extends WidgetBase {
         '#theme' => 'asset_browser_message',
         '#message' => $this->t('You are not authenticated. Please %authenticate to browse Webdam assets.', [
           // @TODO: Remove usage of \Drupal here.
-          '%authenticate' => \Drupal::l('authenticate', Url::fromRoute('media_webdam.auth_start')),
+          '%authenticate' => \Drupal::l('authenticate', Url::fromRoute('media_acquia_dam.auth_start')),
         ]),
         '#attached' => [
           'library' => [
-            'media_webdam/asset_browser',
+            'media_acquia_dam/asset_browser',
           ]
         ],
       ];
@@ -635,7 +635,7 @@ class Webdam extends WidgetBase {
    * @return string
    */
   public function layoutMediaEntity($webdamAsset) {
-    $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
+    $modulePath = $this->module_handler->getModule('media_acquia_dam')->getPath();
 
     $assetName = $webdamAsset->name;
     if (!empty($webdamAsset->thumbnailurls)) {

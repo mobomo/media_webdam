@@ -3,7 +3,7 @@
 namespace Drupal\Tests\media_acquia_dam\unit;
 
 use Drupal\Core\Session\AccountProxy;
-use Drupal\media_webdam\ClientFactory;
+use Drupal\media_acquia_dam\ClientFactory;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserDataInterface;
 use GuzzleHttp\Client as GClient;
