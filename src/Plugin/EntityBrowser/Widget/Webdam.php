@@ -543,23 +543,6 @@ class Webdam extends WidgetBase {
         //Set the chosen source field for this entity to the webdam asset id
         $source_field => $asset->id,
       ];
-      //If a field has been mapped for the file
-      if($file_field = $bundle->field_map['file']){
-        //Download the webdam asset file as a string
-        $file_contents = $this->webdam->downloadAsset($asset->id);
-        //Set the path for webdam assets.
-        $path = 'public://webdam_assets/';
-        //Prepare webdam directory for writing and only proceed if successful
-        if(file_prepare_directory($path,FILE_CREATE_DIRECTORY)) {
-          //Save the file into Drupal
-          $file = file_save_data($file_contents, 'public://webdam_assets/' . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
-          //If the file was saved
-          if($file instanceof FileInterface || $file instanceof File){
-            //Set the value for the file field on the entity
-            $entity_values[$file_field] = $file->id();
-          }
-        }
-      }
       //Create a new entity to represent the webdam asset
       $entity = $this->entityTypeManager->getStorage('media')->create($entity_values);
       //Save the entity
