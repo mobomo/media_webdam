@@ -81,7 +81,8 @@ class WebdamAsset extends MediaTypeBase {
       'datecreated' => $this->t('Date created'),
       'datemodified' => $this->t('Date modified'),
       'datecaptured' => $this->t('Date captured'),
-      'folderID' => $this->t('Folder ID')
+      'folderID' => $this->t('Folder ID'),
+      'status' => $this->t('Status'),
     ];
     return $fields;
   }
@@ -160,6 +161,8 @@ class WebdamAsset extends MediaTypeBase {
         return $this->asset->folder->id;
       case 'file':
         return $this->file ? $this->file->id() : NULL;
+      case 'status':
+        return $this->asset->status == 'active';
     }
 
     return FALSE;
