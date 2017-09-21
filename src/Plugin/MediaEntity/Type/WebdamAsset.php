@@ -6,10 +6,12 @@ use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\file\FileInterface;
 use Drupal\media_entity\MediaInterface;
 use Drupal\media_entity\MediaTypeBase;
 use Drupal\media_webdam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\file\Entity\File;
 
 /**
  * Provides media type plugin for Webdam Images.
@@ -26,6 +28,16 @@ class WebdamAsset extends MediaTypeBase {
    * @var \Drupal\media_webdam\Webdam $webdam
    */
   protected $webdam;
+
+  /**
+   * @var \cweagans\webdam\Entity\Asset
+   */
+  protected $asset = NULL;
+
+  /**
+   * @var \Drupal\file\Entity\File
+   */
+  protected $file = NULL;
 
   public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, WebdamInterface $webdam) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $entity_field_manager, $config_factory->get('media_entity.settings'));
@@ -55,6 +67,7 @@ class WebdamAsset extends MediaTypeBase {
     // @TODO: Determine if other properties need to be added here.
     // @TODO: Determine how to support custom metadata.
     $fields = [
+      'file' => $this->t('File'),
       'type_id' => $this->t('Type ID'),
       'filename' => $this->t('Filename'),
       'filesize' => $this->t('Filesize'),
@@ -69,7 +82,6 @@ class WebdamAsset extends MediaTypeBase {
       'datecaptured' => $this->t('Date captured'),
       'folderID' => $this->t('Folder ID')
     ];
-
     return $fields;
   }
 
@@ -93,7 +105,6 @@ class WebdamAsset extends MediaTypeBase {
       '#default_value' => empty($this->configuration['source_field']) ? NULL : $this->configuration['source_field'],
       '#options' => $options,
     ];
-
     return $form;
   }
 
@@ -102,7 +113,6 @@ class WebdamAsset extends MediaTypeBase {
    */
   public function getField(MediaInterface $media, $name) {
     $assetID = NULL;
-
     if (isset($this->configuration['source_field'])) {
       $source_field = $this->configuration['source_field'];
 
@@ -111,42 +121,44 @@ class WebdamAsset extends MediaTypeBase {
         $assetID = $media->{$source_field}->{$property_name};
       }
     }
-
     // If we don't have an asset ID, there's not much we can do.
     if (is_null($assetID)) {
       return FALSE;
     }
-
-    // Load the asset.
-    $asset = $this->webdam->getAsset($assetID);
-
+    // If the webdam asset has not been loaded
+    if(!$this->asset){
+      // Load the asset.
+      $this->asset = $this->webdam->getAsset($assetID);
+    }
     switch ($name) {
       case 'type_id':
-        return $asset->type_id;
+        return $this->asset->type_id;
       case 'filename':
-        return $asset->filename;
+        return $this->asset->filename;
       case 'filesize':
-        return $asset->filesize;
+        return $this->asset->filesize;
       case 'width':
-        return $asset->width;
+        return $this->asset->width;
       case 'height':
-        return $asset->height;
+        return $this->asset->height;
       case 'description':
-        return $asset->description;
+        return $this->asset->description;
       case 'filetype':
-        return $asset->filetype;
+        return $this->asset->filetype;
       case 'colorspace':
-        return $asset->colorspace;
+        return $this->asset->colorspace;
       case 'version':
-        return $asset->version;
+        return $this->asset->version;
       case 'datecreated':
-        return $asset->date_created_unix;
+        return $this->asset->date_created_unix;
       case 'datemodified':
-        return $asset->date_modified_unix;
+        return $this->asset->date_modified_unix;
       case 'datecaptured':
-        return $asset->datecapturedUnix;
+        return $this->asset->datecapturedUnix;
       case 'folderID':
-        return $asset->folder->id;
+        return $this->asset->folder->id;
+      case 'file':
+        return $this->file ? $this->file->id() : NULL;
     }
 
     return FALSE;
@@ -156,7 +168,75 @@ class WebdamAsset extends MediaTypeBase {
    * {@inheritdoc}
    */
   public function thumbnail(MediaInterface $media) {
-    // @TODO: Should this be a webdam thumbnail image?
+    //Load the bundle for this asset
+    $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($media->bundle());
+    //Load the field definitions for this bundle
+    $field_definitions = $this->entityFieldManager->getFieldDefinitions($media->getEntityTypeId(), $media->bundle());
+    //If a source field is set for this bundle
+    if (isset($this->configuration['source_field'])) {
+      //Set the name of the source field
+      $source_field = $this->configuration['source_field'];
+      //If the media entity has the source field
+      if ($media->hasField($source_field)) {
+        //Set the property name for the source field
+        $property_name = $media->{$source_field}->first()->mainPropertyName();
+        //Get the webdam asset ID value from the source field
+        $assetID = $media->{$source_field}->{$property_name};
+      }
+    }
+    // If we don't have an asset ID, there's not much we can do.
+    if (is_null($assetID)) {
+      return FALSE;
+    }
+    // Load the asset.
+    $asset = $this->webdam->getAsset($assetID);
+    //Download the webdam asset file as a string
+    $file_contents = $this->webdam->downloadAsset($asset->id);
+    //Set the path for webdam assets.
+    //If the bundle has a field mapped for the file
+    if($file_field = $bundle->field_map['file']){
+      //Get the storage scheme for the file field
+      $scheme = $field_definitions[$file_field]->getItemDefinition()->getSetting('uri_scheme');
+    }else{
+      //Otherwise default to public storage
+      $scheme = 'public';
+    }
+    //Set the path prefix for the file that is about to be downloaded from webdam and saved in to Drupal
+    $path = $scheme . '://webdam_assets/';
+    //Prepare webdam directory for writing and only proceed if successful
+    if(file_prepare_directory($path,FILE_CREATE_DIRECTORY)) {
+      //Save the file into Drupal
+      $file = file_save_data($file_contents, $path . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
+      //If the file was saved
+      if ($file instanceof FileInterface || $file instanceof File) {
+        $this->file = $file;
+        //Get the mimetype of the file
+        $mimetype = $file->getMimeType();
+        //Split the mimetype into 2 parts (primary/secondary)
+        $mimetype = explode('/', $mimetype);
+        //If the primary mimetype is not an image
+        if ($mimetype[0] != 'image') {
+          //Try to get the icon for this type of file using both primary and secondary mimetype
+          $thumbnail = $this->config->get('icon_base') . "/{$mimetype[0]}-{$mimetype[1]}.png";
+          //If icon is not found
+          if (!is_file($thumbnail)) {
+            //Try to get the icon for this type of file using only the secondary mimetype
+            $thumbnail = $this->config->get('icon_base') . "/{$mimetype[1]}.png";
+            //If icon is still not found
+            if (!is_file($thumbnail)) {
+              //Use a generic document icon
+              $thumbnail = $this->config->get('icon_base') . '/document.png';
+            }
+          }
+        } else {
+          //Use the URI of the image
+          $thumbnail = $file->getFileUri();
+        }
+        //Return the file URI
+        return $thumbnail;
+      }
+    }
+    //If the file field is not mapped, use the default webdam icon
     return drupal_get_path('module', 'media_webdam') . '/img/webdam.png';
   }
 

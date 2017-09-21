@@ -10,11 +10,12 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
+use Drupal\file\Entity\File;
+use Drupal\file\FileInterface;
 use Drupal\media_webdam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\media_entity\Entity\Media;
-use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Language\LanguageManagerInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 
