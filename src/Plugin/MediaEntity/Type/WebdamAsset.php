@@ -168,10 +168,19 @@ class WebdamAsset extends MediaTypeBase {
    * {@inheritdoc}
    */
   public function thumbnail(MediaInterface $media) {
+    //Load the bundle for this asset
+    $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($media->bundle());
+    //Load the field definitions for this bundle
+    $field_definitions = $this->entityFieldManager->getFieldDefinitions($media->getEntityTypeId(), $media->bundle());
+    //If a source field is set for this bundle
     if (isset($this->configuration['source_field'])) {
+      //Set the name of the source field
       $source_field = $this->configuration['source_field'];
+      //If the media entity has the source field
       if ($media->hasField($source_field)) {
+        //Set the property name for the source field
         $property_name = $media->{$source_field}->first()->mainPropertyName();
+        //Get the webdam asset ID value from the source field
         $assetID = $media->{$source_field}->{$property_name};
       }
     }
@@ -184,11 +193,20 @@ class WebdamAsset extends MediaTypeBase {
     //Download the webdam asset file as a string
     $file_contents = $this->webdam->downloadAsset($asset->id);
     //Set the path for webdam assets.
-    $path = 'public://webdam_assets/';
+    //If the bundle has a field mapped for the file
+    if($file_field = $bundle->field_map['file']){
+      //Get the storage scheme for the file field
+      $scheme = $field_definitions[$file_field]->getItemDefinition()->getSetting('uri_scheme');
+    }else{
+      //Otherwise default to public storage
+      $scheme = 'public';
+    }
+    //Set the path prefix for the file that is about to be downloaded from webdam and saved in to Drupal
+    $path = $scheme . '://webdam_assets/';
     //Prepare webdam directory for writing and only proceed if successful
     if(file_prepare_directory($path,FILE_CREATE_DIRECTORY)) {
       //Save the file into Drupal
-      $file = file_save_data($file_contents, 'public://webdam_assets/' . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
+      $file = file_save_data($file_contents, $path . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
       //If the file was saved
       if ($file instanceof FileInterface || $file instanceof File) {
         $this->file = $file;
