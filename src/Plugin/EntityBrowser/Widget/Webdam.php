@@ -407,8 +407,11 @@ class Webdam extends WidgetBase {
       $folder_assets = $this->webdam->getFolderAssets($current_folder->id, $params);
       //If there is a filter applied for the file type
       if(!empty($params['types'])){
-        //Override number of assets on current folder to make number of search results so pager works correctly
-        $current_folder->numassets = $folder_assets->facets->types->{$params['types']};
+        //Check that we have facets
+        if ($folder_assets->facets) {
+          //Override number of assets on current folder to make number of search results so pager works correctly
+          $current_folder->numassets = $folder_assets->facets->types->{$params['types']};
+        }
       }
       //Store the list of folders for rendering later
       $folders = $folder_assets->folders;
