@@ -288,13 +288,9 @@ class Webdam extends WidgetBase {
     ];
     // Add form reset button.
     $form['filter-sort-container']['filter-sort-reset'] = [
-      '#type' => 'html_tag',
-      '#tag' => 'input',
-      '#attributes' => [
-        'class' => 'button',
-        'type' => 'reset',
-        'value' => 'Reset',
-      ],
+      '#type' => 'button',
+      '#value' => 'Reset',
+      '#name' => 'filter_sort_reset',
     ];
     return $form;
   }
@@ -303,7 +299,11 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   public function getForm(array &$original_form, FormStateInterface $form_state, array $additional_widget_parameters) {
-
+    //If this is not the current entity browser widget being rendered
+    if($this->uuid() != $form_state->getStorage()['entity_browser_current_widget']){
+      //return an empty array
+      return [];
+    }
     try {
       $this->webdam->getAccountSubscriptionDetails();
     }
@@ -322,12 +322,6 @@ class Webdam extends WidgetBase {
       ];
 
       return $form;
-    }
-
-    //If this is not the current entity browser widget being rendered
-    if($this->uuid() != $form_state->getStorage()['entity_browser_current_widget']){
-      //return an empty array
-      return [];
     }
     //Start by inheriting parent form
     $form = parent::getForm($original_form, $form_state, $additional_widget_parameters);
@@ -351,8 +345,8 @@ class Webdam extends WidgetBase {
     $breadcrumbs = [
       '0' => 'Home'
     ];
-    //If the form state contains the widget then pull values for the current state
-    if(isset($form_state->getCompleteForm()['widget'])){
+    //If the form state contains the widget AND the reset button had not been clicked then pull values for the current form state
+    if(isset($form_state->getCompleteForm()['widget']) && isset($trigger_elem) && $trigger_elem['#name'] != 'filter_sort_reset'){
       //assign $widget for convenience
       $widget = $form_state->getCompleteForm()['widget'];
       if(isset($widget['pager-container']) && is_numeric($widget['pager-container']['#page'])){
@@ -366,6 +360,13 @@ class Webdam extends WidgetBase {
       if(isset($widget['breadcrumb-container']) && is_array($widget['breadcrumb-container']['#breadcrumbs'])) {
         //Set the breadcrumbs to the value stored in the form state
         $breadcrumbs = $widget['breadcrumb-container']['#breadcrumbs'];
+      }
+      if($form_state->getValue('assets')){
+        $current_selections = $form_state->getValue('current_selections', []) + array_filter($form_state->getValue('assets', []));
+        $form['current_selections'] = [
+          '#type' => 'value',
+          '#value' => $current_selections
+        ];
       }
     }
     //If the form has been submitted
@@ -426,7 +427,7 @@ class Webdam extends WidgetBase {
       //Override number of assets on current folder to make number of search results so pager works correctly
       $current_folder->numassets = $search_results['total_count'];
       //Set items to array of assets in the search result
-      $items = $search_results['assets'];
+      $items = isset($search_results['assets']) ? $search_results['assets'] : [];
     }
     //Add the filter and sort options to the form
     $form += $this->getFilterSort();
@@ -492,7 +493,6 @@ class Webdam extends WidgetBase {
     //If the number of assets in the current folder is greater than the number of assets to show per page
     if($current_folder->numassets > $num_per_page) {
       //Add the pager to the form
-//      $form['asset-container'] += $this->getPager($current_folder, $page, $num_per_page);
       $form['actions'] += $this->getPager($current_folder, $page, $num_per_page);
     }
     return $form;
@@ -503,7 +503,7 @@ class Webdam extends WidgetBase {
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
     //Get webdam asset id's from form state
-    $asset_ids = array_filter($form_state->getValue(['assets'], []));
+    $asset_ids = $form_state->getValue('current_selections', []) + array_filter($form_state->getValue('assets', []));
     //Load bundle information
     $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($this->configuration['bundle']);
     //Get the source field for this bundle which stores the webdam asset id

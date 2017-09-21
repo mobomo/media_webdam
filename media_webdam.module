@@ -116,6 +116,8 @@ function media_webdam_cron(){
           //Set the value to NULL so that it gets repopulated from webdam on save
           $entity->$mapped_field->value = NULL;
         }
+        //Set flag for thumbnail to be regenerated
+        $entity->setQueuedThumbnailDownload();
         //Save the entity
         $entity->save();
       }
