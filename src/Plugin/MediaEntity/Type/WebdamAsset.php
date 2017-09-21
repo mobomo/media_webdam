@@ -7,6 +7,7 @@ use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\FileInterface;
+use Drupal\image\Entity\ImageStyle;
 use Drupal\media_entity\MediaInterface;
 use Drupal\media_entity\MediaTypeBase;
 use Drupal\media_webdam\WebdamInterface;
@@ -229,6 +230,20 @@ class WebdamAsset extends MediaTypeBase {
             }
           }
         } else {
+          //load the image
+          $image = \Drupal::service('image.factory')->get($file->getFileUri());
+          /** @var \Drupal\Core\Image\Image $image */
+          //If the image is valid
+          if($image->isValid()){
+            //Load all image styles
+            $styles = ImageStyle::loadMultiple();
+            //For each image style
+            foreach ($styles as $style){
+              /** @var ImageStyle $style */
+              //Flush and regenerate the styled image
+              $style->flush($file->getFileUri());
+            }
+          }
           //Use the URI of the image
           $thumbnail = $file->getFileUri();
         }
