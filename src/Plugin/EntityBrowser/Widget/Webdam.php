@@ -466,6 +466,13 @@ class Webdam extends WidgetBase {
         '#tag' => 'p',
         '#value' => $folder->name,
       ];
+      $form['asset-container'][$folder->name]['thumbnail'] = [
+        '#type' => 'html_tag',
+        '#tag' => 'img',
+        '#attributes' => [
+          'src' => $folder->thumbnailurls[0]->url,
+        ],
+      ];
     }
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.
     $assets = [];
