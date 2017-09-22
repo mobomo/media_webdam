@@ -7,14 +7,26 @@
 <div class="asset-data">
     <table>
         <tr>
-            <td><strong>Attribute</strong></td>
-            <td><strong>Value</strong></td>
+            <td colspan="2"><strong>Asset Properties</strong></td>
         </tr>
-        {% for attribute, value in asset_data %}
-        <tr>
-            <td>{{ attribute }}</td>
-            <td>{{ value }}</td>
-        </tr>
+        {% for attribute, value in asset_data.base_properties %}
+            <tr>
+                <td>{{ attribute }}</td>
+                <td>{{ value }}</td>
+            </tr>
         {% endfor %}
+
+
+        {% if asset_data.additional_metadata is not empty %}
+            <tr>
+                <td colspan="2"><strong>Additional Metadata</strong></td>
+            </tr>
+            {% for attribute, value in asset_data.additional_metadata %}
+                <tr>
+                    <td>{{ attribute }}</td>
+                    <td>{{ value }}</td>
+                </tr>
+            {% endfor %}
+        {% endif %}
     </table>
 </div>
