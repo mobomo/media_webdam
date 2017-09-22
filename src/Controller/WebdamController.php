@@ -81,24 +81,33 @@ class WebdamController extends ControllerBase {
     // @TODO: Catch exceptions here and do the right thing.
     $asset = $this->getAsset($assetId);
 
-    $asset_attributes = [];
-    $asset_attributes['Asset ID'] = $asset->id;
-    $asset_attributes['Status'] = $asset->status;
-    $asset_attributes['Filename'] = $asset->filename;
-    $asset_attributes['Version'] = $asset->version;
-    $asset_attributes['Description'] = $asset->description;
-    $asset_attributes['Width'] = $asset->width;
-    $asset_attributes['Height'] = $asset->height;
-    $asset_attributes['Filetype'] = $asset->filetype;
-    $asset_attributes['Color space'] = $asset->colorspace;
-    $asset_attributes['Date created'] = $asset->datecreated;
-    $asset_attributes['Date modified'] = $asset->datemodified;
-    $asset_attributes["Owner"] = $asset->user->name;
-    $asset_attributes["Folder"] = $asset->folder->name;
+    $asset_attributes = [
+      'base_properties' => [],
+      'additional_metadata' => [],
+    ];
+
+    $asset_attributes['base_properties']['Asset ID'] = $asset->id;
+    $asset_attributes['base_properties']['Status'] = $asset->status;
+    $asset_attributes['base_properties']['Filename'] = $asset->filename;
+    $asset_attributes['base_properties']['Version'] = $asset->version;
+    $asset_attributes['base_properties']['Description'] = $asset->description;
+    $asset_attributes['base_properties']['Width'] = $asset->width;
+    $asset_attributes['base_properties']['Height'] = $asset->height;
+    $asset_attributes['base_properties']['Filetype'] = $asset->filetype;
+    $asset_attributes['base_properties']['Color space'] = $asset->colorspace;
+    $asset_attributes['base_properties']['Date created'] = $asset->datecreated;
+    $asset_attributes['base_properties']['Date modified'] = $asset->datemodified;
+    $asset_attributes['base_properties']['Owner'] = $asset->user->name;
+    $asset_attributes['base_properties']['Folder'] = $asset->folder->name;
+
+    if (isset($asset->expiration)) {
+      $asset_attributes['base_properties']['Expiration Date'] = $asset->expiration->date;
+      $asset_attributes['base_properties']['Expiration Notes'] = $asset->expiration->notes;
+    }
 
     if (!empty($asset->xmp_metadata)) {
       foreach ($asset->xmp_metadata as $metadata) {
-        $asset_attributes[$metadata['label']] = $metadata['value'];
+        $asset_attributes['additional_metadata'][$metadata['label']] = $metadata['value'];
       }
     }
 
