@@ -71,6 +71,8 @@ class OauthController extends ControllerBase {
    * Builds the Webdam auth page for a given user.
    *
    * Route: /user/{$user}/webdam
+   * @param UserInterface $user
+   * @return array
    */
   public function authPage(UserInterface $user) {
     // Users cannot access other users' auth forms.
@@ -87,7 +89,7 @@ class OauthController extends ControllerBase {
           '#markup' => '<p>' . $this->t('You are authenticated with Webdam.') . '</p>',
         ],
         [
-          '#markup' => $this->getLinkGenerator()->generate('Reauthenticate', Url::fromRoute('media_webdam.auth_start')),
+          '#markup' => $this->getLinkGenerator()->generate('Reauthenticate', Url::fromRoute('media_webdam.auth_start',['auth_finish_redirect' => "/user/{$this->currentUser->id()}/webdam"])),
         ]
       ];
     }
@@ -100,7 +102,7 @@ class OauthController extends ControllerBase {
           '#markup' => '<p>' . $this->t('You are not authenticated with Webdam.') . '</p>',
         ],
         [
-          '#markup' => $this->getLinkGenerator()->generate('Authenticate', Url::fromRoute('media_webdam.auth_start')),
+          '#markup' => $this->getLinkGenerator()->generate('Authenticate', Url::fromRoute('media_webdam.auth_start',['auth_finish_redirect' => "/user/{$this->currentUser->id()}/webdam"])),
         ]
       ];
     }
@@ -112,6 +114,8 @@ class OauthController extends ControllerBase {
    * Route: /webdam/authStart
    */
   public function authStart() {
+    $auth_finish_redirect = $this->request->query->get('auth_finish_redirect');
+    $this->oauth->setAuthFinishRedirect($auth_finish_redirect);
     return new TrustedRedirectResponse($this->oauth->getAuthLink());
   }
 
@@ -121,6 +125,11 @@ class OauthController extends ControllerBase {
    * Route: /webdam/authFinish
    */
   public function authFinish() {
+    $auth_finish_redirect = $this->request->query->get('auth_finish_redirect');
+    if($original_path = $this->request->query->get('original_path', FALSE)){
+      $auth_finish_redirect .= '&original_path=' . $original_path;
+    }
+    $this->oauth->setAuthFinishRedirect($auth_finish_redirect);
     if (!$this->oauth->authRequestStateIsValid($this->request->get('state'))) {
       throw new AccessDeniedHttpException();
     }
@@ -130,7 +139,7 @@ class OauthController extends ControllerBase {
     $this->userData->set('media_webdam', $this->currentUser->id(), 'webdam_access_token', $access_token['access_token']);
     $this->userData->set('media_webdam', $this->currentUser->id(), 'webdam_access_token_expiration', $access_token['expire_time']);
 
-    return new RedirectResponse("/user/{$this->currentUser->id()}/webdam");
+    return new RedirectResponse($auth_finish_redirect);
   }
 
 }

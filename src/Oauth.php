@@ -51,6 +51,13 @@ class Oauth implements OauthInterface {
   protected $httpClient;
 
   /**
+   * Destination URI after authentication is completed
+   *
+   * @var string
+   */
+  protected $auth_finish_redirect;
+
+  /**
    * Oauth constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
@@ -71,7 +78,7 @@ class Oauth implements OauthInterface {
   public function getAuthLink() {
     $client_id = $this->config->get('client_id');
     $token = $this->csrfTokenGenerator->get('media_webdam.oauth');
-    $redirect_uri = $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', [], ['absolute' => TRUE]);
+    $redirect_uri = $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', ['auth_finish_redirect' => $this->auth_finish_redirect], ['absolute' => TRUE]);
 
     return "{$this->webdamApiBase}/oauth2/authorize?response_type=code&state={$token}&redirect_uri={$redirect_uri}&client_id={$client_id}";
   }
@@ -92,7 +99,7 @@ class Oauth implements OauthInterface {
       'form_params' => [
         'grant_type' => 'authorization_code',
         'code' => $auth_code,
-        'redirect_uri' => $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', [], ['absolute' => TRUE]),
+        'redirect_uri' => $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', ['auth_finish_redirect' => $this->auth_finish_redirect], ['absolute' => TRUE]),
         'client_id' => $this->config->get('client_id'),
         'client_secret' => $this->config->get('secret'),
       ],
@@ -107,4 +114,11 @@ class Oauth implements OauthInterface {
     ];
   }
 
+  /**
+   * {@inheritdoc}
+   */
+  public function setAuthFinishRedirect($auth_finish_redirect) {
+    //TODO: sanitize and validate $redirect_uri
+    $this->auth_finish_redirect = $auth_finish_redirect;
+  }
 }
