@@ -22,6 +22,8 @@ media_webdam.auth_start:
     _controller: '\Drupal\media_webdam\Controller\OauthController::authStart'
   requirements:
     _user_is_logged_in: 'TRUE'
+  options:
+    no_cache: 'TRUE'
 
 media_webdam.auth_finish:
   path: '/webdam/authFinish'

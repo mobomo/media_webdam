@@ -10,8 +10,6 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
-use Drupal\file\Entity\File;
-use Drupal\file\FileInterface;
 use Drupal\media_webdam\WebdamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -312,7 +310,7 @@ class Webdam extends WidgetBase {
         '#theme' => 'asset_browser_message',
         '#message' => $this->t('You are not authenticated. Please %authenticate to browse Webdam assets.', [
           // @TODO: Remove usage of \Drupal here.
-          '%authenticate' => \Drupal::l('authenticate', Url::fromRoute('media_webdam.auth_start')),
+          '%authenticate' => \Drupal::l('authenticate', Url::fromRoute('media_webdam.auth_start',['auth_finish_redirect' => \Drupal::request()->getRequestUri()])),
         ]),
         '#attached' => [
           'library' => [
@@ -320,7 +318,6 @@ class Webdam extends WidgetBase {
           ]
         ],
       ];
-
       return $form;
     }
     //Start by inheriting parent form
@@ -470,7 +467,7 @@ class Webdam extends WidgetBase {
         '#type' => 'html_tag',
         '#tag' => 'img',
         '#attributes' => [
-          'src' => $folder->thumbnailurls[0]->url,
+          'src' => (isset($folder->thumbnailurls) ? $folder->thumbnailurls[0]->url : ''),
         ],
       ];
     }
