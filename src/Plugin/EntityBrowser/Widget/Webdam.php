@@ -133,7 +133,7 @@ class Webdam extends WidgetBase {
       //custom element property to store breadcrumbs array.  This is fetched from the form state every time the form is rebuilt due to navigating between folders
       '#breadcrumbs' => $breadcrumbs,
       '#attributes' => [
-        'class' => ['webdam-browser-breadcrumb-container']
+        'class' => ['breadcrumb webdam-browser-breadcrumb-container']
       ]
     ];
     //Add the breadcrumb buttons to the form
@@ -144,8 +144,8 @@ class Webdam extends WidgetBase {
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder_id,
         '#webdam_parent_folder_id' => $folder_name,
-        '#prefix' => '<span class="webdam-breadcrumb-trail">',
-        '#suffix' => '</span>',
+        '#prefix' => '<li>',
+        '#suffix' => '</li>',
         '#attributes' => [
           'class' => ['webdam-browser-breadcrumb'],
         ]
