@@ -71,7 +71,7 @@ Project page: http://drupal.org/project/media_webdam
 Maintainers:
  - Jason Schulte https://www.drupal.org/user/143978
  - Cameron Eagans https://www.drupal.org/u/cweagans
-
+ 
 
 ## Step-by-step setup guide
 This guide provides an example for how to implement the media_webdam module on your Drupal 8 site.
@@ -136,7 +136,7 @@ If you want your site to reflect the Webdam values for when the asset was create
 #### Crop configuration
 If you are using the [Crop](https://www.drupal.org/project/crop) module on your site, you should map the "Crop configuration -> Image field" to the field that you created to store the Webdam asset file.
 
-###C onfigure an Entity Browser for Webdam
+### Configure an Entity Browser for Webdam
 In order to use the Webdam asset browser you will need to create a new entity browser or add a Webdam widget to an existing entity browser (/admin/config/content/entity_browser).
 
 - NOTE: For more information on entity browser configuration please see the [Entity Browser](https://www.drupal.org/project/entity_browser) module and the [documentation](https://github.com/drupal-media/d8-guide/blob/master/modules/entity_browser/inline_entity_form.md) page on github
