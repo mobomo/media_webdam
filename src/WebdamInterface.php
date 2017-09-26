@@ -1,13 +1,6 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: cweagans
- * Date: 7/18/17
- * Time: 17:01
- */
 
 namespace Drupal\media_webdam;
-
 
 /**
  * Class Webdam.
@@ -32,13 +25,14 @@ interface WebdamInterface {
   /**
    * Passes method calls through to the webdam client object.
    *
-   * @param $name
+   * @param string $name
    *   The name of the method to call.
-   * @param $arguments
+   * @param array $arguments
    *   An array of arguments.
    *
    * @return mixed
    *   Returns whatever the webdam client returns.
    */
   public function __call($name, $arguments);
+
 }
