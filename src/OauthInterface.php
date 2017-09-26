@@ -2,6 +2,9 @@
 
 namespace Drupal\media_webdam;
 
+/**
+ *
+ */
 interface OauthInterface {
 
   /**

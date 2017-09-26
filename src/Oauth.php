@@ -1,18 +1,15 @@
 <?php
 
-/**
- * @file
- * Contains Drupal\media_webdam\Oauth.
- */
-
 namespace Drupal\media_webdam;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Routing\UrlGeneratorInterface;
-use Drupal\Core\Url;
 use GuzzleHttp\ClientInterface;
 
+/**
+ * OAuth Class.
+ */
 class Oauth implements OauthInterface {
 
   /**
@@ -51,19 +48,23 @@ class Oauth implements OauthInterface {
   protected $httpClient;
 
   /**
-   * Destination URI after authentication is completed
+   * Destination URI after authentication is completed.
    *
    * @var string
    */
-  protected $auth_finish_redirect;
+  protected $authFinishRedirect;
 
   /**
    * Oauth constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   *   The config factory.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfTokenGenerator
+   *   The CSRF Token generator.
    * @param \Drupal\Core\Routing\UrlGeneratorInterface $urlGenerator
+   *   The URL generator.
    * @param \GuzzleHttp\ClientInterface $httpClient
+   *   The HTTP guzzle Client.
    */
   public function __construct(ConfigFactory $config_factory, CsrfTokenGenerator $csrfTokenGenerator, UrlGeneratorInterface $urlGenerator, ClientInterface $httpClient) {
     $this->config = $config_factory->get('media_webdam.settings');
@@ -117,8 +118,9 @@ class Oauth implements OauthInterface {
   /**
    * {@inheritdoc}
    */
-  public function setAuthFinishRedirect($auth_finish_redirect) {
-    //TODO: sanitize and validate $redirect_uri
-    $this->auth_finish_redirect = $auth_finish_redirect;
+  public function setAuthFinishRedirect($authFinishRedirect) {
+    // TODO: sanitize and validate $redirect_uri.
+    $this->auth_finish_redirect = $authFinishRedirect;
   }
+
 }
