@@ -133,7 +133,7 @@ class Webdam extends WidgetBase {
       //custom element property to store breadcrumbs array.  This is fetched from the form state every time the form is rebuilt due to navigating between folders
       '#breadcrumbs' => $breadcrumbs,
       '#attributes' => [
-        'class' => ['webdam-browser-breadcrumb-container']
+        'class' => ['breadcrumb webdam-browser-breadcrumb-container']
       ]
     ];
     //Add the breadcrumb buttons to the form
@@ -144,8 +144,8 @@ class Webdam extends WidgetBase {
         '#name' => 'webdam_folder',
         '#webdam_folder_id' => $folder_id,
         '#webdam_parent_folder_id' => $folder_name,
-        '#prefix' => '<span class="webdam-breadcrumb-trail">',
-        '#suffix' => '</span>',
+        '#prefix' => '<li>',
+        '#suffix' => '</li>',
         '#attributes' => [
           'class' => ['webdam-browser-breadcrumb'],
         ]
@@ -440,14 +440,23 @@ class Webdam extends WidgetBase {
       ]
     ];
 
+    // Get module path to create URL for background images.
+    $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
+
     // Add folder buttons to form
     foreach ($folders as $folder){
       $form['asset-container'][$folder->name] = [
         '#type' => 'container',
         '#attributes' => [
-          'class' => ['webdam-browser-folder-link']
+          'class' => ['webdam-browser-folder-link'],
+          'style' => 'background-image:url("/' . $modulePath . '/img/folder.png")',
         ]
       ];
+      // Use folder thumbnail to generate inline style, if present.
+      $backgroundImageStyle = '';
+      if (isset($folder->thumbnailurls) && !empty($folder->thumbnailurls[0]->url)) {
+        $backgroundImageStyle .= 'background-image:url("' . $folder->thumbnailurls[0]->url . '")';
+      }
       $form['asset-container'][$folder->name][$folder->id] = [
         '#type' => 'button',
         '#value' => $folder->name,
@@ -456,19 +465,13 @@ class Webdam extends WidgetBase {
         '#webdam_parent_folder_id' => $current_folder->parent,
         '#attributes' => [
           'class' => ['webdam-folder-link-button'],
+          'style' => $backgroundImageStyle,
         ]
       ];
       $form['asset-container'][$folder->name]['title'] = [
         '#type' => 'html_tag',
         '#tag' => 'p',
         '#value' => $folder->name,
-      ];
-      $form['asset-container'][$folder->name]['thumbnail'] = [
-        '#type' => 'html_tag',
-        '#tag' => 'img',
-        '#attributes' => [
-          'src' => (isset($folder->thumbnailurls) ? $folder->thumbnailurls[0]->url : ''),
-        ],
       ];
     }
     //Assets are rendered as #options for a checkboxes element.  Start with an empty array.

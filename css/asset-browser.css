@@ -18,7 +18,8 @@
 /* Folders and assets take same basic sizing, width, etc. */
 .webdam-asset-browser .form-item.form-type-checkbox,
 .webdam-browser-folder-link {
-  width: 220px;
+  width: 180px;
+  height: 180px;
   display: inline-block;
   margin: 5px;
   padding: 5px;
@@ -54,12 +55,20 @@ p.webdam-asset-filename {
   overflow: hidden;
   margin-top: 5px;
   margin-left: 5px;
+  font-size: .85em;
+  line-height: 1.1em;
 }
 
 img.webdam-asset-browser-icon {
   height: 20px;
   float: right;
   margin: 5px;
+}
+
+.webdam-browser-folder-link {
+  background-position: top center;
+  background-size: 90% auto;
+  background-repeat: no-repeat;
 }
 
 /* Unset values here to set below. */
@@ -76,19 +85,19 @@ img.webdam-asset-browser-icon {
 .webdam-browser-folder-link .webdam-folder-link-button:hover,
 .webdam-browser-folder-link .webdam-folder-link-button:active,
 .webdam-browser-folder-link .webdam-folder-link-button:focus {
-  background: url('/modules/contrib/media_webdam/img/folder.png') no-repeat;
-  background-position-x: 10px;
-  background-size: contain;
   width: 100%;
-  height: 120px;
+  height: 140px;
+  background-position: center 50px;
+  background-size: auto 80px;
+  background-repeat: no-repeat;
   border: none;
   border-radius: 0;
-  padding: 0 10px;
+  padding: 0;
 }
 
 .webdam-browser-folder-link .webdam-folder-link-button:active,
 .webdam-browser-folder-link .webdam-folder-link-button:focus {
-  background-color: aliceblue;
+  background-color: none;
 }
 
 .webdam-browser-folder-link input,
@@ -99,8 +108,25 @@ img.webdam-asset-browser-icon {
   text-shadow: none;
 }
 
+.webdam-folder-link-thumb {
+  position: relative;
+  display: inline-block;
+  z-index: 10;
+  top: 85px;
+  left: 65px;
+  height: 0;
+}
+
+.webdam-folder-link-thumb img {
+  max-height: 40px;
+  max-width: 40px;
+}
+
 .webdam-browser-folder-link p {
-  padding-left: 10px;
+  position: relative;
+  bottom: 0;
+  font-size: .9em;
+  padding: 0 0 0 10px;
 }
 
 input[type="checkbox"] {
@@ -125,12 +151,14 @@ input[type="checkbox"] {
 }
 
 input.webdam-browser-breadcrumb {
-  border: none;
   background: transparent;
+  border: none;
   margin: 5px 0;
-  text-decoration: underline;
   padding-left: 5px;
   padding-right: 5px;
+  font-weight: normal;
+  text-decoration: none;
+  color: #0074bd;
 }
 
 input.webdam-browser-breadcrumb:hover,
@@ -138,15 +166,9 @@ input.webdam-browser-breadcrumb:focus {
   background: none;
   box-shadow: none;
   border: none;
-}
-
-.webdam-breadcrumb-trail::before {
-  content: ">>";
-  font-size: 80%;
-}
-
-.webdam-breadcrumb-trail:first-of-type::before {
-  content: none;
+  font-weight: normal;
+  text-decoration: underline;
+  color: #0074bd;
 }
 /* end breadcrumb styles */
 
