@@ -170,6 +170,13 @@ input.webdam-browser-breadcrumb:focus {
   text-decoration: underline;
   color: #0074bd;
 }
+
+/* Override default */
+.breadcrumb.webdam-browser-breadcrumb-container {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
 /* end breadcrumb styles */
 
 .webdam-asset-browser-pager {
@@ -229,8 +236,19 @@ input.webdam-browser-breadcrumb:focus {
 }
 
 #edit-asset-container {
-  height: 330px;
+  max-height: 310px;
   overflow-y: scroll;
+}
+
+/* Hide scrollbar on Windows */
+#edit-asset-container::-webkit-scrollbar,
+.entity-browser-form::-webkit-scrollbar,
+.ui-dialog::-webkit-scrollbar,
+.ui-dialog-content::-webkit-scrollbar,
+.ui-dialog-content > div::-webkit-scrollbar,
+.entity-browser-modal-iframe body::-webkit-scrollbar,
+.entity-browser-modal-iframe::-webkit-scrollbar {
+  width: 0 !important;
 }
 
 #edit-actions {
