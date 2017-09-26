@@ -236,19 +236,7 @@ input.webdam-browser-breadcrumb:focus {
 }
 
 #edit-asset-container {
-  max-height: 310px;
   overflow-y: scroll;
-}
-
-/* Hide scrollbar on Windows */
-#edit-asset-container::-webkit-scrollbar,
-.entity-browser-form::-webkit-scrollbar,
-.ui-dialog::-webkit-scrollbar,
-.ui-dialog-content::-webkit-scrollbar,
-.ui-dialog-content > div::-webkit-scrollbar,
-.entity-browser-modal-iframe body::-webkit-scrollbar,
-.entity-browser-modal-iframe::-webkit-scrollbar {
-  width: 0 !important;
 }
 
 #edit-actions {
