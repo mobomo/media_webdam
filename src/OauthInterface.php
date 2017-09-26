@@ -3,7 +3,7 @@
 namespace Drupal\media_webdam;
 
 /**
- *
+ * OAuth Interface.
  */
 interface OauthInterface {
 
@@ -18,7 +18,7 @@ interface OauthInterface {
   /**
    * Validate that the state token in an auth request is valid.
    *
-   * @param $token
+   * @param string $token
    *   The CSRF token from the auth request.
    *
    * @return bool
