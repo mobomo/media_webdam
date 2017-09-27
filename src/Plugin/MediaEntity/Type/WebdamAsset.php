@@ -162,7 +162,7 @@ class WebdamAsset extends MediaTypeBase {
       case 'file':
         return $this->file ? $this->file->id() : NULL;
       case 'status':
-        return $this->asset->status == 'active';
+        return intval($this->asset->status == 'active');
     }
 
     return FALSE;

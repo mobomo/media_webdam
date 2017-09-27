@@ -92,6 +92,30 @@ class WebdamConfig extends ConfigFormBase {
       '#required' => TRUE,
     ];
 
+    $form['cron'] = [
+      '#type' => 'fieldset',
+      '#title' => $this->t('Cron Settings'),
+    ];
+
+    $form['cron']['sync_interval'] = [
+      '#type' => 'select',
+      '#title' => $this->t('Asset refresh interval'),
+      '#options' => [
+        '-1' => 'Every cron run',
+        '3600' => 'Every hour',
+        '7200' => 'Every 2 hours',
+        '10800' => 'Every 3 hours',
+        '14400' => 'Every 4 hours',
+        '21600' => 'Every 6 hours',
+        '28800' => 'Every 8 hours',
+        '43200' => 'Every 12 hours',
+        '86400' => 'Every 24 hours',
+      ],
+      '#default_value' => empty($config->get('sync_interval')) ? 3600 : $config->get('sync_interval'),
+      '#description' => $this->t('Asset values and metadata are synchronized from Webdam during cron.  How often should asset values be synchronized from Webdam'),
+      '#required' => TRUE,
+    ];
+
     return parent::buildForm($form, $form_state);
   }
 
@@ -104,6 +128,7 @@ class WebdamConfig extends ConfigFormBase {
       ->set('password', $form_state->getValue('password'))
       ->set('client_id', $form_state->getValue('client_id'))
       ->set('secret', $form_state->getValue('client_secret'))
+      ->set('sync_interval', $form_state->getValue('sync_interval'))
       ->save();
 
     parent::submitForm($form, $form_state);
