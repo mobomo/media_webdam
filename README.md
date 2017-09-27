@@ -87,7 +87,7 @@ Download and install the media_webdam module and all dependencies.  [See here fo
 - (2017-09-25) The current version of media_entity depends on entity (>=8.x-1.0-alpha3) which may have to be [installed manually](https://www.drupal.org/node/1499548)
 - The [Crop](https://www.drupal.org/project/crop) and Entity Browser IEF modules are recommended for increased functionality
 
-###Configure Webdam API credentials and Cron settings
+### Configure Webdam API credentials and Cron settings
 You webdam API credentials and Cron settings should be configured at /admin/media/config/webdam.  This module uses cron to periodically synchronize the mapped media entity field values with webdam.  The synchronize interval will be dependent on how often your site is configured to run cron.
 
 - NOTE: The Password and Client Secret fields will appear blank after saving.
