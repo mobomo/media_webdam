@@ -68,6 +68,31 @@ function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
 }
 
 /**
+ * Implements hook_ENTITY_TYPE_presave().
+ *
+ * @var \Drupal\media_entity\Entity\Media $entity
+ *
+ * Override the preSave function from \Drupal\media_entity\Entity\Media
+ * because it ignores empty values (e.g. status = 0) and doesn't set date values
+ * for created/changed because the are already set by Drupal core
+ *
+ */
+function media_webdam_media_presave($entity) {
+  //Set the flag for the thumbnail to be downloaded
+  $entity->setQueuedThumbnailDownload();
+  //Download and set the thumbnail image
+  $entity->automaticallySetThumbnail();
+  //Loop through the mapped fields
+  foreach ($entity->bundle->entity->field_map as $source_field => $destination_field) {
+    //If the entity has the mapped destination field
+    if ($entity->hasField($destination_field)) {
+      //Set the value of the mapped field to the asset value
+      $entity->set($destination_field, $entity->getType()->getField($entity, $source_field));
+    }
+  }
+}
+
+/**
  * Implements hook_cron().
  *
  * Refresh webdam metadata and sync to media entities
@@ -109,12 +134,12 @@ function media_webdam_cron(){
       $batch_entities = \Drupal::entityTypeManager()->getStorage('media')->loadMultiple($batch_ids);
       //Loop through batch of entities
       foreach ($batch_entities as $entity) {
-        //Get the bundle for this entity
-        $bundle = $entity->bundle();
         //Loop through the mapped fields for this bundle
-        foreach ($media_bundles[$bundle]->field_map as $entity_field => $mapped_field){
+        foreach ($entity->bundle->entity->field_map as $entity_field => $mapped_field){
           //Set the value to NULL so that it gets repopulated from webdam on save
-          $entity->$mapped_field->value = NULL;
+          if ($entity->hasField($mapped_field)) {
+            $entity->set($mapped_field, NULL);
+          }
         }
         //Set flag for thumbnail to be regenerated
         $entity->setQueuedThumbnailDownload();
