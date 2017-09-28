@@ -62,9 +62,20 @@ class Webdam implements WebdamInterface {
     return $folder_data;
   }
 
+  /**
+   * Passes method calls through to the webdam client object.
+   *
+   * @param string $name
+   *   The name of the method to call.
+   * @param array $arguments
+   *   An array of arguments.
+   *
+   * @return mixed
+   *   Returns whatever the webdam client returns.
+   */
   public function __call($name, $arguments) {
     $method_variable = array($this->client, $name);
-    if(is_callable($method_variable)){
+    if (is_callable($method_variable)) {
       return call_user_func_array($method_variable, $arguments);
     }
   }

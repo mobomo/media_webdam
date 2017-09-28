@@ -39,11 +39,15 @@ class WebdamController extends ControllerBase {
    * WebdamController constructor.
    *
    * @param \Drupal\media_webdam\WebdamInterface $webdam
+   *   The Webdam Interface.
    */
   public function __construct(WebdamInterface $webdam) {
     $this->webdam = $webdam;
   }
 
+  /**
+   * {@inheritdoc}
+   */
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('media_webdam.webdam')
@@ -64,6 +68,12 @@ class WebdamController extends ControllerBase {
     return $this->asset;
   }
 
+  /**
+   * Sets the asset details page title.
+   *
+   * @param int $assetId
+   *   The Webdam asset ID for the asset to render title for.
+   */
   public function assetDetailsPageTitle($assetId) {
     $asset = $this->getAsset($assetId);
     return $this->t("Asset details: %filename", ['%filename' => $asset->filename]);
@@ -122,8 +132,8 @@ class WebdamController extends ControllerBase {
       '#attached' => [
         'library' => [
           'media_webdam/asset_details',
-        ]
-      ]
+        ],
+      ],
     ];
   }
 

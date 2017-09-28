@@ -51,7 +51,7 @@ class ClientFactory {
    * @param \GuzzleHttp\ClientInterface $gclient
    *   A fully configured Guzzle client to pass to the webdam client.
    */
-  public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $gclient, UserDataInterface $user_data, AccountProxyInterface $currentUser)  {
+  public function __construct(ConfigFactoryInterface $config_factory, ClientInterface $gclient, UserDataInterface $user_data, AccountProxyInterface $currentUser) {
     $this->config = $config_factory->get('media_webdam.settings');
     $this->client = $gclient;
     $this->userData = $user_data;
@@ -62,7 +62,8 @@ class ClientFactory {
    * Creates a new Webdam client object.
    *
    * @param string $credentials
-   *   The switch for which credentials the client object should be configured with.
+   *   The switch for which credentials the client object
+   *   should be configured with.
    *
    * @return \cweagans\webdam\Client
    *   A configured Webdam HTTP client object.
