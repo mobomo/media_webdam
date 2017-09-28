@@ -79,7 +79,7 @@ class Oauth implements OauthInterface {
   public function getAuthLink() {
     $client_id = $this->config->get('client_id');
     $token = $this->csrfTokenGenerator->get('media_webdam.oauth');
-    $redirect_uri = $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', ['auth_finish_redirect' => $this->auth_finish_redirect], ['absolute' => TRUE]);
+    $redirect_uri = $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', ['auth_finish_redirect' => $this->authFinishRedirect], ['absolute' => TRUE]);
 
     return "{$this->webdamApiBase}/oauth2/authorize?response_type=code&state={$token}&redirect_uri={$redirect_uri}&client_id={$client_id}";
   }
@@ -100,7 +100,7 @@ class Oauth implements OauthInterface {
       'form_params' => [
         'grant_type' => 'authorization_code',
         'code' => $auth_code,
-        'redirect_uri' => $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', ['auth_finish_redirect' => $this->auth_finish_redirect], ['absolute' => TRUE]),
+        'redirect_uri' => $this->urlGenerator->generateFromRoute('media_webdam.auth_finish', ['auth_finish_redirect' => $this->authFinishRedirect], ['absolute' => TRUE]),
         'client_id' => $this->config->get('client_id'),
         'client_secret' => $this->config->get('secret'),
       ],
@@ -120,7 +120,7 @@ class Oauth implements OauthInterface {
    */
   public function setAuthFinishRedirect($authFinishRedirect) {
     // TODO: sanitize and validate $redirect_uri.
-    $this->auth_finish_redirect = $authFinishRedirect;
+    $this->authFinishRedirect = $authFinishRedirect;
   }
 
 }
