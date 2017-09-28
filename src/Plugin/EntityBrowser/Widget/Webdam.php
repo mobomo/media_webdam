@@ -417,6 +417,28 @@ class Webdam extends WidgetBase {
         // Reset page to zero.
         $page = 0;
       }
+      //If the reset submit button has been clicked
+      if ($trigger_elem['#name'] == 'filter_sort_reset') {
+        //Fetch the user input.
+        $user_input = $form_state->getUserInput();
+        //Fetch clean values keys (system related, not user input).
+        $clean_val_key = $form_state->getCleanValueKeys();
+        //Loop through user inputs
+        foreach ($user_input as $key => $item) {
+          //Unset only the User Input values.
+          if (!in_array($key, $clean_val_key)) {
+            unset($user_input[$key]);
+          }
+        }
+        // Reset the user input.
+        $form_state->setUserInput($user_input);
+        //Set values to user input.
+        $form_state->setValues($user_input);
+        // Rebuild the form state values.
+        $form_state->setRebuild();
+        // Get back to first page.
+        $page = 0;
+      }
     }
     // Offset used for pager.
     $offset = $num_per_page * $page;

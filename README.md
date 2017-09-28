@@ -1,3 +1,8 @@
+# Media: Webdam
+
+[![Build Status](https://travis-ci.org/mobomo/media_webdam.svg?branch=8.x-1.x)](https://travis-ci.org/mobomo/media_webdam)
+[![Coverage Status](https://coveralls.io/repos/github/mobomo/media_webdam/badge.svg?branch=8.x-1.x)](https://coveralls.io/github/mobomo/media_webdam?branch=8.x-1.x)
+
 ## About Media entity
 
 Media entity provides a 'base' entity for a media element. This is a very basic
@@ -71,7 +76,7 @@ Project page: http://drupal.org/project/media_webdam
 Maintainers:
  - Jason Schulte https://www.drupal.org/user/143978
  - Cameron Eagans https://www.drupal.org/u/cweagans
- 
+
 
 ## Step-by-step setup guide
 This guide provides an example for how to implement the media_webdam module on your Drupal 8 site.
@@ -82,8 +87,10 @@ Download and install the media_webdam module and all dependencies.  [See here fo
 - (2017-09-25) The current version of media_entity depends on entity (>=8.x-1.0-alpha3) which may have to be [installed manually](https://www.drupal.org/node/1499548)
 - The [Crop](https://www.drupal.org/project/crop) and Entity Browser IEF modules are recommended for increased functionality
 
-### Configure Webdam API credentials
-You webdam API credentials should be configured at /admin/media/config/webdam. NOTE: The Password and Client Secret fields will appear blank after saving.
+### Configure Webdam API credentials and Cron settings
+You webdam API credentials and Cron settings should be configured at /admin/media/config/webdam.  This module uses cron to periodically synchronize the mapped media entity field values with webdam.  The synchronize interval will be dependent on how often your site is configured to run cron.
+
+- NOTE: The Password and Client Secret fields will appear blank after saving.
 
 ### Create Media Bundle for webdam assets
 Add a new media bundle (admin/structure/media/add) which uses "Webdam Asset" as the "Type Provider".  
@@ -129,6 +136,7 @@ Return to the media bundle configuration page and set the field mappings for the
 If you want your site to reflect the Webdam asset status you should map the "Status" field to "Publishing status" in the media bundle configuration.  This will set the published value (i.e. status) on the media entity that gets created when a Webdam asset is added to a piece of content.  This module uses cron to periodically synchronize the mapped media entity field values with webdam.
 
 - NOTE: If you are using the asset expiration feature in Webdam, be aware that that the published status will not get updated in Drupal until the next time that cron runs (after the asset has expired in Webdam).
+- (2017-09-26) When an inactive asset is synchronized the entity status will show blank because of [this issue](https://www.drupal.org/node/2855630)
 
 #### Date created and date modified
 If you want your site to reflect the Webdam values for when the asset was created or modified you should map the "Date created" field to the "Created" and the "Date modified" field to "Changed" in the media bundle configuration.  This will set the "created" and "changed" values on the media entity that gets created when a Webdam asset is added to a piece of content.  This module uses cron to periodically synchronize the mapped media entity field values with Webdam.
@@ -140,13 +148,17 @@ If you are using the [Crop](https://www.drupal.org/project/crop) module on your 
 In order to use the Webdam asset browser you will need to create a new entity browser or add a Webdam widget to an existing entity browser (/admin/config/content/entity_browser).
 
 - NOTE: For more information on entity browser configuration please see the [Entity Browser](https://www.drupal.org/project/entity_browser) module and the [documentation](https://github.com/drupal-media/d8-guide/blob/master/modules/entity_browser/inline_entity_form.md) page on github
+- NOTE: When editing and/or creating an entity browser, be aware that the "Modal" Display plugin is not compatible with the WYSIWYG media embed button.  
+- NOTE: When using the "Modal" Display plugin you may want to disable the "Auto open entity browser" setting.
 
 ### Add a media field
 In order to add a Webdam asset to a piece of content you will need to add a media field to one of your content types.
 
 - NOTE: For more information on media fields please see the [Media Entity](https://www.drupal.org/project/media_entity) module and the [Drupal 8 Media Guide](https://drupal-media.gitbooks.io/drupal8-guide/content/modules/media_entity/intro.html)
+- NOTE: The default display mode for media fields will only show a the media entity label.  If you are using a media field for images you will likely want to change this under the display settings (Manage Display).
 
 ### WYSIWYG configuration
 The media entity module provides a default embed button which can be configured at /admin/config/content/embed.  It can be configured to use a specific entity browser and allow for different display modes.
 
+- NOTE: When choosing an entity browser to use for the media embed button, be aware that the "Modal" Display plugin is not compatible with the WYSIWYG media embed button.  You may want to use the "iFrame" display plugin or create a separate Entity Browser to use with the media embed button
 
