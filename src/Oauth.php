@@ -3,7 +3,7 @@
 namespace Drupal\media_webdam;
 
 use Drupal\Core\Access\CsrfTokenGenerator;
-use Drupal\Core\Config\ConfigFactory;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Routing\UrlGeneratorInterface;
 use GuzzleHttp\ClientInterface;
 
@@ -57,7 +57,7 @@ class Oauth implements OauthInterface {
   /**
    * Oauth constructor.
    *
-   * @param \Drupal\Core\Config\ConfigFactory $config_factory
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    * @param \Drupal\Core\Access\CsrfTokenGenerator $csrfTokenGenerator
    *   The CSRF Token generator.
@@ -66,7 +66,7 @@ class Oauth implements OauthInterface {
    * @param \GuzzleHttp\ClientInterface $httpClient
    *   The HTTP guzzle Client.
    */
-  public function __construct(ConfigFactory $config_factory, CsrfTokenGenerator $csrfTokenGenerator, UrlGeneratorInterface $urlGenerator, ClientInterface $httpClient) {
+  public function __construct(ConfigFactoryInterface $config_factory, CsrfTokenGenerator $csrfTokenGenerator, UrlGeneratorInterface $urlGenerator, ClientInterface $httpClient) {
     $this->config = $config_factory->get('media_webdam.settings');
     $this->csrfTokenGenerator = $csrfTokenGenerator;
     $this->urlGenerator = $urlGenerator;
