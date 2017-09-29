@@ -83,7 +83,6 @@ class OauthTest extends UnitTestCase {
       ->method('generateFromRoute')
       ->willReturn('some/url/test');
 
-//    $this->guzzle_client = $this->getMockBuilder('GuzzleHttp\Client')->getMock();
     $this->guzzle_client = new GClient();
 
     $container = new ContainerBuilder();
