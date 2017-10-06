@@ -10,9 +10,6 @@ use GuzzleHttp\Client as GClient;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Psr7\Response;
-use cweagans\webdam\Client;
-use Drupal\media_webdam\OauthInterface;
-use Drupal\Core\Config\ConfigFactoryInterface;
 
 /**
  * Oauth test.
@@ -138,37 +135,36 @@ class OauthTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testGetAccessToken($auth_code = '') {
-    // @todo: This test is not testing the oauth class? To review and clarify.
-    /*$mock = new MockHandler([
+    $mock = new MockHandler([
       new Response(200, [], '{"access_token":"ACCESS_TOKEN", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
       new Response(200, [], '{"response_type":"code", "state":"z09GqyCtJFZa-BT2Lz1K_E5ngfCvObZqpGHJyjtlSzc"}'),
     ]);
     $handler = HandlerStack::create($mock);
-    $httpClient = new GClient(['handler' => $handler]);
-    $client = new Client($httpClient, '', '', '', '');
-
-    // Debugging.
-    $webdamConfig = $this->getConfigFactoryStub()->get('media_webdam.settings');
-    $tokenGen = $this->csrfTokenGenerator->get('media_webdam.oauth');
-    $authfinishRedirect = 'http://any.local.path/to-go';
-    $urlGen = $this->urlGenerator->generateFromRoute('mocked.auth_finish', ['auth_finish_redirect' => $authfinishRedirect], ['absolute' => TRUE]);
+    $this->httpClient = new GClient(['handler' => $handler]);
 
     $auth_code = 'somedummycode123';
-    $url = $this->webdamApiBase . '/oauth2/token';
-    $data = [
-      'grant_type' => 'authorization_code',
-      'code' => $auth_code,
-      'redirect_uri' => $urlGen,
-      'client_id' => $this->config->get('client_id'),
-      'client_secret' => $this->config->get('secret'),
-    ];*/
+
+    $this->oAuth = new Oauth($this->getConfigFactoryStub(), $this->csrfTokenGenerator, $this->urlGenerator, $this->httpClient);
+    $getAccessToken = $this->oAuth->getAccessToken($auth_code);
+
+    $this->assertArrayHasKey('expire_time', $getAccessToken);
+    $this->assertArrayHasKey('access_token', $getAccessToken);
+    $this->assertNotEmpty($getAccessToken['access_token']);
 
   }
 
   /**
    * {@inheritdoc}
    */
-  public function testSetAuthFinishRedirect() {
+  public function testSetAuthFinishRedirect($authFinishRedirect = '') {
+    $mock = new MockHandler([
+      new Response(200, [], '{"access_token":"ACCESS_TOKEN", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
+      new Response(200, [], '{"auth_finish_redirect":"https://thelongurl.with.useful?parameters"}'),
+    ]);
+    $handler = HandlerStack::create($mock);
+    $this->httpClient = new GClient(['handler' => $handler]);
+
+    $this->oAuth = new Oauth($this->getConfigFactoryStub(), $this->csrfTokenGenerator, $this->urlGenerator, $this->httpClient);
 
   }
 
