@@ -137,7 +137,6 @@ class OauthTest extends UnitTestCase {
   public function testGetAccessToken($auth_code = '') {
     $mock = new MockHandler([
       new Response(200, [], '{"access_token":"ACCESS_TOKEN", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
-      new Response(200, [], '{"response_type":"code", "state":"z09GqyCtJFZa-BT2Lz1K_E5ngfCvObZqpGHJyjtlSzc"}'),
     ]);
     $handler = HandlerStack::create($mock);
     $this->httpClient = new GClient(['handler' => $handler]);
@@ -154,18 +153,35 @@ class OauthTest extends UnitTestCase {
   }
 
   /**
-   * {@inheritdoc}
+   * Tests that auth_finish_redirect is set.
    */
-  public function testSetAuthFinishRedirect($authFinishRedirect = '') {
+  public function testSetAndGetAuthFinishRedirect() {
     $mock = new MockHandler([
       new Response(200, [], '{"access_token":"ACCESS_TOKEN", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
-      new Response(200, [], '{"auth_finish_redirect":"https://thelongurl.with.useful?parameters"}'),
+    ]);
+    $handler = HandlerStack::create($mock);
+    $this->httpClient = new GClient(['handler' => $handler]);
+    $authFinishRedirect = 'https://thelongurl.with.useful?parameters';
+
+    $this->oAuth = new Oauth($this->getConfigFactoryStub(), $this->csrfTokenGenerator, $this->urlGenerator, $this->httpClient);
+    $this->oAuth->setAuthFinishRedirect($authFinishRedirect);
+
+    $this->assertSame($authFinishRedirect, $this->oAuth->getAuthFinishRedirect());
+  }
+
+  /**
+   * Tests that the auth_finish_redirect is not set.
+   */
+  public function testSetAndGetAuthFinishRedirectNull() {
+    $mock = new MockHandler([
+      new Response(200, [], '{"access_token":"ACCESS_TOKEN", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
     ]);
     $handler = HandlerStack::create($mock);
     $this->httpClient = new GClient(['handler' => $handler]);
 
     $this->oAuth = new Oauth($this->getConfigFactoryStub(), $this->csrfTokenGenerator, $this->urlGenerator, $this->httpClient);
 
+    $this->assertSame(NULL, $this->oAuth->getAuthFinishRedirect());
   }
 
 }
