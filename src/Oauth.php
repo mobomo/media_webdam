@@ -123,4 +123,19 @@ class Oauth implements OauthInterface {
     $this->authFinishRedirect = $authFinishRedirect;
   }
 
+  /**
+   * Gets the auth_finish_redirect url.
+   *
+   * @return mixed
+   *   Url string if is set, null if not set.
+   */
+  public function getAuthFinishRedirect() {
+    if (isset($this->authFinishRedirect)) {
+      return $this->authFinishRedirect;
+    }
+    else {
+      return NULL;
+    }
+  }
+
 }
