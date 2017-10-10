@@ -8,6 +8,9 @@ use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Form\FormState;
 use Drupal\media_webdam\Form\WebdamConfig;
 use Drupal\Tests\UnitTestCase;
+use Drupal\media_webdam\WebdamInterface;
+use Drupal\media_webdam\Webdam;
+use cweagans\webdam\Exception\InvalidCredentialsException;
 
 /**
  * Webdam config form test.
@@ -16,26 +19,39 @@ use Drupal\Tests\UnitTestCase;
  */
 class WebdamConfigFormTest extends UnitTestCase {
 
+
   /**
+   * Drupal\media_webdam\WebdamInterface definition.
    *
+   * @var \Drupal\media_webdam\WebdamInterface
+   */
+  protected $webdam;
+
+  /**
+   * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
+    $this->webdam = $this->getMockBuilder('Drupal\media_webdam\WebdamInterface')
+      ->disableOriginalConstructor()
+      ->getMock();
+
     $container = new Container();
     $container->set('string_translation', $this->getStringTranslationStub());
+    $container->set('webdam', $this->webdam);
     \Drupal::setContainer($container);
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testGetFormId() {
-    $form = new WebdamConfig($this->getConfigFactoryStub());
+    $form = new WebdamConfig($this->getConfigFactoryStub(), $this->webdam);
     $this->assertEquals('webdam_config', $form->getFormId());
   }
 
   /**
-   *
+   * {@inheritdoc}
    */
   public function testBuildForm() {
     $wconfig = new WebdamConfig($this->getConfigFactoryStub([
@@ -45,7 +61,7 @@ class WebdamConfigFormTest extends UnitTestCase {
         'client_id' => 'WDclient-id',
         'secret' => 'WDsecret',
       ],
-    ])
+    ]), $this->webdam
     );
     $form = $wconfig->buildForm([], new FormState());
 
@@ -59,6 +75,51 @@ class WebdamConfigFormTest extends UnitTestCase {
     $this->assertEquals('WDpassword', $form['authentication']['password']['#default_value']);
     $this->assertEquals('WDclient-id', $form['authentication']['client_id']['#default_value']);
     $this->assertEquals('WDsecret', $form['authentication']['client_secret']['#default_value']);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function getConfigFactoryStub(array $configs = []) {
+    return parent::getConfigFactoryStub([
+      'media_webdam.settings' => [
+        'username' => 'WDusername',
+        'password' => 'WDpassword',
+        'client_id' => 'WDclient-id',
+        'secret' => 'WDsecret',
+      ],
+    ]);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function testValidateForm() {
+    $wconfig = new WebdamConfig($this->getConfigFactoryStub([
+      'media_webdam.settings' => [
+        'username' => 'WDusername',
+        'password' => 'WDpassword',
+        'client_id' => 'WDclient-id',
+        'secret' => 'WDsecret',
+      ],
+    ]), $this->webdam
+    );
+
+    $config_stub = new FormConfigStub();
+    $config_factory_stub = new FormConfigFactoryStub();
+    $config_factory_stub->set('media_webdam.settings', $config_stub);
+
+    $form = $wconfig->buildForm([], new FormState());
+    $wconfig->validateForm($form, new FormState());
+    $cli_data = [
+      'grant_type' => 'password',
+      'username' => 'WDusername',
+      'password' => 'WDpassword',
+      'client_id' => 'WDclient-id',
+      'secret' => 'wrong',
+    ];
+    $this->webdam->checkCredentials($cli_data);
+
   }
 
   // @TODO: This test is broken. Not sure what's wrong and don't have time to debug.

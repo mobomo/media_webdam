@@ -5,7 +5,10 @@ namespace Drupal\media_webdam\Form;
 use Drupal\Core\Form\ConfigFormBase;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\media_webdam\Webdam;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Drupal\media_webdam\WebdamInterface;
+use cweagans\webdam\Exception\InvalidCredentialsException;
 
 /**
  * Class WebdamConfig.
@@ -15,13 +18,21 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class WebdamConfig extends ConfigFormBase {
 
   /**
+   * Drupal\media_webdam\WebdamInterface definition.
+   *
+   * @var \Drupal\media_webdam\WebdamInterface
+   */
+  protected $webdam;
+
+  /**
    * WebdamConfig constructor.
    *
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The config factory.
    */
-  public function __construct(ConfigFactoryInterface $config_factory) {
-    parent::__construct($config_factory);
+  public function __construct(ConfigFactoryInterface $config_factory, WebdamInterface $webdam) {
+    $this->configFactory = $config_factory;
+    $this->webdam = $webdam;
   }
 
   /**
@@ -29,7 +40,8 @@ class WebdamConfig extends ConfigFormBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('media_webdam.webdam')
     );
   }
 
@@ -117,6 +129,30 @@ class WebdamConfig extends ConfigFormBase {
     ];
 
     return parent::buildForm($form, $form_state);
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    // Try to call Webdam checkCredentials() with details from form_state.
+    try {
+      // We set the client data array with the values from form_state.
+      $cli_data = [
+        'grant_type' => 'password',
+        'username' => $form_state->getValue('username'),
+        'password' => $form_state->getValue('password'),
+        'client_id' => $form_state->getValue('client_id'),
+        'client_secret' => $form_state->getValue('client_secret'),
+      ];
+      $this->webdam->checkCredentials($cli_data);
+    }
+    // If checkCredentials() throws an exception,
+    // we catch it here and display the error message to the user.
+    catch (InvalidCredentialsException $e) {
+      $form_state->setErrorByName('authentication', $e->getMessage());
+    }
+
   }
 
   /**
