@@ -176,7 +176,7 @@ class Webdam extends WidgetBase {
    *
    * Create a custom pager.
    */
-  public function getPager(Folder $current_folder, int $page, int $num_per_page) {
+  public function getPager(Folder $current_folder, $page, $num_per_page) {
     // Add container for pager.
     $form['pager-container'] = [
       '#type' => 'container',
