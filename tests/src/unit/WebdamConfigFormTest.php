@@ -8,8 +8,13 @@ use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Form\FormState;
 use Drupal\media_webdam\Form\WebdamConfig;
 use Drupal\Tests\UnitTestCase;
-use Drupal\media_webdam\WebdamInterface;
+use GuzzleHttp\Handler\MockHandler;
 use Drupal\media_webdam\Webdam;
+use GuzzleHttp\ClientInterface;
+use GuzzleHttp\Client;
+use GuzzleHttp\HandlerStack;
+use GuzzleHttp\Psr7\Response;
+use cweagans\webdam\Client as WebdamClient;
 use cweagans\webdam\Exception\InvalidCredentialsException;
 
 /**
@@ -21,24 +26,26 @@ class WebdamConfigFormTest extends UnitTestCase {
 
 
   /**
-   * Drupal\media_webdam\WebdamInterface definition.
+   * An HTTP client.
    *
-   * @var \Drupal\media_webdam\WebdamInterface
+   * @var \Guzzle\Http\ClientInterface|\PHPUnit_Framework_MockObject_MockObject
    */
-  protected $webdam;
+  protected $httpClient;
 
   /**
    * {@inheritdoc}
    */
   public function setUp() {
     parent::setUp();
-    $this->webdam = $this->getMockBuilder('Drupal\media_webdam\WebdamInterface')
+    $this->httpClient = $this->getMockBuilder('GuzzleHttp\ClientInterface')
       ->disableOriginalConstructor()
       ->getMock();
 
+    $this->httpClient = new Client();
+
     $container = new Container();
     $container->set('string_translation', $this->getStringTranslationStub());
-    $container->set('webdam', $this->webdam);
+    $container->set('http_client', $this->httpClient);
     \Drupal::setContainer($container);
   }
 
@@ -46,7 +53,7 @@ class WebdamConfigFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testGetFormId() {
-    $form = new WebdamConfig($this->getConfigFactoryStub(), $this->webdam);
+    $form = new WebdamConfig($this->getConfigFactoryStub(), $this->httpClient);
     $this->assertEquals('webdam_config', $form->getFormId());
   }
 
@@ -61,7 +68,7 @@ class WebdamConfigFormTest extends UnitTestCase {
         'client_id' => 'WDclient-id',
         'secret' => 'WDsecret',
       ],
-    ]), $this->webdam
+    ]), $this->httpClient
     );
     $form = $wconfig->buildForm([], new FormState());
 
@@ -95,30 +102,60 @@ class WebdamConfigFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testValidateForm() {
-    $wconfig = new WebdamConfig($this->getConfigFactoryStub([
-      'media_webdam.settings' => [
-        'username' => 'WDusername',
-        'password' => 'WDpassword',
-        'client_id' => 'WDclient-id',
-        'secret' => 'WDsecret',
-      ],
-    ]), $this->webdam
-    );
+    $mock = new MockHandler([
+      new Response(200, [], '{"access_token":"ACCESS_TOKEN0", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
+      new Response(200, [], '{"access_token":"ACCESS_TOKEN1", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
+      new Response(200, [], '{"access_token":"ACCESS_TOKEN2", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
+      new Response(200, [], '{"maxAdmins": "5","numAdmins": "4","maxContributors": "10","numContributors": 0,"maxEndUsers": "15","numEndUsers": 0,"maxUsers": 0,"url": "accounturl.webdamdb.com","username": "WDusername","planDiskSpace": "10000 MB","currentDiskSpace": "45 MB","activeUsers": "4","inactiveUsers": 0}'),
+    ]);
+    $handler = HandlerStack::create($mock);
+    $this->httpClient = new Client(['handler' => $handler]);
 
-    $config_stub = new FormConfigStub();
-    $config_factory_stub = new FormConfigFactoryStub();
-    $config_factory_stub->set('media_webdam.settings', $config_stub);
+    $wconfig = new WebdamConfig($this->getConfigFactoryStub(), $this->httpClient);
 
-    $form = $wconfig->buildForm([], new FormState());
-    $wconfig->validateForm($form, new FormState());
-    $cli_data = [
-      'grant_type' => 'password',
-      'username' => 'WDusername',
-      'password' => 'WDpassword',
-      'client_id' => 'WDclient-id',
-      'secret' => 'wrong',
-    ];
-    $this->webdam->checkCredentials($cli_data);
+    $form_state = new FormState();
+    $form_state->set('username', 'WDusername');
+    $form_state->set('password', 'WDpassword');
+    $form_state->set('client_id', 'WDclient-id');
+    $form_state->set('secret', 'WDmuchsecret');
+
+    $form = $wconfig->buildForm([], $form_state);
+    $wconfig->validateForm($form, $form_state);
+
+    $username = $form_state->getValue('username');
+    $password = $form_state->getValue('password');
+    $client_id = $form_state->getValue('client_id');
+    $client_secret = $form_state->getValue('client_secret');
+
+    $webdam_client = new WebdamClient($this->httpClient, $username, $password, $client_id, $client_secret);
+    $this->assertEquals($form_state->get('username'), $webdam_client->getAccountSubscriptionDetails()->username);
+  }
+
+  /**
+   * Tests validate fails.
+   *
+   * @expectedException GuzzleHttp\Exception\ClientException
+   * @expectedExceptionMessage The client credentials are invalid
+   */
+  public function testValidateFormFailed() {
+    $mock = new MockHandler([
+      new Response(200, [], '{"access_token":"ACCESS_TOKEN", "token_type":"bearer", "expires_in":3600, "refresh_token": "refresh_token"}'),
+      new Response(400, [], '{"error":"invalid_client","error_description":"The client credentials are invalid"}'),
+    ]);
+    $handler = HandlerStack::create($mock);
+    $this->httpClient = new Client(['handler' => $handler]);
+
+    $wconfig = new WebdamConfig($this->getConfigFactoryStub(), $this->httpClient);
+
+    $form_state = new FormState();
+    $form = $wconfig->buildForm([], $form_state);
+    $wconfig->validateForm($form, $form_state);
+
+    $webdam_client = new WebdamClient($this->httpClient, $username, $password, $client_id, $client_secret);
+    $authstate = $webdam_client->getAuthState();
+    $this->assertFalse($authstate['valid_token']);
+
+    $form_state->setErrorByName('authenticate', 'The client credentials are invalid');
 
   }
 
@@ -128,7 +165,7 @@ class WebdamConfigFormTest extends UnitTestCase {
   //    $config_factory_stub = new FormConfigFactoryStub();
   //    $config_factory_stub->set('media_webdam.settings', $config_stub);
   //
-  //    $wconfig = new WebdamConfig($config_factory_stub);
+  //    $wconfig = new WebdamConfig($this->getConfigFactoryStub(), $this->httpClient);
   //
   //    $form_state = new FormState();
   //    $form_state->set('username', 'webdam_username');
