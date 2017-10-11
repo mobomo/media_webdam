@@ -219,8 +219,10 @@ class WebdamAsset extends MediaTypeBase {
     // Download the webdam asset file as a string.
     $file_contents = $this->webdam->downloadAsset($asset->id);
     // Set the path for webdam assets.
-    // If the bundle has a field mapped for the file.
-    if ($file_field = $bundle->field_map['file']) {
+    // If the bundle has a field mapped for the file define it.
+    $file_field = isset($bundle->field_map['file']) ? $bundle->field_map['file'] : '';
+    // Define path.
+    if ($file_field) {
       // Get the storage scheme for the file field.
       $scheme = $field_definitions[$file_field]->getItemDefinition()->getSetting('uri_scheme');
     }
