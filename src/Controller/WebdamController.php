@@ -124,11 +124,16 @@ class WebdamController extends ControllerBase {
     // Get an asset preview.
     $asset_preview = $asset->thumbnailurls[3]->url;
 
+    // Get subscription details so that we can generate the correct URL to send the user
+    // to the DAM UI.
+    $subscription_details = $this->webdam->getAccountSubscriptionDetails();
+    $dam_url = $subscription_details->url;
+
     return [
       '#theme' => 'asset_details',
       '#asset_data' => $asset_attributes,
       '#asset_preview' => $asset_preview,
-      '#asset_link' => "https://mobomotrial.webdamdb.com/cloud/#asset/" . $assetId,
+      '#asset_link' => "https://{$dam_url}/cloud/#asset/{$assetId}",
       '#attached' => [
         'library' => [
           'media_webdam/asset_details',
