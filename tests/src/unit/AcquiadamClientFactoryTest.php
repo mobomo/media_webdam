@@ -1,23 +1,23 @@
 <?php
 
-namespace Drupal\Tests\media_webdam\unit;
+namespace Drupal\Tests\media_acquiadam\unit;
 
 use Drupal\Core\Session\AccountProxy;
-use Drupal\media_webdam\ClientFactory;
+use Drupal\media_acquiadam\ClientFactory;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserDataInterface;
 use GuzzleHttp\Client as GClient;
 
 /**
- * Webdam client factory test.
+ * client factory test.
  *
- * @group media_webdam
+ * @group media_acquiadam
  */
-class WebdamClientFactoryTest extends UnitTestCase {
+class AcquiadamClientFactoryTest extends UnitTestCase {
 
   public function testFactory() {
     $config_factory = $this->getConfigFactoryStub([
-      'media_webdam.settings' => [
+      'media_acquiadam.settings' => [
         'username' => 'WDusername',
         'password' => 'WDpassword',
         'client_id' => 'WDclient-id',

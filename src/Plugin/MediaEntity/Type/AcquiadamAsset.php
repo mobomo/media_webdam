@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_webdam\Plugin\MediaEntity\Type;
+namespace Drupal\media_acquiadam\Plugin\MediaEntity\Type;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -10,27 +10,27 @@ use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
 use Drupal\media_entity\MediaInterface;
 use Drupal\media_entity\MediaTypeBase;
-use Drupal\media_webdam\WebdamInterface;
+use Drupal\media_acquiadam\AcquiadamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\file\Entity\File;
 
 /**
- * Provides media type plugin for Webdam Images.
+ * Provides media type plugin for Acquia DAM assets.
  *
  * @MediaType(
- *   id = "webdam_asset",
- *   label = @Translation("Webdam asset"),
- *   description = @Translation("Provides business logic and metadata for assets stored on Webdam.")
+ *   id = "acquiadam_asset",
+ *   label = @Translation("Acquia DAM asset"),
+ *   description = @Translation("Provides business logic and metadata for assets stored on Acquia DAM.")
  * )
  */
-class WebdamAsset extends MediaTypeBase {
+class AcquiadamAsset extends MediaTypeBase {
 
   /**
-   * A configured webdam API object.
+   * A configured API object.
    *
-   * @var \Drupal\media_webdam\Webdam $webdam
+   * @var \Drupal\media_acquiadam\Acquiadam $acquiadam
    */
-  protected $webdam;
+  protected $acquiadam;
 
   /**
    * The asset that we're going to render details for.
@@ -47,11 +47,11 @@ class WebdamAsset extends MediaTypeBase {
   protected $file = NULL;
 
   /**
-   * WebdamAsset constructor.
+   * AcquiadamAsset constructor.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, WebdamInterface $webdam) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, AcquiadamInterface $acquiadam) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $entity_field_manager, $config_factory->get('media_entity.settings'));
-    $this->webdam = $webdam;
+    $this->acquiadam = $acquiadam;
   }
 
   /**
@@ -65,7 +65,7 @@ class WebdamAsset extends MediaTypeBase {
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
       $container->get('config.factory'),
-      $container->get('media_webdam.webdam')
+      $container->get('media_acquiadam.acquiadam')
     );
   }
 
@@ -111,7 +111,7 @@ class WebdamAsset extends MediaTypeBase {
     $form['source_field'] = [
       '#type' => 'select',
       '#title' => $this->t('Field with source information'),
-      '#description' => $this->t('Field on media entity that stores the Webdam asset ID. You can create a bundle without selecting a value for this dropdown initially. This dropdown can be populated after adding fields to the bundle.'),
+      '#description' => $this->t('Field on media entity that stores the Acquia DAM asset ID. You can create a bundle without selecting a value for this dropdown initially. This dropdown can be populated after adding fields to the bundle.'),
       '#default_value' => empty($this->configuration['source_field']) ? NULL : $this->configuration['source_field'],
       '#options' => $options,
     ];
@@ -135,10 +135,10 @@ class WebdamAsset extends MediaTypeBase {
     if (is_null($assetID)) {
       return FALSE;
     }
-    // If the webdam asset has not been loaded.
+    // If the asset has not been loaded.
     if (!$this->asset) {
       // Load the asset.
-      $this->asset = $this->webdam->getAsset($assetID);
+      $this->asset = $this->acquiadam->getAsset($assetID);
     }
     switch ($name) {
       case 'type_id':
@@ -206,7 +206,7 @@ class WebdamAsset extends MediaTypeBase {
       if ($media->hasField($source_field)) {
         // Set the property name for the source field.
         $property_name = $media->{$source_field}->first()->mainPropertyName();
-        // Get the webdam asset ID value from the source field.
+        // Get the asset ID value from the source field.
         $assetID = $media->{$source_field}->{$property_name};
       }
     }
@@ -215,25 +215,22 @@ class WebdamAsset extends MediaTypeBase {
       return FALSE;
     }
     // Load the asset.
-    $asset = $this->webdam->getAsset($assetID);
-    // Download the webdam asset file as a string.
-    $file_contents = $this->webdam->downloadAsset($asset->id);
-    // Set the path for webdam assets.
+    $asset = $this->acquiadam->getAsset($assetID);
+    // Download the asset file as a string.
+    $file_contents = $this->acquiadam->downloadAsset($asset->id);
+    // Set the path for assets.
     // If the bundle has a field mapped for the file define it.
     $file_field = isset($bundle->field_map['file']) ? $bundle->field_map['file'] : '';
     // Define path.
+    $scheme = 'public';
     if ($file_field) {
       // Get the storage scheme for the file field.
       $scheme = $field_definitions[$file_field]->getItemDefinition()->getSetting('uri_scheme');
     }
-    else {
-      // Otherwise default to public storage.
-      $scheme = 'public';
-    }
-    // Set the path prefix for the file that is about to be downloaded from
-    // webdam and saved in to Drupal.
-    $path = $scheme . '://webdam_assets/';
-    // Prepare webdam directory for writing and only proceed if successful.
+    // Set the path prefix for the file that is about to be downloaded
+    // and saved in to Drupal.
+    $path = $scheme . '://acquiadam_assets/';
+    // Prepare acquiadam directory for writing and only proceed if successful.
     if (file_prepare_directory($path, FILE_CREATE_DIRECTORY)) {
       // Save the file into Drupal.
       $file = file_save_data($file_contents, $path . $asset->id . '.' . $asset->filetype, FILE_EXISTS_REPLACE);
@@ -281,8 +278,8 @@ class WebdamAsset extends MediaTypeBase {
         return $thumbnail;
       }
     }
-    // If the file field is not mapped, use the default webdam icon.
-    return drupal_get_path('module', 'media_webdam') . '/img/webdam.png';
+    // If the file field is not mapped, use the default icon.
+    return drupal_get_path('module', 'media_acquiadam') . '/img/webdam.png';
   }
 
 }

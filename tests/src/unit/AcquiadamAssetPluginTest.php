@@ -1,11 +1,9 @@
 <?php
 
-namespace Drupal\Tests\media_webdam\unit;
+namespace Drupal\Tests\media_acquiadam\unit;
 
 use cweagans\webdam\Entity\Asset;
 use cweagans\webdam\Entity\MiniFolder;
-use Drupal\Core\Config\Config;
-use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\Entity\EntityFieldManager;
 use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -14,20 +12,18 @@ use Drupal\Core\Form\FormInterface;
 use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\Plugin\DataType\ItemList;
-use Drupal\Core\TypedData\TypedDataInterface;
 use Drupal\entity_test\FieldStorageDefinition;
 use Drupal\media_entity\Entity\Media;
-use Drupal\media_entity\MediaInterface;
-use Drupal\media_webdam\Plugin\MediaEntity\Type\WebdamAsset;
-use Drupal\media_webdam\Webdam;
+use Drupal\media_acquiadam\Plugin\MediaEntity\Type\AcquiadamAsset;
+use Drupal\media_acquiadam\Acquiadam;
 use Drupal\Tests\UnitTestCase;
 
 /**
- * Webdam asset plugin test.
+ * asset plugin test.
  *
- * @group media_webdam
+ * @group media_acquiadam
  */
-class WebdamAssetPluginTest extends UnitTestCase {
+class AcquiadamAssetPluginTest extends UnitTestCase {
 
   /**
    * Tests the buildConfigurationForm method.
@@ -62,21 +58,21 @@ class WebdamAssetPluginTest extends UnitTestCase {
       ->getMock();
 
     $entity_field_manager->method('getFieldDefinitions')
-      ->with('media', 'webdam_asset')
+      ->with('media', 'acquiadam_asset')
       ->willReturn(['test_field' => $field]);
 
     $entity = new MediaStub([]);
 
     $form = new FormStub($entity);
 
-    $plugin = new WebdamAsset(
+    $plugin = new AcquiadamAsset(
       ['source_field' => 'source'],
       'test_plugin',
       [],
       $this->getMockBuilder(EntityTypeManager::class)->disableOriginalConstructor()->getMock(),
       $entity_field_manager,
       $this->getConfigFactoryStub(['media_entity.settings' => []]),
-      new WebdamStub()
+      new AcquiadamStub()
     );
     $plugin->setStringTranslation($this->getStringTranslationStub());
 
@@ -94,14 +90,14 @@ class WebdamAssetPluginTest extends UnitTestCase {
    * Tests the getField method.
    */
   public function testGetField() {
-    $plugin = new WebdamAsset(
+    $plugin = new AcquiadamAsset(
       ['source_field' => 'source'],
       'test_plugin',
       [],
       $this->getMockBuilder(EntityTypeManager::class)->disableOriginalConstructor()->getMock(),
       $this->getMockBuilder(EntityFieldManager::class)->disableOriginalConstructor()->getMock(),
       $this->getConfigFactoryStub(['media_entity.settings' => []]),
-      new WebdamStub()
+      new AcquiadamStub()
     );
 
     // If the media entity doesn't have a source field value, then we should get FALSE.
@@ -140,7 +136,7 @@ class ItemListStub extends ItemList {
   }
 }
 
-class WebdamStub extends Webdam {
+class AcquiadamStub extends Acquiadam {
   public function __construct() {}
   public function getAsset($assetId) {
     $asset = new Asset();
@@ -186,7 +182,7 @@ class MediaStub extends Media {
   }
 
   public function id() {
-    return 'webdam_asset';
+    return 'acquiadam_asset';
   }
 
   public function &__get($name) {

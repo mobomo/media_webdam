@@ -2,13 +2,13 @@
 
 /**
  * @file
- * Integrates Drupal with Webdam.
+ * Integrates Drupal with Acquia DAM.
  */
 
 /**
  * Implements hook_theme().
  */
-function media_webdam_theme($existing, $type, $theme, $path) {
+function media_acquiadam_theme($existing, $type, $theme, $path) {
   return [
     'asset_details' => [
       'variables' => [
@@ -17,9 +17,9 @@ function media_webdam_theme($existing, $type, $theme, $path) {
         'asset_link' => NULL,
       ],
     ],
-    'checkboxes__webdam_assets' => [
+    'checkboxes__acquiadam_assets' => [
       'render element' => 'element',
-      'template' => 'checkboxes--webdam-assets',
+      'template' => 'checkboxes--acquiadam-assets',
     ],
     'asset_browser_message' => [
       'variables' => [
@@ -32,22 +32,22 @@ function media_webdam_theme($existing, $type, $theme, $path) {
 /**
  * Implements hook_entity_type_alter().
  */
-function media_webdam_entity_type_alter(array &$entity_types) {
+function media_acquiadam_entity_type_alter(array &$entity_types) {
   /** #var $entity_types \Drupal\Core\Entity\EntityTypeInterface[] */
-  $entity_types['user']->setLinkTemplate('webdam-auth-form', '/user/{user}/webdam');
+  $entity_types['user']->setLinkTemplate('acquiadam-auth-form', '/user/{user}/acquiadam');
 }
 
 /**
  * Implements hook_menu_local_tasks_alter().
  *
- * Hides the 'Webdam' tab on the user profile if the user is not viewing their
+ * Hides the 'Acquia DAM' tab on the user profile if the user is not viewing their
  * own profile.
  */
-function media_webdam_menu_local_tasks_alter(&$data, $route_name) {
+function media_acquiadam_menu_local_tasks_alter(&$data, $route_name) {
   if ($route_name == 'entity.user.canonical') {
     foreach ($data['tabs'][0] as $key => $link) {
       if (
-        $link['#link']['url']->getRouteName() == 'entity.user.webdam_auth' &&
+        $link['#link']['url']->getRouteName() == 'entity.user.acquiadam_auth' &&
         $link['#link']['url']->getRouteParameters()['user'] != \Drupal::currentUser()->id()
       ) {
         unset($data['tabs'][0][$key]);
@@ -59,12 +59,12 @@ function media_webdam_menu_local_tasks_alter(&$data, $route_name) {
 /**
  * Implements hook_preprocess_HOOK().
  *
- * Allow custom markup for webdam asset checkboxes
+ * Allow custom markup for acquiadam asset checkboxes
  */
-function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
+function media_acquiadam_preprocess_checkboxes__acquiadam_assets(&$variables) {
   $element = $variables['element'];
   $variables['children'] = $element['#children'];
-  $variables['element']['#theme'] = 'checkboxes__webdam_assets';
+  $variables['element']['#theme'] = 'checkboxes__acquiadam_assets';
 }
 
 /**
@@ -77,7 +77,7 @@ function media_webdam_preprocess_checkboxes__webdam_assets(&$variables) {
  * for created/changed because the are already set by Drupal core
  *
  */
-function media_webdam_media_presave($entity) {
+function media_acquiadam_media_presave($entity) {
   //Set the flag for the thumbnail to be downloaded
   $entity->setQueuedThumbnailDownload();
   //Download and set the thumbnail image
@@ -95,33 +95,33 @@ function media_webdam_media_presave($entity) {
 /**
  * Implements hook_cron().
  *
- * Refresh webdam metadata and sync to media entities
+ * Refresh acquiadam metadata and sync to media entities
  */
-function media_webdam_cron(){
+function media_acquiadam_cron(){
   // We access our configuration.
-  $cron_config = \Drupal::configFactory()->getEditable('media_webdam.settings');
+  $cron_config = \Drupal::configFactory()->getEditable('media_acquiadam.settings');
   // Default to an hourly interval. Of course, cron has to be running at least
   // hourly for this to work.
   $interval = $cron_config->get('sync_interval');
   $interval = !empty($interval) ? $interval : 3600;
   // We usually don't want to act every time cron runs (which could be every
   // minute) so keep a time for the next run in the site state.
-  $next_execution = \Drupal::state()->get('media_webdam.settings.next_sync');
+  $next_execution = \Drupal::state()->get('media_acquiadam.settings.next_sync');
   $next_execution = !empty($next_execution) ? $next_execution : 0;
   $request_time = \Drupal::time()->getRequestTime();
   if ($request_time >= $next_execution) {
     //Load all media bundles
     $media_bundles = \Drupal::entityTypeManager()->getStorage('media_bundle')->loadMultiple();
-    //Filter out bundles that do not have type = webdam_asset
-    $webdam_bundles = array_map( function($item){
+    //Filter out bundles that do not have type = acquiadam_asset
+    $acquiadam_bundles = array_map( function($item){
       return $item->label;
     },array_filter($media_bundles, function($item){
-        return $item->type == 'webdam_asset';
+        return $item->type == 'acquiadam_asset';
       })
     );
-    //fetch all webdam asset entity ID's
+    //fetch all acquiadam asset entity ID's
     $all_ids = \Drupal::entityQuery('media')
-      ->condition('bundle',array_keys($webdam_bundles), 'IN')
+      ->condition('bundle',array_keys($acquiadam_bundles), 'IN')
       ->execute();
     //Set the number of entities to fetch from the database in each batch
     $batch_size = 50;
@@ -136,7 +136,7 @@ function media_webdam_cron(){
       foreach ($batch_entities as $entity) {
         //Loop through the mapped fields for this bundle
         foreach ($entity->bundle->entity->field_map as $entity_field => $mapped_field){
-          //Set the value to NULL so that it gets repopulated from webdam on save
+          //Set the value to NULL so that it gets repopulated from acquiadam on save
           if ($entity->hasField($mapped_field)) {
             $entity->set($mapped_field, NULL);
           }
@@ -149,6 +149,6 @@ function media_webdam_cron(){
       //Increment counter and stop if all entities have been processed
     }while($count+=$batch_size < count($all_ids));
     //Set the next execution time
-    \Drupal::state()->set('media_webdam.next_sync', $request_time + $interval);
+    \Drupal::state()->set('media_acquiadam.next_sync', $request_time + $interval);
   }
 }

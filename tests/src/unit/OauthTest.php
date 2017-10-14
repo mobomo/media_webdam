@@ -1,8 +1,8 @@
 <?php
 
-namespace Drupal\Tests\media_webdam\unit;
+namespace Drupal\Tests\media_acquiadam\unit;
 
-use Drupal\media_webdam\Oauth;
+use Drupal\media_acquiadam\Oauth;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Drupal\Core\Access\CsrfTokenGenerator;
 use Drupal\Tests\UnitTestCase;
@@ -14,19 +14,19 @@ use GuzzleHttp\Psr7\Response;
 /**
  * Oauth test.
  *
- * @group media_webdam
+ * @group media_acquiadam
  */
 class OauthTest extends UnitTestCase {
 
   /**
-   * The base URL to use for the Webdam API.
+   * The base URL to use for the API.
    *
    * @var string
    */
   protected $webdamApiBase = "https://apiv2.webdamdb.comh";
 
   /**
-   * The media_webdam configuration.
+   * The media_acquiadam configuration.
    *
    * @var \Drupal\Core\Config\ConfigFactoryInterface|\PHPUnit_Framework_MockObject_MockObject
    */
@@ -65,7 +65,7 @@ class OauthTest extends UnitTestCase {
    */
   public function setUp() {
     parent::setUp();
-    $this->config = $this->getConfigFactoryStub()->get('media_webdam.settings');
+    $this->config = $this->getConfigFactoryStub()->get('media_acquiadam.settings');
 
     $this->csrfTokenGenerator = $this->getMockBuilder('Drupal\Core\Access\CsrfTokenGenerator')
       ->disableOriginalConstructor()
@@ -96,7 +96,7 @@ class OauthTest extends UnitTestCase {
    */
   public function getConfigFactoryStub(array $configs = []) {
     return parent::getConfigFactoryStub([
-      'media_webdam.settings' => [
+      'media_acquiadam.settings' => [
         'username' => 'WDusername',
         'password' => 'WDpassword',
         'client_id' => 'WDclient-id',

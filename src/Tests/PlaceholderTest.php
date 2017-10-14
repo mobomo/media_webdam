@@ -1,13 +1,13 @@
 <?php
 
-namespace Drupal\media_webdam\Tests;
+namespace Drupal\media_acquiadam\Tests;
 
-use Drupal\simpletest\KernelTestBase;
+use Drupal\KernelTests\KernelTestBase;
 
 /**
  * Placeholder test. Delete when there are real tests.
  *
- * @group media_webdam
+ * @group media_acquiadam
  */
 class PlaceholderTest extends KernelTestBase {
 

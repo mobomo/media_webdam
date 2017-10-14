@@ -1,15 +1,15 @@
 <?php
 
-namespace Drupal\Tests\media_webdam\unit;
+namespace Drupal\Tests\media_acquiadam\unit;
 
 use Drupal\Core\Config\Config;
 use Drupal\Core\Config\ConfigFactory;
 use Drupal\Core\DependencyInjection\Container;
 use Drupal\Core\Form\FormState;
-use Drupal\media_webdam\Form\WebdamConfig;
+use Drupal\media_acquiadam\Form\AcquiadamConfig;
 use Drupal\Tests\UnitTestCase;
 use GuzzleHttp\Handler\MockHandler;
-use Drupal\media_webdam\Webdam;
+use Drupal\media_acquiadam\Acquiadam;
 use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Client;
 use GuzzleHttp\HandlerStack;
@@ -18,11 +18,11 @@ use cweagans\webdam\Client as WebdamClient;
 use cweagans\webdam\Exception\InvalidCredentialsException;
 
 /**
- * Webdam config form test.
+ * config form test.
  *
- * @group media_webdam
+ * @group media_acquiadam
  */
-class WebdamConfigFormTest extends UnitTestCase {
+class AcquiadamConfigFormTest extends UnitTestCase {
 
 
   /**
@@ -53,16 +53,16 @@ class WebdamConfigFormTest extends UnitTestCase {
    * {@inheritdoc}
    */
   public function testGetFormId() {
-    $form = new WebdamConfig($this->getConfigFactoryStub(), $this->httpClient);
-    $this->assertEquals('webdam_config', $form->getFormId());
+    $form = new AcquiadamConfig($this->getConfigFactoryStub(), $this->httpClient);
+    $this->assertEquals('acquiadam_config', $form->getFormId());
   }
 
   /**
    * {@inheritdoc}
    */
   public function testBuildForm() {
-    $wconfig = new WebdamConfig($this->getConfigFactoryStub([
-      'media_webdam.settings' => [
+    $wconfig = new AcquiadamConfig($this->getConfigFactoryStub([
+      'media_acquiadam.settings' => [
         'username' => 'WDusername',
         'password' => 'WDpassword',
         'client_id' => 'WDclient-id',
@@ -89,7 +89,7 @@ class WebdamConfigFormTest extends UnitTestCase {
    */
   public function getConfigFactoryStub(array $configs = []) {
     return parent::getConfigFactoryStub([
-      'media_webdam.settings' => [
+      'media_acquiadam.settings' => [
         'username' => 'WDusername',
         'password' => 'WDpassword',
         'client_id' => 'WDclient-id',
@@ -111,7 +111,7 @@ class WebdamConfigFormTest extends UnitTestCase {
     $handler = HandlerStack::create($mock);
     $this->httpClient = new Client(['handler' => $handler]);
 
-    $wconfig = new WebdamConfig($this->getConfigFactoryStub(), $this->httpClient);
+    $wconfig = new AcquiadamConfig($this->getConfigFactoryStub(), $this->httpClient);
 
     $form_state = new FormState();
     $form_state->set('username', 'WDusername');
@@ -145,7 +145,7 @@ class WebdamConfigFormTest extends UnitTestCase {
     $handler = HandlerStack::create($mock);
     $this->httpClient = new Client(['handler' => $handler]);
 
-    $wconfig = new WebdamConfig($this->getConfigFactoryStub(), $this->httpClient);
+    $wconfig = new AcquiadamConfig($this->getConfigFactoryStub(), $this->httpClient);
 
     $form_state = new FormState();
     $form = $wconfig->buildForm([], $form_state);
@@ -163,24 +163,24 @@ class WebdamConfigFormTest extends UnitTestCase {
   //  public function testSubmitForm() {
   //    $config_stub = new FormConfigStub();
   //    $config_factory_stub = new FormConfigFactoryStub();
-  //    $config_factory_stub->set('media_webdam.settings', $config_stub);
+  //    $config_factory_stub->set('media_acquiadam.settings', $config_stub);
   //
-  //    $wconfig = new WebdamConfig($this->getConfigFactoryStub(), $this->httpClient);
+  //    $wconfig = new AcquiadamConfig($this->getConfigFactoryStub(), $this->httpClient);
   //
   //    $form_state = new FormState();
-  //    $form_state->set('username', 'webdam_username');
-  //    $form_state->set('password', 'webdam_pw');
-  //    $form_state->set('client_id', 'webdam_client_id');
-  //    $form_state->set('secret', 'webdam_client_secret');
+  //    $form_state->set('username', 'acquiadam_username');
+  //    $form_state->set('password', 'acquiadam_pw');
+  //    $form_state->set('client_id', 'acquiadam_client_id');
+  //    $form_state->set('secret', 'acquiadam_client_secret');
   //
   //    $form = [];
   //
   //    $wconfig->submitForm($form, $form_state);
   //
-  //    $this->assertEquals('webdam_username', $config_stub->get('username'));
-  //    $this->assertEquals('webdam_pw', $config_stub->get('password'));
-  //    $this->assertEquals('webdam_client_id', $config_stub->get('client_id'));
-  //    $this->assertEquals('webdam_client_secret', $config_stub->get('secret'));
+  //    $this->assertEquals('acquiadam_username', $config_stub->get('username'));
+  //    $this->assertEquals('acquiadam_pw', $config_stub->get('password'));
+  //    $this->assertEquals('acquiadam_client_id', $config_stub->get('client_id'));
+  //    $this->assertEquals('acquiadam_client_secret', $config_stub->get('secret'));
   //  }
 }
 

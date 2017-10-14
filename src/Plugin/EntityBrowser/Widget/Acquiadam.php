@@ -1,7 +1,8 @@
 <?php
 
-namespace Drupal\media_webdam\Plugin\EntityBrowser\Widget;
+namespace Drupal\media_acquiadam\Plugin\EntityBrowser\Widget;
 
+use cweagans\webdam\Entity\Asset;
 use cweagans\webdam\Entity\Folder;
 use cweagans\webdam\Exception\InvalidCredentialsException;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -10,7 +11,7 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
-use Drupal\media_webdam\WebdamInterface;
+use Drupal\media_acquiadam\AcquiadamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Drupal\media_entity\Entity\Media;
@@ -21,19 +22,19 @@ use Drupal\Core\Extension\ModuleHandlerInterface;
  * Uses a view to provide entity listing in a browser's widget.
  *
  * @EntityBrowserWidget(
- *   id = "webdam",
- *   label = @Translation("Webdam"),
- *   description = @Translation("Webdam asset browser"),
+ *   id = "acquiadam",
+ *   label = @Translation("Acquia DAM"),
+ *   description = @Translation("Acquia DAM asset browser"),
  *   auto_select = FALSE
  * )
  */
-class Webdam extends WidgetBase {
+class Acquiadam extends WidgetBase {
   /**
-   * The webdam interface.
+   * The dam interface.
    *
-   * @var \Drupal\media_webdam\WebdamInterface
+   * @var \Drupal\media_acquiadam\AcquiadamInterface
    */
-  protected $webdam;
+  protected $acquiadam;
 
   /**
    * The current user account.
@@ -57,10 +58,10 @@ class Webdam extends WidgetBase {
   protected $moduleHandler;
 
   /**
-   * Webdam constructor.
+   * Acquiadam constructor.
    *
    * @param array $configuration
-   *   The Webdam Configuration array with information about the module.
+   *   The config array with information about the module.
    * @param string $plugin_id
    *   The plugin_id for this plugin instance.
    * @param mixed $plugin_definition
@@ -71,16 +72,16 @@ class Webdam extends WidgetBase {
    *   The Entity Manager service.
    * @param \Drupal\entity_browser\WidgetValidationManager $validation_manager
    *   The Widget Validation Manager service.
-   * @param \Drupal\media_webdam\WebdamInterface $webdam
-   *   The Webdam Interface.
+   * @param \Drupal\media_acquiadam\AcquiadamInterface $acquiadam
+   *   The dam Interface.
    * @param \Drupal\Core\Session\AccountInterface $account
    *   The user account for which to get the permissions hash.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, WebdamInterface $webdam, AccountInterface $account, LanguageManagerInterface $languageManager, ModuleHandlerInterface $moduleHandler) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, AcquiadamInterface $acquiadam, AccountInterface $account, LanguageManagerInterface $languageManager, ModuleHandlerInterface $moduleHandler) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
-    $this->webdam = $webdam;
+    $this->acquiadam = $acquiadam;
     $this->user = $account;
     $this->language_manager = $languageManager;
     $this->module_handler = $moduleHandler;
@@ -97,7 +98,7 @@ class Webdam extends WidgetBase {
       $container->get('event_dispatcher'),
       $container->get('entity_type.manager'),
       $container->get('plugin.manager.entity_browser.widget_validation'),
-      $container->get('media_webdam.webdam_user_creds'),
+      $container->get('media_acquiadam.acquiadam_user_creds'),
       $container->get('current_user'),
       $container->get('language_manager'),
       $container->get('module_handler')
@@ -150,7 +151,7 @@ class Webdam extends WidgetBase {
       // due to navigating between folders.
       '#breadcrumbs' => $breadcrumbs,
       '#attributes' => [
-        'class' => ['breadcrumb webdam-browser-breadcrumb-container'],
+        'class' => ['breadcrumb acquiadam-browser-breadcrumb-container'],
       ],
     ];
     // Add the breadcrumb buttons to the form.
@@ -158,13 +159,13 @@ class Webdam extends WidgetBase {
       $form['breadcrumb-container'][$folder_id] = [
         '#type' => 'button',
         '#value' => $folder_name,
-        '#name' => 'webdam_folder',
-        '#webdam_folder_id' => $folder_id,
-        '#webdam_parent_folder_id' => $folder_name,
+        '#name' => 'acquiadam_folder',
+        '#acquiadam_folder_id' => $folder_id,
+        '#acquiadam_parent_folder_id' => $folder_name,
         '#prefix' => '<li>',
         '#suffix' => '</li>',
         '#attributes' => [
-          'class' => ['webdam-browser-breadcrumb'],
+          'class' => ['acquiadam-browser-breadcrumb'],
         ],
       ];
     }
@@ -183,7 +184,7 @@ class Webdam extends WidgetBase {
       // Store page number in container so it can be retrieved from form state.
       '#page' => $page,
       '#attributes' => [
-        'class' => ['webdam-asset-browser-pager'],
+        'class' => ['acquiadam-asset-browser-pager'],
       ],
     ];
     // If not on the first page.
@@ -192,8 +193,8 @@ class Webdam extends WidgetBase {
       $form['pager-container']['first'] = [
         '#type' => 'button',
         '#value' => '<<',
-        '#name' => 'webdam_pager',
-        '#webdam_page' => 0,
+        '#name' => 'acquiadam_pager',
+        '#acquiadam_page' => 0,
         '#attributes' => [
           'class' => ['page-button', 'page-first'],
         ],
@@ -202,8 +203,8 @@ class Webdam extends WidgetBase {
       $form['pager-container']['previous'] = [
         '#type' => 'button',
         '#value' => '<',
-        '#name' => 'webdam_pager',
-        '#webdam_page' => $page - 1,
+        '#name' => 'acquiadam_pager',
+        '#acquiadam_page' => $page - 1,
         '#attributes' => [
           'class' => ['page-button', 'page-previous'],
         ],
@@ -223,8 +224,8 @@ class Webdam extends WidgetBase {
       $form['pager-container']['page_' . $i] = [
         '#type' => 'button',
         '#value' => $i + 1,
-        '#name' => 'webdam_pager',
-        '#webdam_page' => $i,
+        '#name' => 'acquiadam_pager',
+        '#acquiadam_page' => $i,
         '#attributes' => [
           'class' => [($i == $page ? 'page-current' : ''), 'page-button'],
         ],
@@ -236,8 +237,8 @@ class Webdam extends WidgetBase {
       $form['pager-container']['next'] = [
         '#type' => 'button',
         '#value' => '>',
-        '#name' => 'webdam_pager',
-        '#webdam_page' => $page + 1,
+        '#name' => 'acquiadam_pager',
+        '#acquiadam_page' => $page + 1,
         '#attributes' => [
           'class' => ['page-button', 'page-next'],
         ],
@@ -246,8 +247,8 @@ class Webdam extends WidgetBase {
       $form['pager-container']['last'] = [
         '#type' => 'button',
         '#value' => '>>',
-        '#name' => 'webdam_pager',
-        '#webdam_page' => $last_page,
+        '#name' => 'acquiadam_pager',
+        '#acquiadam_page' => $last_page,
         '#attributes' => [
           'class' => ['page-button', 'page-last'],
         ],
@@ -333,18 +334,18 @@ class Webdam extends WidgetBase {
       return [];
     }
     try {
-      $this->webdam->getAccountSubscriptionDetails();
+      $this->acquiadam->getAccountSubscriptionDetails();
     }
     catch (InvalidCredentialsException $e) {
       $form['message'] = [
         '#theme' => 'asset_browser_message',
-        '#message' => $this->t('You are not authenticated. Please %authenticate to browse Webdam assets.', [
+        '#message' => $this->t('You are not authenticated. Please %authenticate to browse Acquia DAM assets.', [
           // @TODO: Remove usage of \Drupal here.
-          '%authenticate' => \Drupal::l('authenticate', Url::fromRoute('media_webdam.auth_start', ['auth_finish_redirect' => \Drupal::request()->getRequestUri()])),
+          '%authenticate' => \Drupal::l('authenticate', Url::fromRoute('media_acquiadam.auth_start', ['auth_finish_redirect' => \Drupal::request()->getRequestUri()])),
         ]),
         '#attached' => [
           'library' => [
-            'media_webdam/asset_browser',
+            'media_acquiadam/asset_browser',
           ],
         ],
       ];
@@ -382,9 +383,9 @@ class Webdam extends WidgetBase {
         // Set the page number to the value stored in the form state.
         $page = intval($widget['pager-container']['#page']);
       }
-      if (isset($widget['asset-container']) && is_numeric($widget['asset-container']['#webdam_folder_id'])) {
+      if (isset($widget['asset-container']) && is_numeric($widget['asset-container']['#acquiadam_folder_id'])) {
         // Set current folder id to the value stored in the form state.
-        $current_folder->id = $widget['asset-container']['#webdam_folder_id'];
+        $current_folder->id = $widget['asset-container']['#acquiadam_folder_id'];
       }
       if (isset($widget['breadcrumb-container']) && is_array($widget['breadcrumb-container']['#breadcrumbs'])) {
         // Set the breadcrumbs to the value stored in the form state.
@@ -401,16 +402,16 @@ class Webdam extends WidgetBase {
     // If the form has been submitted.
     if (isset($trigger_elem)) {
       // If a folder button has been clicked.
-      if ($trigger_elem['#name'] == 'webdam_folder') {
+      if ($trigger_elem['#name'] == 'acquiadam_folder') {
         // Set the current folder id to the id of the folder that was clicked.
-        $current_folder->id = intval($trigger_elem['#webdam_folder_id']);
+        $current_folder->id = intval($trigger_elem['#acquiadam_folder_id']);
         // Reset page to zero if we have navigated to a new folder.
         $page = 0;
       }
       // If a pager button has been clicked.
-      if ($trigger_elem['#name'] == 'webdam_pager') {
+      if ($trigger_elem['#name'] == 'acquiadam_pager') {
         // Set the current folder id to the id of the folder that was clicked.
-        $page = intval($trigger_elem['#webdam_page']);
+        $page = intval($trigger_elem['#acquiadam_page']);
       }
       // If the filter/sort submit button has been clicked.
       if ($trigger_elem['#name'] == 'filter_sort_submit') {
@@ -455,10 +456,10 @@ class Webdam extends WidgetBase {
     // If the current folder is not zero then fetch information about
     // the sub folder being rendered.
     if ($current_folder->id) {
-      // Fetch the folder object from webdam.
-      $current_folder = $this->webdam->getFolder($current_folder->id);
-      // Fetch a list of assets for the folder from webdam.
-      $folder_assets = $this->webdam->getFolderAssets($current_folder->id, $params);
+      // Fetch the folder object.
+      $current_folder = $this->acquiadam->getFolder($current_folder->id);
+      // Fetch a list of assets for the folder.
+      $folder_assets = $this->acquiadam->getFolderAssets($current_folder->id, $params);
       // If there is a filter applied for the file type.
       if (!empty($params['types'])) {
         // Override number of assets on current folder to make number of search
@@ -471,14 +472,14 @@ class Webdam extends WidgetBase {
       $items = $folder_assets->items;
     }
     else {
-      // The webdam root folder is fetched differently because it can only
+      // The root folder is fetched differently because it can only
       // contain subfolders (not assets)
-      $folders = $this->webdam->getTopLevelFolders();
+      $folders = $this->acquiadam->getTopLevelFolders();
     }
     // If searching by keyword.
     if (!empty($params['query'])) {
-      // Fetch search results from webdam.
-      $search_results = $this->webdam->searchAssets($params);
+      // Fetch search results.
+      $search_results = $this->acquiadam->searchAssets($params);
       // Override number of assets on current folder to make number of
       // search results so pager works correctly.
       $current_folder->numassets = $search_results['total_count'];
@@ -494,21 +495,21 @@ class Webdam extends WidgetBase {
       '#type' => 'container',
       // Store the current folder id in the form so it can be retrieved
       // from the form state.
-      '#webdam_folder_id' => $current_folder->id,
+      '#acquiadam_folder_id' => $current_folder->id,
       '#attributes' => [
-        'class' => ['webdam-asset-browser'],
+        'class' => ['acquiadam-asset-browser'],
       ],
     ];
 
     // Get module path to create URL for background images.
-    $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
+    $modulePath = $this->module_handler->getModule('media_acquiadam')->getPath();
 
     // Add folder buttons to form.
     foreach ($folders as $folder) {
       $form['asset-container'][$folder->name] = [
         '#type' => 'container',
         '#attributes' => [
-          'class' => ['webdam-browser-folder-link'],
+          'class' => ['acquiadam-browser-folder-link'],
           'style' => 'background-image:url("/' . $modulePath . '/img/folder.png")',
         ],
       ];
@@ -520,11 +521,11 @@ class Webdam extends WidgetBase {
       $form['asset-container'][$folder->name][$folder->id] = [
         '#type' => 'button',
         '#value' => $folder->name,
-        '#name' => 'webdam_folder',
-        '#webdam_folder_id' => $folder->id,
-        '#webdam_parent_folder_id' => $current_folder->parent,
+        '#name' => 'acquiadam_folder',
+        '#acquiadam_folder_id' => $folder->id,
+        '#acquiadam_parent_folder_id' => $current_folder->parent,
         '#attributes' => [
-          'class' => ['webdam-folder-link-button'],
+          'class' => ['acquiadam-folder-link-button'],
           'style' => $backgroundImageStyle,
         ],
       ];
@@ -549,12 +550,12 @@ class Webdam extends WidgetBase {
     // See: \core\lib\Drupal\Core\Render\Element\CompositeFormElementTrait.php.
     $form['asset-container']['assets'] = [
       '#type' => 'checkboxes',
-      '#theme_wrappers' => ['checkboxes__webdam_assets'],
+      '#theme_wrappers' => ['checkboxes__acquiadam_assets'],
       '#title_display' => 'invisible',
       '#options' => $assets,
       '#attached' => [
         'library' => [
-          'media_webdam/asset_browser',
+          'media_acquiadam/asset_browser',
         ],
       ],
     ];
@@ -571,11 +572,11 @@ class Webdam extends WidgetBase {
    * {@inheritdoc}
    */
   protected function prepareEntities(array $form, FormStateInterface $form_state) {
-    // Get webdam asset id's from form state.
+    // Get asset id's from form state.
     $asset_ids = $form_state->getValue('current_selections', []) + array_filter($form_state->getValue('assets', []));
     // Load bundle information.
     $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($this->configuration['bundle']);
-    // Get the source field for this bundle which stores the webdam asset id.
+    // Get the source field for this bundle which stores the asset id.
     $source_field = $bundle->type_configuration['source_field'];
     // Query for existing entities.
     $existing_ids = $this->entityTypeManager->getStorage('media')->getQuery()
@@ -586,18 +587,18 @@ class Webdam extends WidgetBase {
     $entities = $this->entityTypeManager->getStorage('media')->loadMultiple($existing_ids);
     // Loop through the existing entities.
     foreach ($entities as $entity) {
-      // Set the webdam asset id of the current entity.
+      // Set the asset id of the current entity.
       $asset_id = $entity->get($source_field)->value;
       // If the asset id of the entity is in the list of asset id's selected.
       if (in_array($asset_id, $asset_ids)) {
-        // Remove the asset id from the input so it does not get fetched from
-        // webdam and does not get created as a duplicate.
+        // Remove the asset id from the input so it does not get fetched
+        // and does not get created as a duplicate.
         unset($asset_ids[$asset_id]);
       }
     }
-    // Fetch the assets from webdam.
-    $assets = $this->webdam->getAssetMultiple($asset_ids);
-    // Loop through the returned webdam assets.
+    // Fetch the assets.
+    $assets = $this->acquiadam->getAssetMultiple($asset_ids);
+    // Loop through the returned assets.
     foreach ($assets as $asset) {
       // Initialize entity values.
       $entity_values = [
@@ -606,14 +607,14 @@ class Webdam extends WidgetBase {
         'uid' => $this->user->id(),
         // This should be the current language code.
         'langcode' => $this->language_manager->getCurrentLanguage()->getId(),
-        // This should map the webdam asset status to the drupal entity status.
+        // This should map the asset status to the drupal entity status.
         'status' => ($asset->status == 'active' ? Media::PUBLISHED : Media::NOT_PUBLISHED),
-        // Set the entity name to the webdam asset name.
+        // Set the entity name to the asset name.
         'name' => $asset->name,
-        // Set the chosen source field for this entity to the webdam asset id.
+        // Set the chosen source field for this entity to the asset id.
         $source_field => $asset->id,
       ];
-      // Create a new entity to represent the webdam asset.
+      // Create a new entity to represent the asset.
       $entity = $this->entityTypeManager->getStorage('media')->create($entity_values);
       // Save the entity.
       $entity->save();
@@ -683,18 +684,18 @@ class Webdam extends WidgetBase {
     $form = parent::buildConfigurationForm($form, $form_state);
     // Load media bundles.
     $media_bundles = $this->entityTypeManager->getStorage('media_bundle')->loadMultiple();
-    // Filter out bundles that do not have type = webdam_asset.
-    $webdam_bundles = array_map(function ($item) {
+    // Filter out bundles that do not have type = acquiadam_asset.
+    $acquiadam_bundles = array_map(function ($item) {
       return $item->label;
     }, array_filter($media_bundles, function ($item) {
-        return $item->type == 'webdam_asset';
+        return $item->type == 'acquiadam_asset';
     })
     );
     // Add bundle dropdown to form.
     $form['bundle'] = [
       '#type' => 'select',
       '#title' => $this->t('Bundle'),
-      '#options' => $webdam_bundles,
+      '#options' => $acquiadam_bundles,
     ];
     return $form;
   }
@@ -711,22 +712,22 @@ class Webdam extends WidgetBase {
   /**
    * Format display of one asset in media browser.
    *
-   * @var \Drupal\media_webdam\Webdam $webdamAsset
+   * @var \cweagans\webdam\Entity\Asset $acquiadamAsset
    *
    * @return string
    *   Element HTML markup.
    */
-  public function layoutMediaEntity($webdamAsset) {
-    $modulePath = $this->module_handler->getModule('media_webdam')->getPath();
+  public function layoutMediaEntity(Asset $acquiadamAsset) {
+    $modulePath = $this->module_handler->getModule('media_acquiadam')->getPath();
 
-    $assetName = $webdamAsset->name;
-    if (!empty($webdamAsset->thumbnailurls)) {
-      $thumbnail = '<div class="webdam-asset-thumb"><img src="' . $webdamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" /></div>';
+    $assetName = $acquiadamAsset->name;
+    if (!empty($acquiadamAsset->thumbnailurls)) {
+      $thumbnail = '<div class="acquiadam-asset-thumb"><img src="' . $acquiadamAsset->thumbnailurls[2]->url . '" alt="' . $assetName . '" /></div>';
     }
     else {
-      $thumbnail = '<span class="webdam-browser-empty">No preview available.</span>';
+      $thumbnail = '<span class="acquiadam-browser-empty">No preview available.</span>';
     }
-    $element = '<div class="webdam-asset-checkbox">' . $thumbnail . '<div class="webdam-asset-details"><a href="/webdam/asset/' . $webdamAsset->id . '" class="use-ajax" data-dialog-type="modal"><img src="/' . $modulePath . '/img/ext-link.png" alt="Folder link" class="webdam-asset-browser-icon" /></a><p class="webdam-asset-filename">' . $assetName . '</p></div></div>';
+    $element = '<div class="acquiadam-asset-checkbox">' . $thumbnail . '<div class="acquiadam-asset-details"><a href="/dam/asset/' . $acquiadamAsset->id . '" class="use-ajax" data-dialog-type="modal"><img src="/' . $modulePath . '/img/ext-link.png" alt="Folder link" class="acquiadam-asset-browser-icon" /></a><p class="acquiadam-asset-filename">' . $assetName . '</p></div></div>';
     return $element;
   }
 
