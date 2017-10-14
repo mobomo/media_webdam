@@ -36,8 +36,8 @@ media_acquiadam.auth_finish:
 media_acquiadam.asset_details:
   path: 'acquiadam/asset/{assetId}'
   defaults:
-    _controller: '\Drupal\media_acquiadam\Controller\WebdamController:assetDetailsPage'
-    _title_callback: '\Drupal\media_acquiadam\Controller\WebdamController:assetDetailsPageTitle'
+    _controller: '\Drupal\media_acquiadam\Controller\AcquiadamController:assetDetailsPage'
+    _title_callback: '\Drupal\media_acquiadam\Controller\AcquiadamController:assetDetailsPageTitle'
   requirements:
     _user_is_logged_in: 'TRUE'
     assetId: \d+
