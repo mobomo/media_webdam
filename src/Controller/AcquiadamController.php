@@ -1,32 +1,22 @@
 <?php
 
-namespace Drupal\media_webdam\Controller;
+namespace Drupal\media_acquiadam\Controller;
 
 use Drupal\Core\Controller\ControllerBase;
-use Drupal\Core\Routing\TrustedRedirectResponse;
-use Drupal\Core\Session\AccountProxyInterface;
-use Drupal\Core\Url;
-use Drupal\media_webdam\OauthInterface;
-use Drupal\media_webdam\WebdamInterface;
-use Drupal\user\UserDataInterface;
-use Drupal\user\UserInterface;
+use Drupal\media_acquiadam\AcquiadamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\HttpFoundation\RequestStack;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Controller routines for webdam routes.
+ * Controller routines for Acquia DAM routes.
  */
-class WebdamController extends ControllerBase {
+class AcquiadamController extends ControllerBase {
 
   /**
-   * A configured webdam API object.
+   * A configured API object.
    *
-   * @var \Drupal\media_webdam\WebdamInterface
+   * @var \Drupal\media_acquiadam\AcquiadamInterface
    */
-  protected $webdam;
+  protected $acquiadam;
 
   /**
    * The asset that we're going to render details for.
@@ -36,13 +26,13 @@ class WebdamController extends ControllerBase {
   protected $asset;
 
   /**
-   * WebdamController constructor.
+   * AcquiadamController constructor.
    *
-   * @param \Drupal\media_webdam\WebdamInterface $webdam
-   *   The Webdam Interface.
+   * @param \Drupal\media_acquiadam\AcquiadamInterface $acquiadam
+   *   The Acquiadam Interface.
    */
-  public function __construct(WebdamInterface $webdam) {
-    $this->webdam = $webdam;
+  public function __construct(AcquiadamInterface $acquiadam) {
+    $this->acquiadam = $acquiadam;
   }
 
   /**
@@ -50,19 +40,19 @@ class WebdamController extends ControllerBase {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('media_webdam.webdam')
+      $container->get('media_acquiadam.acquiadam')
     );
   }
 
   /**
-   * Get an asset from Webdam.
+   * Get an asset.
    *
    * @param int $assetId
-   *   The Webdam asset ID for the asset to render details for.
+   *   The asset ID for the asset to render details for.
    */
   protected function getAsset($assetId) {
     if (!isset($this->asset)) {
-      $this->asset = $this->webdam->getAsset($assetId, TRUE);
+      $this->asset = $this->acquiadam->getAsset($assetId, TRUE);
     }
 
     return $this->asset;
@@ -72,7 +62,7 @@ class WebdamController extends ControllerBase {
    * Sets the asset details page title.
    *
    * @param int $assetId
-   *   The Webdam asset ID for the asset to render title for.
+   *   The asset ID for the asset to render title for.
    */
   public function assetDetailsPageTitle($assetId) {
     $asset = $this->getAsset($assetId);
@@ -83,7 +73,7 @@ class WebdamController extends ControllerBase {
    * Render a page that includes details about an asset.
    *
    * @param int $assetId
-   *   The Webdam asset ID to retrieve data for.
+   *   The asset ID to retrieve data for.
    */
   public function assetDetailsPage($assetId) {
 
@@ -126,7 +116,7 @@ class WebdamController extends ControllerBase {
 
     // Get subscription details so that we can generate the correct URL to send the user
     // to the DAM UI.
-    $subscription_details = $this->webdam->getAccountSubscriptionDetails();
+    $subscription_details = $this->acquiadam->getAccountSubscriptionDetails();
     $dam_url = $subscription_details->url;
 
     return [
@@ -136,7 +126,7 @@ class WebdamController extends ControllerBase {
       '#asset_link' => "https://{$dam_url}/cloud/#asset/{$assetId}",
       '#attached' => [
         'library' => [
-          'media_webdam/asset_details',
+          'media_acquiadam/asset_details',
         ],
       ],
     ];

@@ -1,25 +1,25 @@
 <?php
 
-namespace Drupal\Tests\media_webdam\unit;
+namespace Drupal\Tests\media_acquiadam\unit;
 
 use Drupal\Core\Session\AccountProxy;
-use Drupal\media_webdam\ClientFactory;
-use Drupal\media_webdam\Webdam;
+use Drupal\media_acquiadam\ClientFactory;
+use Drupal\media_acquiadam\Acquiadam;
 use Drupal\Tests\UnitTestCase;
 use Drupal\user\UserDataInterface;
 use GuzzleHttp\Client as GClient;
 
 /**
- * Webdam service test
+ * service test
  *
- * @group media_webdam
+ * @group media_acquiadam
  */
-class WebdamServiceTest extends UnitTestCase {
+class AcquiadamServiceTest extends UnitTestCase {
 
   // Saves some typing.
   public function getConfigFactoryStub(array $configs = []) {
     return parent::getConfigFactoryStub([
-      'media_webdam.settings' => [
+      'media_acquiadam.settings' => [
         'username' => 'WDusername',
         'password' => 'WDpassword',
         'client_id' => 'WDclient-id',
@@ -30,8 +30,8 @@ class WebdamServiceTest extends UnitTestCase {
 
   public function testConstructor() {
     $client_factory = new ClientFactory($this->getConfigFactoryStub(), new GClient(), $this->getMock(UserDataInterface::class), $this->getMock(AccountProxy::class));
-    $webdam = new Webdam($client_factory, 'background');
-    $this->assertInstanceOf('Drupal\media_webdam\Webdam', $webdam);
+    $acquiadam = new Acquiadam($client_factory, 'background');
+    $this->assertInstanceOf('Drupal\media_acquiadam\Acquiadam', $acquiadam);
   }
 
 }

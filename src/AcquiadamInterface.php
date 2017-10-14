@@ -1,15 +1,13 @@
 <?php
 
-namespace Drupal\media_webdam;
+namespace Drupal\media_acquiadam;
 
 /**
- * Class Webdam.
+ * Interface AcquiadamInterface
  *
- * Abstracts away details of the REST API.
- *
- * @package Drupal\media_webdam
+ * @package Drupal\media_acquiadam
  */
-interface WebdamInterface {
+interface AcquiadamInterface {
 
   /**
    * Get a list of folders keyed by ID.
@@ -23,7 +21,7 @@ interface WebdamInterface {
   public function getFlattenedFolderList($folder_id = NULL);
 
   /**
-   * Passes method calls through to the webdam client object.
+   * Passes method calls through to the DAM client object.
    *
    * @param string $name
    *   The name of the method to call.
@@ -31,7 +29,7 @@ interface WebdamInterface {
    *   An array of arguments.
    *
    * @return mixed
-   *   Returns whatever the webdam client returns.
+   *   Returns whatever the dam client returns.
    */
   public function __call($name, $arguments);
 

@@ -1,0 +1,9 @@
+name: "Media Acquia DAM"
+description: "Integrates the Media module ecosystem with Acquia DAM"
+core: 8.x
+type: module
+package: Media
+dependencies:
+  - media_entity
+  - taxonomy
+configure: media_acquiadam.config

@@ -1,6 +1,6 @@
 {
-	"name": "drupal/media_webdam",
-	"description": "Integrates the Media module ecosystem with Webdam.",
+	"name": "drupal/media_acquiadam",
+	"description": "Integrates the Media module ecosystem with Acquia DAM.",
 	"authors": [
 		{
 			"name": "Mobomo",
@@ -11,10 +11,6 @@
 			"name": "Cameron Eagans",
 			"email": "me@cweagans.net",
 			"homepage": "https://www.cweagans.net"
-		},
-		{
-			"name": "Brian Wagner",
-			"email": "brianjameswagner@gmail.com"
 		}
 	],
 	"repositories": [

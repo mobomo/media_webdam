@@ -1,27 +1,27 @@
 <?php
 
-namespace Drupal\media_webdam;
+namespace Drupal\media_acquiadam;
 
 /**
- * Class Webdam.
+ * Class Acquiadam.
  *
  * Abstracts away details of the REST API.
  *
- * @package Drupal\media_webdam
+ * @package Drupal\media_acquiadam
  */
-class Webdam implements WebdamInterface {
+class Acquiadam implements AcquiadamInterface {
 
   /**
-   * A webdam HTTP client.
+   * A dam client.
    *
    * @var \cweagans\webdam\Client
    */
   protected $client;
 
   /**
-   * Webdam constructor.
+   * Acquiadam constructor.
    *
-   * @param \Drupal\media_webdam\ClientFactory $client_factory
+   * @param \Drupal\media_acquiadam\ClientFactory $client_factory
    *   An instance of ClientFactory that we can get a webdam client from.
    * @param string $credential_type
    *   The type of credentials to use.
@@ -31,13 +31,7 @@ class Webdam implements WebdamInterface {
   }
 
   /**
-   * Get a list of folders keyed by ID.
-   *
-   * @param int $folder_id
-   *   The folder ID to recurse into. This is mostly for internal use.
-   *
-   * @return array
-   *   A list of folder names keyed by folder IDs.
+   * {@inheritdoc}
    */
   public function getFlattenedFolderList($folder_id = NULL) {
     $folder_data = [];
@@ -63,15 +57,7 @@ class Webdam implements WebdamInterface {
   }
 
   /**
-   * Passes method calls through to the webdam client object.
-   *
-   * @param string $name
-   *   The name of the method to call.
-   * @param array $arguments
-   *   An array of arguments.
-   *
-   * @return mixed
-   *   Returns whatever the webdam client returns.
+   * {@inheritdoc}
    */
   public function __call($name, $arguments) {
     $method_variable = array($this->client, $name);
