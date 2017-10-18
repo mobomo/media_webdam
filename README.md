@@ -161,4 +161,3 @@ In order to add a Acquia DAM asset to a piece of content you will need to add a 
 The media entity module provides a default embed button which can be configured at /admin/config/content/embed.  It can be configured to use a specific entity browser and allow for different display modes.
 
 - NOTE: When choosing an entity browser to use for the media embed button, be aware that the "Modal" Display plugin is not compatible with the WYSIWYG media embed button.  You may want to use the "iFrame" display plugin or create a separate Entity Browser to use with the media embed button
-

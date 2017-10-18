@@ -3,13 +3,12 @@ status: true
 dependencies:
   module:
     - media_entity
-id: media.field_webdam_asset_id
-field_name: field_webdam_asset_id
+id: media.field_acquiadam_asset_descrip
+field_name: field_acquiadam_asset_descrip
 entity_type: media
-type: integer
+type: string_long
 settings:
-  unsigned: false
-  size: normal
+  case_sensitive: false
 module: core
 locked: false
 cardinality: 1

@@ -28,8 +28,8 @@ before_install:
   - echo 'sendmail_path="$(which true)"' >> ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/travis.ini
   # Travis automatically CDs into mobomo/media_webdam
   - cd ../../
-  - git clone https://github.com/mobomo/media_webdam_dev
-  - cd media_webdam_dev
+  - git clone https://github.com/mobomo/media_acquiadam_dev
+  - cd media_acquiadam_dev
 
 install:
   - make dependencies

@@ -3,11 +3,11 @@ status: true
 dependencies:
   config:
     - field.storage.media.field_media_in_library
-    - media_entity.bundle.webdam_asset
-id: media.webdam_asset.field_media_in_library
+    - media_entity.bundle.acquia_dam_asset
+id: media.acquia_dam_asset.field_media_in_library
 field_name: field_media_in_library
 entity_type: media
-bundle: webdam_asset
+bundle: acquia_dam_asset
 label: 'Save to my media library'
 description: ''
 required: false

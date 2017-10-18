@@ -1,11 +1,11 @@
 (function ($, Drupal) {
 
-    Drupal.behaviors.webdamAssetBrowser = {
+    Drupal.behaviors.acquiadamAssetBrowser = {
         attach: function () {
             // Resize the asset browser frame.
-            $(".webdam-asset-browser").height($(window).height() - $(".filter-sort-container").height() - 175);
+            $(".acquiadam-asset-browser").height($(window).height() - $(".filter-sort-container").height() - 175);
             $(window).on('resize',function(){
-              $(".webdam-asset-browser").height($(window).height() - $(".filter-sort-container").height() - 175);
+              $(".acquiadam-asset-browser").height($(window).height() - $(".filter-sort-container").height() - 175);
             });
         }
     };
