@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_acquia;
+namespace Drupal\media_acquiadam;
 
 use cweagans\webdam\Client;
 use Drupal\Core\Config\ConfigFactoryInterface;
