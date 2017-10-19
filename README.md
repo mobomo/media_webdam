@@ -1,6 +1,6 @@
 # Media: Acquia DAM
 
-[![Build Status](https://travis-ci.org/mobomo/media_webdam.svg?branch=8.x-1.x)](https://travis-ci.org/mobomo/media_acquiadam)
+[![Build Status](https://travis-ci.org/mobomo/media_acquiadam.svg?branch=8.x-1.x)](https://travis-ci.org/mobomo/media_acquiadam)
 [![Coverage Status](https://coveralls.io/repos/github/mobomo/media_acquiadam/badge.svg?branch=8.x-1.x)](https://coveralls.io/github/mobomo/media_acquiadam?branch=8.x-1.x)
 
 ## About Media entity
