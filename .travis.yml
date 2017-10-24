@@ -27,7 +27,7 @@ install:
   - make dependencies
   - rm -r ./modules/contrib/media_acquiadam/*
   - mv $TRAVIS_BUILD_DIR/* ./modules/contrib/media_acquiadam/
-  - make travis-install-site
+  #- make travis-install-site
 
 script:
   - make test-unit
