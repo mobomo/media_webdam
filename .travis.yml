@@ -31,7 +31,7 @@ install:
 
 script:
   - make test-unit
-  - make travis-test-browser
+  #- make travis-test-browser
 
 after_script:
   - if [ "${TRAVIS_PHP_VERSION}" == "7.0" ]; then make report-coverage; fi;
