@@ -123,31 +123,11 @@ function media_acquiadam_cron(){
     $all_ids = \Drupal::entityQuery('media')
       ->condition('bundle',array_keys($acquiadam_bundles), 'IN')
       ->execute();
-    //Set the number of entities to fetch from the database in each batch
-    $batch_size = 50;
-    //Initialize counter
-    $count = 0;
-    do{
-      //Get a batch of id's.  Number of ID's = $batch_size
-      $batch_ids = array_slice($all_ids,$count,$count+$batch_size);
-      //Fetch the batch of entities
-      $batch_entities = \Drupal::entityTypeManager()->getStorage('media')->loadMultiple($batch_ids);
-      //Loop through batch of entities
-      foreach ($batch_entities as $entity) {
-        //Loop through the mapped fields for this bundle
-        foreach ($entity->bundle->entity->field_map as $entity_field => $mapped_field){
-          //Set the value to NULL so that it gets repopulated from acquiadam on save
-          if ($entity->hasField($mapped_field)) {
-            $entity->set($mapped_field, NULL);
-          }
-        }
-        //Set flag for thumbnail to be regenerated
-        $entity->setQueuedThumbnailDownload();
-        //Save the entity
-        $entity->save();
-      }
-      //Increment counter and stop if all entities have been processed
-    }while($count+=$batch_size < count($all_ids));
+
+    foreach ($all_ids as $id) {
+      \Drupal::queue('media_acquiadam_asset_refresh')->createItem(['id' => $id]);
+    }
+
     //Set the next execution time
     \Drupal::state()->set('media_acquiadam.next_sync', $request_time + $interval);
   }
