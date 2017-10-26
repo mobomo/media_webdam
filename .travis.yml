@@ -34,7 +34,7 @@ script:
   #- make travis-test-browser
 
 after_script:
-  - if [ "${TRAVIS_PHP_VERSION}" == "7.0" ]; then make report-coverage; fi;
+  - make report-coverage
 
 notifications:
   slack: mobomo:IUUkblgpWtwuJjnYcBo3a2nN
