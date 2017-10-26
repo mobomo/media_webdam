@@ -30,6 +30,16 @@ function media_acquiadam_theme($existing, $type, $theme, $path) {
 }
 
 /**
+ * Implements hook_field_formatter_info_alter().
+ */
+function media_acquiadam_field_formatter_info_alter(&$info) {
+  // Allow using the image formatter on a file field.
+  if (isset($info['image']) && !in_array('file', $info['image']['field_types'])) {
+    $info['image']['field_types'][] = 'file';
+  }
+}
+
+/**
  * Implements hook_entity_type_alter().
  */
 function media_acquiadam_entity_type_alter(array &$entity_types) {
