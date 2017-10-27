@@ -8,3 +8,4 @@ dependencies:
   - media_entity
   - file
   - image
+  - fallback_formatter
