@@ -6,6 +6,15 @@ media_acquiadam.config:
   requirements:
     _permission: 'administer site configuration'
 
+media_acquiadam.upload:
+  path: '/admin/content/media/acquiadam'
+  defaults:
+    _form: '\Drupal\media_acquiadam\Form\Upload'
+    _title: 'Acquia DAM Upload'
+  requirements:
+    #@todo: check/modify permission.
+    _permission: 'administer site configuration'
+
 entity.user.acquiadam_auth:
   path: '/user/{user}/acquiadam'
   defaults:
