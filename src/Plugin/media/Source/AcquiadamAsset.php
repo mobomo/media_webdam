@@ -143,6 +143,9 @@ class AcquiadamAsset extends MediaSourceBase {
       case 'default_name':
         return parent::getMetadata($media, 'default_name');
 
+      case 'thumbnail_uri':
+        return $this->thumbnail($media);
+
       case 'type_id':
         return $this->asset->type_id;
 
