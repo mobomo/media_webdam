@@ -8,8 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
-use Drupal\media_entity\MediaInterface;
-use Drupal\media_entity\MediaTypeBase;
+use Drupal\media\MediaSourceBase;
 use Drupal\media_acquiadam\AcquiadamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Drupal\file\Entity\File;
@@ -23,7 +22,7 @@ use Drupal\file\Entity\File;
  *   description = @Translation("Provides business logic and metadata for assets stored on Acquia DAM.")
  * )
  */
-class AcquiadamAsset extends MediaTypeBase {
+class AcquiadamAsset extends MediaSourceBase {
 
   /**
    * A configured API object.
