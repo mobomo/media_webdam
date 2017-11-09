@@ -71,7 +71,7 @@ class AcquiadamAsset extends MediaSourceBase {
   /**
    * {@inheritdoc}
    */
-  public function providedFields() {
+  public function getMetadataAttributes() {
     // @TODO: Determine if other properties need to be added here.
     // @TODO: Determine how to support custom metadata.
     $fields = [
