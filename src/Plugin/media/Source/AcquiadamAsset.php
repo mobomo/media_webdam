@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\media_acquiadam\Plugin\MediaEntity\Type;
+namespace Drupal\media_acquiadam\Plugin\media\Source;
 
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
@@ -17,7 +17,7 @@ use Drupal\file\Entity\File;
 /**
  * Provides media type plugin for Acquia DAM assets.
  *
- * @MediaType(
+ * @MediaSource(
  *   id = "acquiadam_asset",
  *   label = @Translation("Acquia DAM asset"),
  *   description = @Translation("Provides business logic and metadata for assets stored on Acquia DAM.")
