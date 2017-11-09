@@ -8,6 +8,7 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
+use Drupal\media\MediaInterface;
 use Drupal\media\MediaSourceBase;
 use Drupal\media_acquiadam\AcquiadamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
@@ -19,7 +20,8 @@ use Drupal\file\Entity\File;
  * @MediaSource(
  *   id = "acquiadam_asset",
  *   label = @Translation("Acquia DAM asset"),
- *   description = @Translation("Provides business logic and metadata for assets stored on Acquia DAM.")
+ *   description = @Translation("Provides business logic and metadata for assets stored on Acquia DAM."),
+ *   allowed_field_types = {"integer"},
  * )
  */
 class AcquiadamAsset extends MediaSourceBase {
@@ -92,29 +94,6 @@ class AcquiadamAsset extends MediaSourceBase {
       'status' => $this->t('Status'),
     ];
     return $fields;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
-    $options = [];
-    $bundle = $form_state->getFormObject()->getEntity();
-    $allowed_field_types = ['integer'];
-    foreach ($this->entityFieldManager->getFieldDefinitions('media', $bundle->id()) as $field_name => $field) {
-      if (in_array($field->getType(), $allowed_field_types) && !$field->getFieldStorageDefinition()->isBaseField()) {
-        $options[$field_name] = $field->getLabel();
-      }
-    }
-
-    $form['source_field'] = [
-      '#type' => 'select',
-      '#title' => $this->t('Field with source information'),
-      '#description' => $this->t('Field on media entity that stores the Acquia DAM asset ID. You can create a bundle without selecting a value for this dropdown initially. This dropdown can be populated after adding fields to the bundle.'),
-      '#default_value' => empty($this->configuration['source_field']) ? NULL : $this->configuration['source_field'],
-      '#options' => $options,
-    ];
-    return $form;
   }
 
   /**
