@@ -5,7 +5,7 @@ type: module
 package: Media
 configure: media_acquiadam.config
 dependencies:
-  - media_entity
+  - drupal:media (>= 8.4)
   - file
   - image
   - fallback_formatter
