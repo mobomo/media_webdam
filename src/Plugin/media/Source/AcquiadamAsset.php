@@ -120,7 +120,7 @@ class AcquiadamAsset extends MediaSourceBase {
   /**
    * {@inheritdoc}
    */
-  public function getField(MediaInterface $media, $name) {
+  public function getMetadata(MediaInterface $media, $name) {
     $assetID = NULL;
     if (isset($this->configuration['source_field'])) {
       $source_field = $this->configuration['source_field'];
@@ -140,6 +140,9 @@ class AcquiadamAsset extends MediaSourceBase {
       $this->asset = $this->acquiadam->getAsset($assetID);
     }
     switch ($name) {
+      case 'default_name':
+        return parent::getMetadata($media, 'default_name');
+
       case 'type_id':
         return $this->asset->type_id;
 
