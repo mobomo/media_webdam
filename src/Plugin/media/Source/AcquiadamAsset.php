@@ -179,7 +179,7 @@ class AcquiadamAsset extends MediaSourceBase {
    */
   public function thumbnail(MediaInterface $media) {
     // Load the bundle for this asset.
-    $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($media->bundle());
+    $bundle = $this->entityTypeManager->getStorage('media_type')->load($media->bundle());
     // Load the field definitions for this bundle.
     $field_definitions = $this->entityFieldManager->getFieldDefinitions($media->getEntityTypeId(), $media->bundle());
     // If a source field is set for this bundle.

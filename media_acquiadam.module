@@ -121,7 +121,7 @@ function media_acquiadam_cron(){
   $request_time = \Drupal::time()->getRequestTime();
   if ($request_time >= $next_execution) {
     //Load all media bundles
-    $media_bundles = \Drupal::entityTypeManager()->getStorage('media_bundle')->loadMultiple();
+    $media_bundles = \Drupal::entityTypeManager()->getStorage('media_type')->loadMultiple();
     //Filter out bundles that do not have type = acquiadam_asset
     $acquiadam_bundles = array_map( function($item){
       return $item->label;

@@ -575,7 +575,7 @@ class Acquiadam extends WidgetBase {
     // Get asset id's from form state.
     $asset_ids = $form_state->getValue('current_selections', []) + array_filter($form_state->getValue('assets', []));
     // Load bundle information.
-    $bundle = $this->entityTypeManager->getStorage('media_bundle')->load($this->configuration['bundle']);
+    $bundle = $this->entityTypeManager->getStorage('media_type')->load($this->configuration['bundle']);
     // Get the source field for this bundle which stores the asset id.
     $source_field = $bundle->type_configuration['source_field'];
     // Query for existing entities.
@@ -683,7 +683,7 @@ class Acquiadam extends WidgetBase {
     // Start with parent form.
     $form = parent::buildConfigurationForm($form, $form_state);
     // Load media bundles.
-    $media_bundles = $this->entityTypeManager->getStorage('media_bundle')->loadMultiple();
+    $media_bundles = $this->entityTypeManager->getStorage('media_type')->loadMultiple();
     // Filter out bundles that do not have type = acquiadam_asset.
     $acquiadam_bundles = array_map(function ($item) {
       return $item->label;

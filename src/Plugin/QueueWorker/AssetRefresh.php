@@ -38,7 +38,7 @@ class AssetRefresh extends QueueWorkerBase implements ContainerFactoryPluginInte
    */
   public function processItem($data) {
     $entity = \Drupal::entityTypeManager()->getStorage('media')->load($data['id']);
-    $bundle = \Drupal::entityTypeManager()->getStorage('media_bundle')->load($entity->bundle());
+    $bundle = \Drupal::entityTypeManager()->getStorage('media_type')->load($entity->bundle());
 
     foreach ($bundle->field_map as $entity_field => $mapped_field) {
       // Set all mapped field values to NULL so that they are repopulated from Acquia DAM on save.
