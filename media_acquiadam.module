@@ -80,9 +80,9 @@ function media_acquiadam_preprocess_checkboxes__acquiadam_assets(&$variables) {
 /**
  * Implements hook_ENTITY_TYPE_presave().
  *
- * @var \Drupal\media_entity\Entity\Media $entity
+ * @var \Drupal\media\Entity\Media $entity
  *
- * Override the preSave function from \Drupal\media_entity\Entity\Media
+ * Override the preSave function from \Drupal\media\Entity\Media
  * because it ignores empty values (e.g. status = 0) and doesn't set date values
  * for created/changed because the are already set by Drupal core
  *

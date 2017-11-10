@@ -13,8 +13,8 @@ use Drupal\Core\Form\FormState;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\Core\TypedData\Plugin\DataType\ItemList;
 use Drupal\entity_test\FieldStorageDefinition;
-use Drupal\media_entity\Entity\Media;
-use Drupal\media_acquiadam\Plugin\MediaEntity\Type\AcquiadamAsset;
+use Drupal\media\Entity\Media;
+use Drupal\media_acquiadam\Plugin\media\Source\AcquiadamAsset;
 use Drupal\media_acquiadam\Acquiadam;
 use Drupal\Tests\UnitTestCase;
 
