@@ -88,16 +88,14 @@ function media_acquiadam_preprocess_checkboxes__acquiadam_assets(&$variables) {
  *
  */
 function media_acquiadam_media_presave($entity) {
-  //Set the flag for the thumbnail to be downloaded
-  $entity->setQueuedThumbnailDownload();
   //Download and set the thumbnail image
-  $entity->automaticallySetThumbnail();
+  $entity->updateQueuedThumbnail();
   //Loop through the mapped fields
-  foreach ($entity->bundle->entity->field_map as $source_field => $destination_field) {
+  foreach ($entity->bundle->entity->getFieldMap() as $source_field => $destination_field) {
     //If the entity has the mapped destination field
     if ($entity->hasField($destination_field)) {
       //Set the value of the mapped field to the asset value
-      $entity->set($destination_field, $entity->getType()->getField($entity, $source_field));
+      $entity->set($destination_field, $entity->getSource()->getMetadata($entity, $source_field));
     }
   }
 }

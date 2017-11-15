@@ -5,6 +5,7 @@ namespace Drupal\media_acquiadam\Plugin\media\Source;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityFieldManagerInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Field\FieldTypePluginManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\file\FileInterface;
 use Drupal\image\Entity\ImageStyle;
@@ -50,8 +51,8 @@ class AcquiadamAsset extends MediaSourceBase {
   /**
    * AcquiadamAsset constructor.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, ConfigFactoryInterface $config_factory, AcquiadamInterface $acquiadam) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $entity_field_manager, $config_factory->get('media_entity.settings'));
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, EntityTypeManagerInterface $entity_type_manager, EntityFieldManagerInterface $entity_field_manager, FieldTypePluginManagerInterface $field_type_manager, ConfigFactoryInterface $config_factory, AcquiadamInterface $acquiadam) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $entity_type_manager, $entity_field_manager, $field_type_manager, $config_factory);
     $this->acquiadam = $acquiadam;
   }
 
@@ -65,6 +66,7 @@ class AcquiadamAsset extends MediaSourceBase {
       $plugin_definition,
       $container->get('entity_type.manager'),
       $container->get('entity_field.manager'),
+      $container->get('plugin.manager.field.field_type'),
       $container->get('config.factory'),
       $container->get('media_acquiadam.acquiadam')
     );

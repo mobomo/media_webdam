@@ -11,6 +11,8 @@ use Drupal\Core\Session\AccountInterface;
 use Drupal\Core\Url;
 use Drupal\entity_browser\WidgetBase;
 use Drupal\entity_browser\WidgetValidationManager;
+use Drupal\media\Entity\MediaType;
+use Drupal\media\MediaSourceManager;
 use Drupal\media_acquiadam\AcquiadamInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -58,6 +60,13 @@ class Acquiadam extends WidgetBase {
   protected $moduleHandler;
 
   /**
+   * A media source manager.
+   *
+   * @var \Drupal\media\MediaSourceManager
+   */
+  protected $sourceManager;
+
+  /**
    * Acquiadam constructor.
    *
    * @param array $configuration
@@ -78,13 +87,34 @@ class Acquiadam extends WidgetBase {
    *   The user account for which to get the permissions hash.
    * @param \Drupal\Core\Language\LanguageManagerInterface $languageManager
    *   The language manager service.
+   * @param ModuleHandlerInterface $moduleHandler
+   * @param MediaSourceManager $sourceManager
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, EventDispatcherInterface $event_dispatcher, EntityTypeManagerInterface $entity_type_manager, WidgetValidationManager $validation_manager, AcquiadamInterface $acquiadam, AccountInterface $account, LanguageManagerInterface $languageManager, ModuleHandlerInterface $moduleHandler) {
-    parent::__construct($configuration, $plugin_id, $plugin_definition, $event_dispatcher, $entity_type_manager, $validation_manager);
+  public function __construct(
+    array $configuration,
+    $plugin_id,
+    $plugin_definition,
+    EventDispatcherInterface $event_dispatcher,
+    EntityTypeManagerInterface $entity_type_manager,
+    WidgetValidationManager $validation_manager,
+    AcquiadamInterface $acquiadam,
+    AccountInterface $account,
+    LanguageManagerInterface $languageManager,
+    ModuleHandlerInterface $moduleHandler,
+    MediaSourceManager $sourceManager
+  ) {
+    parent::__construct(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $event_dispatcher,
+      $entity_type_manager,
+      $validation_manager);
     $this->acquiadam = $acquiadam;
     $this->user = $account;
-    $this->language_manager = $languageManager;
-    $this->module_handler = $moduleHandler;
+    $this->languageManager = $languageManager;
+    $this->moduleHandler = $moduleHandler;
+    $this->sourceManager = $sourceManager;
   }
 
   /**
@@ -101,7 +131,8 @@ class Acquiadam extends WidgetBase {
       $container->get('media_acquiadam.acquiadam_user_creds'),
       $container->get('current_user'),
       $container->get('language_manager'),
-      $container->get('module_handler')
+      $container->get('module_handler'),
+      $container->get('plugin.manager.media.source')
     );
   }
 
@@ -502,7 +533,8 @@ class Acquiadam extends WidgetBase {
     ];
 
     // Get module path to create URL for background images.
-    $modulePath = $this->module_handler->getModule('media_acquiadam')->getPath();
+    $modulePath = $this->moduleHandler->getModule('media_acquiadam')->getPath();
+
 
     // Add folder buttons to form.
     foreach ($folders as $folder) {
@@ -575,9 +607,10 @@ class Acquiadam extends WidgetBase {
     // Get asset id's from form state.
     $asset_ids = $form_state->getValue('current_selections', []) + array_filter($form_state->getValue('assets', []));
     // Load bundle information.
+    /** @var MediaType $bundle */
     $bundle = $this->entityTypeManager->getStorage('media_type')->load($this->configuration['bundle']);
     // Get the source field for this bundle which stores the asset id.
-    $source_field = $bundle->type_configuration['source_field'];
+    $source_field = $bundle->getSource()->getSourceFieldDefinition($bundle)->getName();
     // Query for existing entities.
     $existing_ids = $this->entityTypeManager->getStorage('media')->getQuery()
       ->condition('bundle', $bundle->id())
@@ -606,9 +639,9 @@ class Acquiadam extends WidgetBase {
         // This should be the current user id.
         'uid' => $this->user->id(),
         // This should be the current language code.
-        'langcode' => $this->language_manager->getCurrentLanguage()->getId(),
+        'langcode' => $this->languageManager->getCurrentLanguage()->getId(),
         // This should map the asset status to the drupal entity status.
-        'status' => ($asset->status == 'active' ? Media::PUBLISHED : Media::NOT_PUBLISHED),
+        'status' => ($asset->status === 'active'),
         // Set the entity name to the asset name.
         'name' => $asset->name,
         // Set the chosen source field for this entity to the asset id.
@@ -618,6 +651,8 @@ class Acquiadam extends WidgetBase {
       $entity = $this->entityTypeManager->getStorage('media')->create($entity_values);
       // Save the entity.
       $entity->save();
+      // Reload the entity to make sure we have everything populated properly.
+      $entity = $this->entityTypeManager->getStorage('media')->load($entity->id());
       // Add the new entity to the array of returned entities.
       $entities[] = $entity;
     }
@@ -682,20 +717,21 @@ class Acquiadam extends WidgetBase {
   public function buildConfigurationForm(array $form, FormStateInterface $form_state) {
     // Start with parent form.
     $form = parent::buildConfigurationForm($form, $form_state);
-    // Load media bundles.
-    $media_bundles = $this->entityTypeManager->getStorage('media_type')->loadMultiple();
-    // Filter out bundles that do not have type = acquiadam_asset.
-    $acquiadam_bundles = array_map(function ($item) {
-      return $item->label;
-    }, array_filter($media_bundles, function ($item) {
-        return $item->type == 'acquiadam_asset';
-    })
-    );
+
+    // Show options for acquia dam bundles.
+    $plugins = $this->sourceManager->getDefinitions();
+    $options = [];
+    foreach ($plugins as $plugin_id => $definition) {
+      if ($definition['class'] == 'Drupal\media_acquiadam\Plugin\media\Source\AcquiadamAsset') {
+        $options[$plugin_id] = $definition['label'];
+      }
+    }
+
     // Add bundle dropdown to form.
     $form['bundle'] = [
       '#type' => 'select',
       '#title' => $this->t('Bundle'),
-      '#options' => $acquiadam_bundles,
+      '#options' => $options,
     ];
     return $form;
   }
@@ -718,7 +754,7 @@ class Acquiadam extends WidgetBase {
    *   Element HTML markup.
    */
   public function layoutMediaEntity(Asset $acquiadamAsset) {
-    $modulePath = $this->module_handler->getModule('media_acquiadam')->getPath();
+    $modulePath = $this->moduleHandler->getModule('media_acquiadam')->getPath();
 
     $assetName = $acquiadamAsset->name;
     if (!empty($acquiadamAsset->thumbnailurls)) {
