@@ -3,7 +3,7 @@ status: true
 dependencies:
   module:
     - file
-    - media_entity
+    - media
 id: media.field_acquiadam_asset_file
 field_name: field_acquiadam_asset_file
 entity_type: media

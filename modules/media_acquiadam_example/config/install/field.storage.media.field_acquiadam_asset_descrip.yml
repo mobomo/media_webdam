@@ -2,7 +2,7 @@ langcode: en
 status: true
 dependencies:
   module:
-    - media_entity
+    - media
 id: media.field_acquiadam_asset_descrip
 field_name: field_acquiadam_asset_descrip
 entity_type: media

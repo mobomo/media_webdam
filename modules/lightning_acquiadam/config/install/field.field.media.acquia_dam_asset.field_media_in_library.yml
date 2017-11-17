@@ -3,7 +3,7 @@ status: true
 dependencies:
   config:
     - field.storage.media.field_media_in_library
-    - media_entity.bundle.acquia_dam_asset
+    - media.type.acquia_dam_asset
 id: media.acquia_dam_asset.field_media_in_library
 field_name: field_media_in_library
 entity_type: media
